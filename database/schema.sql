@@ -116,8 +116,7 @@ CREATE TABLE IF NOT EXISTS `sessions` (
   `ip_address`    VARCHAR(45)     NULL,                -- IPv6 max
   `user_agent`    VARCHAR(255)    NULL,
   `last_activity` TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `expires_at`    TIMESTAMP       NOT NULL,
-  `revoked_at`    TIMESTAMP       NULL,
+`expires_at` TIMESTAMP NULL,  `revoked_at`    TIMESTAMP       NULL,
   `created_at`    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sessions_token_hash` (`token_hash`),
@@ -138,9 +137,8 @@ CREATE TABLE IF NOT EXISTS `auth_verifications` (
                                NOT NULL,
   `code_hash`  VARCHAR(255)    NOT NULL,               -- hash of OTP/token, never the plaintext
   `meta`       JSON            NULL,                   -- e.g., destination phone/email if different
-  `expires_at` TIMESTAMP       NOT NULL,
-  `used_at`    TIMESTAMP       NULL,
-  `created_at` TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` TIMESTAMP NULL,
+  `used_at`    TIMESTAMP NULL,  `created_at` TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_av_user_type` (`user_id`,`type`),
   KEY `idx_av_expires`   (`expires_at`),
