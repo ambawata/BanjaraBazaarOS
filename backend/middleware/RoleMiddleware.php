@@ -4,31 +4,26 @@ declare(strict_types=1);
 namespace Backend\Middleware;
 
 use Backend\Core\Request;
-use Backend\Core\Response;
+use Backend\Helpers\JsonResponse;
+use Backend\Services\RbacService;
 
-/**
- * Phase 1 stub. Requires the authenticated user (set by AuthMiddleware)
- * to hold at least one of the listed role slugs.
- *
- * Usage:
- *   $r->get('/api/v1/admin/users', $handler, [
- *       new AuthMiddleware(require: true),
- *       new RoleMiddleware(['admin', 'master_admin']),
- *   ]);
- */
 final class RoleMiddleware implements Middleware
 {
     /** @param list<string> $allowed */
     public function __construct(private readonly array $allowed) {}
 
-    public function handle(Request $request): ?Response
+    public function handle(Request $request): ?\Backend\Core\Response
     {
-        $auth  = $request->attributes['auth'] ?? null;
-        $roles = is_array($auth) ? ($auth['roles'] ?? []) : [];
-
-        if (!is_array($roles) || count(array_intersect($this->allowed, $roles)) === 0) {
-            return Response::json(['error' => 'forbidden'], 403);
+        $auth = $request->attributes['auth'] ?? null;
+        if (!is_array($auth) || !isset($auth['user_id'])) {
+            return JsonResponse::unauthorized();
         }
+
+        $roles = (new RbacService())->getRolesForUser((int) $auth['user_id']);
+        if (count(array_intersect($this->allowed, $roles)) === 0) {
+            return JsonResponse::forbidden();
+        }
+
         return null;
     }
 }
