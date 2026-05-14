@@ -100,6 +100,72 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
+-- Phase 1 — Section B.1: Vendor Onboarding
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS `vendors` (
+  `id`               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`          BIGINT UNSIGNED NOT NULL,
+  `slug`             VARCHAR(100)    NOT NULL,
+  `status`           ENUM('pending','active','rejected','suspended') NOT NULL DEFAULT 'pending',
+  `approved_at`      TIMESTAMP       NULL,
+  `rejected_at`      TIMESTAMP       NULL,
+  `rejected_reason`  VARCHAR(255)    NULL,
+  `suspended_at`     TIMESTAMP       NULL,
+  `suspended_reason` VARCHAR(255)    NULL,
+  `created_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_vendors_slug` (`slug`),
+  UNIQUE KEY `uq_vendors_user` (`user_id`),
+  KEY `idx_vendors_status` (`status`),
+  CONSTRAINT `fk_vendors_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vendor_profiles` (
+  `id`                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `vendor_id`         BIGINT UNSIGNED NOT NULL,
+  `business_name`     VARCHAR(191)    NOT NULL,
+  `gst_number`        VARCHAR(20)     NULL,
+  `pan_number`        VARCHAR(20)     NULL,
+  `business_type`     VARCHAR(100)    NULL,
+  `business_category` VARCHAR(100)    NULL,
+  `address_line1`     VARCHAR(255)    NULL,
+  `address_line2`     VARCHAR(255)    NULL,
+  `city`              VARCHAR(100)    NULL,
+  `state`             VARCHAR(100)    NULL,
+  `postal_code`       VARCHAR(20)     NULL,
+  `country`           VARCHAR(100)    NOT NULL DEFAULT 'India',
+  `website`           VARCHAR(191)    NULL,
+  `contact_name`      VARCHAR(150)    NULL,
+  `contact_email`     VARCHAR(191)    NULL,
+  `contact_phone`     VARCHAR(20)     NULL,
+  `business_metadata` JSON            NULL,
+  `created_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_vendor_profiles_vendor` (`vendor_id`),
+  KEY `idx_vendor_profiles_gst` (`gst_number`),
+  CONSTRAINT `fk_vendor_profiles_vendor` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vendor_audit_log` (
+  `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `vendor_id`    BIGINT UNSIGNED NOT NULL,
+  `user_id`      BIGINT UNSIGNED NULL,
+  `event`        VARCHAR(100)    NOT NULL,
+  `ip_address`   VARCHAR(45)     NULL,
+  `user_agent`   VARCHAR(255)    NULL,
+  `metadata`     JSON            NULL,
+  `created_at`   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_val_vendor` (`vendor_id`),
+  KEY `idx_val_user`   (`user_id`),
+  CONSTRAINT `fk_val_vendor` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_val_user`   FOREIGN KEY (`user_id`)   REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
 -- Phase 1 — Section C: Sessions & Refresh Tokens (JWT/session-ready)
 -- One table covers both auth surfaces:
 --   * type='session' — server-side session record (works with PHP session id)

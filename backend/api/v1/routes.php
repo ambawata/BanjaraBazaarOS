@@ -85,4 +85,123 @@ return function (Router $r): void {
         $service->logout($refreshToken, $request);
         return \Backend\Helpers\JsonResponse::success(['message' => 'Logged out successfully.']);
     });
+
+    // ---- Phase-1 vendor onboarding -----------------------------------------
+    $r->post('/api/v1/vendors/apply', function (Request $request): Response {
+        try {
+            $service = new \Backend\Services\VendorService();
+            $result = $service->apply($request->json ?? [], $request);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vendor_application_failed', $message, $status);
+        }
+    });
+
+    $r->get('/api/v1/vendors/me', function (Request $request): Response {
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        $service = new \Backend\Services\VendorService();
+        $vendor = $service->getByUserId($userId);
+        if ($vendor === null) {
+            return \Backend\Helpers\JsonResponse::error('not_found', 'Vendor profile not found.', 404);
+        }
+        return \Backend\Helpers\JsonResponse::success($vendor);
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->get('/api/v1/vendors/applications', function (Request $request): Response {
+        $service = new \Backend\Services\VendorService();
+        return \Backend\Helpers\JsonResponse::success($service->listApplications());
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    $r->post('/api/v1/vendors/{vendor_id}/approve', function (Request $request, array $params): Response {
+        $vendorId = (int) ($params['vendor_id'] ?? 0);
+        if ($vendorId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['vendor_id' => 'Vendor id is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $actorId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        $notes = trim((string) ($request->input('notes', '') ?? '')) ?: null;
+
+        try {
+            $service = new \Backend\Services\VendorService();
+            $result = $service->approve($vendorId, $actorId ?? 0, $request, $notes);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('vendor_approval_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    $r->post('/api/v1/vendors/{vendor_id}/reject', function (Request $request, array $params): Response {
+        $vendorId = (int) ($params['vendor_id'] ?? 0);
+        $reason = trim((string) ($request->input('reason', '') ?? ''));
+
+        if ($vendorId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['vendor_id' => 'Vendor id is required.']);
+        }
+        if ($reason === '') {
+            return \Backend\Helpers\JsonResponse::validation(['reason' => 'Rejection reason is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $actorId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+
+        try {
+            $service = new \Backend\Services\VendorService();
+            $result = $service->reject($vendorId, $actorId ?? 0, $request, $reason);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('vendor_rejection_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    $r->post('/api/v1/vendors/{vendor_id}/suspend', function (Request $request, array $params): Response {
+        $vendorId = (int) ($params['vendor_id'] ?? 0);
+        $reason = trim((string) ($request->input('reason', '') ?? ''));
+
+        if ($vendorId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['vendor_id' => 'Vendor id is required.']);
+        }
+        if ($reason === '') {
+            return \Backend\Helpers\JsonResponse::validation(['reason' => 'Suspension reason is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $actorId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+
+        try {
+            $service = new \Backend\Services\VendorService();
+            $result = $service->suspend($vendorId, $actorId ?? 0, $request, $reason);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('vendor_suspension_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 };

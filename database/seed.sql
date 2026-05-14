@@ -46,7 +46,13 @@ INSERT INTO `permissions` (`slug`, `label`, `module`, `description`) VALUES
   ('roles.update',           'Update roles',           'roles',  'Edit role labels and grants.'),
   ('roles.delete',           'Delete roles',           'roles',  'Delete non-system roles.'),
   -- Audit
-  ('audit.view',             'View audit log',         'audit',  'Read auth + admin audit trail.')
+  ('audit.view',             'View audit log',         'audit',  'Read auth + admin audit trail.'),
+  ('vendors.apply',          'Apply to become vendor', 'vendors', 'Submit a vendor onboarding application.'),
+  ('vendors.view',           'View vendor applications','vendors','Read vendor application and profile data.'),
+  ('vendors.manage',         'Manage vendor profile',  'vendors','Update own vendor profile.'),
+  ('vendors.approve',        'Approve vendors',       'vendors','Approve vendor onboarding requests.'),
+  ('vendors.reject',         'Reject vendors',        'vendors','Reject vendor onboarding requests.'),
+  ('vendors.suspend',        'Suspend vendors',       'vendors','Suspend or reactivate vendors.')
 ON DUPLICATE KEY UPDATE
   `label`       = VALUES(`label`),
   `module`      = VALUES(`module`),
@@ -81,6 +87,13 @@ FROM `roles` r JOIN `permissions` p
   ON p.slug IN ('users.view','roles.view','audit.view','system.settings.view')
 WHERE r.slug = 'staff';
 
+-- vendor — manage own vendor profile and application lifecycle
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
+SELECT r.id, p.id
+FROM `roles` r JOIN `permissions` p
+  ON p.slug IN ('vendors.apply','vendors.view','vendors.manage')
+WHERE r.slug = 'vendor';
+
 -- =============================================================================
 -- 4. Bootstrap master_admin user
 --    NULL password_hash + status='pending_verification' forces a password
@@ -112,7 +125,10 @@ INSERT INTO `settings` (`key`, `value`, `value_type`, `group`, `is_public`, `des
   ('auth.lockout_minutes',      '15',                    'int',    'auth',     0, 'How long account stays locked.'),
   ('auth.otp_ttl_minutes',      '10',                    'int',    'auth',     0, 'Phone OTP / email code lifetime.'),
   ('feature.signup_open',       '1',                     'bool',   'features', 1, 'Allow self-signup as customer.'),
-  ('feature.vendor_signup_open','0',                     'bool',   'features', 1, 'Allow self-signup as vendor (off until KYC ready).')
+  ('feature.vendor_signup_open','0',                     'bool',   'features', 1, 'Allow self-signup as vendor (off until KYC ready).'),
+  ('vendor.approval_required',  '1',                     'bool',   'vendor',   0, 'Require manual approval for new vendor applications.'),
+  ('vendor.gst_required',       '1',                     'bool',   'vendor',   0, 'Require GST details for vendor onboarding.'),
+  ('vendor.business_name_required','1',                  'bool',   'vendor',   0, 'Require business name for vendor applications.')
 ON DUPLICATE KEY UPDATE
   `description` = VALUES(`description`),
   `value_type`  = VALUES(`value_type`),
