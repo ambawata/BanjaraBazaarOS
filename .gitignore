@@ -1,23 +1,37 @@
+# --- Dependencies ---
 /vendor/
-/node_modules/
+**/node_modules/
 
+# --- Env / secrets ---
 .env
-.env.local
+.env.*
+!.env.example
 
-/logs/
-/cache/
-/tmp/
-/storage/
+# --- Build / cache output ---
+**/dist/
+**/.vite/
+**/.turbo/
+**/build/
+*.log
+
+# --- Storage runtime contents (track structure via .gitkeep, ignore content) ---
+/storage/uploads/*
+/storage/qr/*
+/storage/exports/*
+/storage/logs/*
+/storage/cache/*
+/storage/temp/*
+!/storage/**/.gitkeep
+
+# --- Legacy / misc ignores ---
 /backups/
-/exports/
 
-/uploads/
-/qr_codes/
-
+# --- Editor / OS ---
 /.idea/
 /.vscode/
-
-*.zip
-*.sql
+/.claude/
 .DS_Store
 Thumbs.db
+
+# --- Archives (allow /database/*.sql to be tracked) ---
+*.zip
