@@ -115,11 +115,15 @@ CREATE TABLE IF NOT EXISTS `vendors` (
   `suspended_reason` VARCHAR(255)    NULL,
   `created_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at`       TIMESTAMP       NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_vendors_slug` (`slug`),
-  UNIQUE KEY `uq_vendors_user` (`user_id`),
+  UNIQUE KEY `uq_vendors_user_id` (`user_id`),
   KEY `idx_vendors_status` (`status`),
-  CONSTRAINT `fk_vendors_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+  KEY `idx_vendors_user_id` (`user_id`),
+  KEY `idx_vendors_created_at` (`created_at`),
+  KEY `idx_vendors_deleted_at` (`deleted_at`),
+  CONSTRAINT `fk_vendors_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `vendor_profiles` (
@@ -143,10 +147,14 @@ CREATE TABLE IF NOT EXISTS `vendor_profiles` (
   `business_metadata` JSON            NULL,
   `created_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at`        TIMESTAMP       NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_vendor_profiles_vendor` (`vendor_id`),
-  KEY `idx_vendor_profiles_gst` (`gst_number`),
-  CONSTRAINT `fk_vendor_profiles_vendor` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE
+  UNIQUE KEY `uq_vendor_profiles_vendor_id` (`vendor_id`),
+  KEY `idx_vendor_profiles_gst_number` (`gst_number`),
+  KEY `idx_vendor_profiles_business_category` (`business_category`),
+  KEY `idx_vendor_profiles_contact_email` (`contact_email`),
+  KEY `idx_vendor_profiles_deleted_at` (`deleted_at`),
+  CONSTRAINT `fk_vendor_profiles_vendor_id` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `vendor_audit_log` (
@@ -159,10 +167,13 @@ CREATE TABLE IF NOT EXISTS `vendor_audit_log` (
   `metadata`     JSON            NULL,
   `created_at`   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_val_vendor` (`vendor_id`),
-  KEY `idx_val_user`   (`user_id`),
-  CONSTRAINT `fk_val_vendor` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_val_user`   FOREIGN KEY (`user_id`)   REFERENCES `users`(`id`) ON DELETE SET NULL
+  KEY `idx_vendor_audit_log_vendor_id` (`vendor_id`),
+  KEY `idx_vendor_audit_log_user_id` (`user_id`),
+  KEY `idx_vendor_audit_log_event` (`event`),
+  KEY `idx_vendor_audit_log_created_at` (`created_at`),
+  KEY `idx_vendor_audit_log_vendor_created` (`vendor_id`, `created_at`),
+  CONSTRAINT `fk_vendor_audit_log_vendor_id` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_vendor_audit_log_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
