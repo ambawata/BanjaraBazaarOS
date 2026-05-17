@@ -225,4 +225,219 @@ return function (Router $r): void {
             return \Backend\Helpers\JsonResponse::error('vendor_suspension_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    // ---- Phase-2 product catalog -------------------------------------------
+    $r->post('/api/v1/products', function (Request $request): Response {
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        // Get vendor ID from user
+        try {
+            $vendorService = new \Backend\Services\VendorService();
+            $vendor = $vendorService->getByUserId($userId);
+            if ($vendor === null) {
+                return \Backend\Helpers\JsonResponse::error('vendor_not_found', 'No vendor profile found for this user.', 404);
+            }
+            $vendorId = (int) $vendor['id'];
+
+            $service = new \Backend\Services\ProductService();
+            $result = $service->create($vendorId, $request->json ?? [], $request);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('product_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
+
+    $r->get('/api/v1/products', function (Request $request): Response {
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        try {
+            $vendorService = new \Backend\Services\VendorService();
+            $vendor = $vendorService->getByUserId($userId);
+            if ($vendor === null) {
+                return \Backend\Helpers\JsonResponse::error('vendor_not_found', 'No vendor profile found for this user.', 404);
+            }
+            $vendorId = (int) $vendor['id'];
+
+            $limit = (int) ($request->input('limit', 20));
+            $offset = (int) ($request->input('offset', 0));
+            $status = $request->input('status') ? (string) $request->input('status') : null;
+
+            $service = new \Backend\Services\ProductService();
+            $result = $service->listByVendor($vendorId, $limit, $offset, $status);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), 400);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
+
+    $r->patch('/api/v1/products/{product_id}', function (Request $request, array $params): Response {
+        $productId = (int) ($params['product_id'] ?? 0);
+        if ($productId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['product_id' => 'Product ID is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        try {
+            $vendorService = new \Backend\Services\VendorService();
+            $vendor = $vendorService->getByUserId($userId);
+            if ($vendor === null) {
+                return \Backend\Helpers\JsonResponse::error('vendor_not_found', 'No vendor profile found for this user.', 404);
+            }
+            $vendorId = (int) $vendor['id'];
+
+            $service = new \Backend\Services\ProductService();
+            $result = $service->update($productId, $vendorId, $request->json ?? [], $request);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('product_update_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
+
+    $r->post('/api/v1/products/{product_id}/submit', function (Request $request, array $params): Response {
+        $productId = (int) ($params['product_id'] ?? 0);
+        if ($productId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['product_id' => 'Product ID is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        try {
+            $vendorService = new \Backend\Services\VendorService();
+            $vendor = $vendorService->getByUserId($userId);
+            if ($vendor === null) {
+                return \Backend\Helpers\JsonResponse::error('vendor_not_found', 'No vendor profile found for this user.', 404);
+            }
+            $vendorId = (int) $vendor['id'];
+
+            $service = new \Backend\Services\ProductService();
+            $result = $service->submitForApproval($productId, $vendorId, $request);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('product_submit_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
+
+    $r->post('/api/v1/products/{product_id}/approve', function (Request $request, array $params): Response {
+        $productId = (int) ($params['product_id'] ?? 0);
+        if ($productId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['product_id' => 'Product ID is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        try {
+            $service = new \Backend\Services\ProductService();
+            // Fetch product to get vendor_id
+            $product = $service->getById($productId);
+            if ($product === null) {
+                return \Backend\Helpers\JsonResponse::error('product_not_found', 'Product not found.', 404);
+            }
+
+            $notes = trim((string) ($request->input('notes', '') ?? '')) ?: null;
+            $result = $service->approve($productId, (int) $product['vendor_id'], $userId, $request, $notes);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('product_approval_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    $r->post('/api/v1/products/{product_id}/reject', function (Request $request, array $params): Response {
+        $productId = (int) ($params['product_id'] ?? 0);
+        $reason = trim((string) ($request->input('reason', '') ?? ''));
+
+        if ($productId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['product_id' => 'Product ID is required.']);
+        }
+        if ($reason === '') {
+            return \Backend\Helpers\JsonResponse::validation(['reason' => 'Rejection reason is required.']);
+        }
+
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+        if ($userId === null) {
+            return \Backend\Helpers\JsonResponse::unauthorized();
+        }
+
+        try {
+            $service = new \Backend\Services\ProductService();
+            // Fetch product to get vendor_id
+            $product = $service->getById($productId);
+            if ($product === null) {
+                return \Backend\Helpers\JsonResponse::error('product_not_found', 'Product not found.', 404);
+            }
+
+            $result = $service->reject($productId, (int) $product['vendor_id'], $userId, $request, $reason);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            return \Backend\Helpers\JsonResponse::error('product_rejection_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    $r->get('/api/v1/products/admin/pending', function (Request $request): Response {
+        $limit = (int) ($request->input('limit', 20));
+        $offset = (int) ($request->input('offset', 0));
+
+        try {
+            $service = new \Backend\Services\ProductService();
+            $result = $service->listPending($limit, $offset);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), 400);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 };

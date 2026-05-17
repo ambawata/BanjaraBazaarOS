@@ -267,10 +267,80 @@ CREATE TABLE IF NOT EXISTS `auth_audit_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
+-- Phase 2 — Section A: Products & Inventory (vendor catalogs)
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS `products` (
+  `id`                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `vendor_id`         BIGINT UNSIGNED NOT NULL,
+  `sku`               VARCHAR(100)    NULL,                 -- Optional: vendor's internal SKU
+  `slug`              VARCHAR(100)    NOT NULL,            -- SEO-friendly, unique per vendor
+  `name`              VARCHAR(255)    NOT NULL,
+  `description`       LONGTEXT        NULL,
+  `price`             DECIMAL(12,2)   NOT NULL,            -- Base price (pre-discounts)
+  `currency`          VARCHAR(10)     NOT NULL DEFAULT 'INR',
+  `status`            ENUM('draft','pending','approved','rejected') NOT NULL DEFAULT 'draft',
+  `rejection_reason`  VARCHAR(255)    NULL,
+  `approved_at`       TIMESTAMP       NULL,
+  `rejected_at`       TIMESTAMP       NULL,
+  `category_id`       BIGINT UNSIGNED NULL,                -- For future category feature
+  `tags`              JSON            NULL,                -- e.g. ["handmade", "eco-friendly"]
+  `metadata`          JSON            NULL,                -- Extended attributes (color, size, etc.)
+  `stock_quantity`    INT UNSIGNED    NOT NULL DEFAULT 0,
+  `stock_reserved`    INT UNSIGNED    NOT NULL DEFAULT 0,  -- Units in carts/orders
+  `created_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at`        TIMESTAMP       NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_products_vendor_slug` (`vendor_id`, `slug`),
+  KEY `idx_products_vendor_id` (`vendor_id`),
+  KEY `idx_products_status` (`status`),
+  KEY `idx_products_created_at` (`created_at`),
+  KEY `idx_products_deleted_at` (`deleted_at`),
+  KEY `idx_products_slug` (`slug`),
+  CONSTRAINT `fk_products_vendor_id` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_images` (
+  `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_id`   BIGINT UNSIGNED NOT NULL,
+  `file_path`    VARCHAR(255)    NOT NULL,                 -- Relative path: /storage/uploads/products/...
+  `alt_text`     VARCHAR(255)    NULL,
+  `display_order` TINYINT UNSIGNED NOT NULL DEFAULT 0,    -- Sort order for product gallery
+  `is_primary`   TINYINT(1)      NOT NULL DEFAULT 0,      -- Thumbnail image
+  `created_at`   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_images_product_id` (`product_id`),
+  KEY `idx_product_images_is_primary` (`is_primary`),
+  CONSTRAINT `fk_product_images_product_id` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_audit_log` (
+  `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_id`   BIGINT UNSIGNED NOT NULL,
+  `vendor_id`    BIGINT UNSIGNED NOT NULL,
+  `user_id`      BIGINT UNSIGNED NULL,                    -- Admin/reviewer ID for approvals
+  `event`        VARCHAR(100)    NOT NULL,                -- e.g., "product.created", "product.approved"
+  `ip_address`   VARCHAR(45)     NULL,
+  `user_agent`   VARCHAR(255)    NULL,
+  `metadata`     JSON            NULL,
+  `created_at`   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_pal_product_id` (`product_id`),
+  KEY `idx_pal_vendor_id` (`vendor_id`),
+  KEY `idx_pal_user_id` (`user_id`),
+  KEY `idx_pal_event` (`event`),
+  KEY `idx_pal_created_at` (`created_at`),
+  KEY `idx_pal_vendor_created` (`vendor_id`, `created_at`),
+  CONSTRAINT `fk_pal_product_id` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pal_vendor_id` FOREIGN KEY (`vendor_id`) REFERENCES `vendors`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pal_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
 -- Later phases (placeholders only — do not implement until scheduled)
 -- =============================================================================
--- TODO(phase-2): vendors, vendor_profiles, kyc_documents
--- TODO(phase-3): categories, products, product_variants, inventory
+-- TODO(phase-3): categories, product_variants
 -- TODO(phase-4): carts, orders, order_items, payments, shipments
 -- TODO(phase-5): reviews, messaging, notifications
 
