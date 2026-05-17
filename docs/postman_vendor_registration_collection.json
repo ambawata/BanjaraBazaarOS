@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "BanjaraBazaar - Vendor Registration",
+    "_postman_id": "b59b8c1a-0000-4000-8000-000000000000",
+    "description": "Beginner-friendly Postman collection to test the /api/v1/vendors/register endpoint.\n\nInstructions: import this collection into Postman, set the `base_url` variable (e.g. http://localhost:8000), then run the requests in order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "vendor_email", "value": "" },
+    { "key": "vendor_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 - Register Vendor (Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{vendor_email}}\",\n  \"full_name\": \"Alice Merchant\",\n  \"phone\": \"9876543210\",\n  \"password\": \"verysecurepassword\",\n  \"business_name\": \"Alice Stores\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/vendors/register",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "v1", "vendors", "register" ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Generate a unique email for repeated runs",
+              "if (!pm.environment.get('vendor_email') || pm.environment.get('vendor_email') === '') {",
+              "    pm.environment.set('vendor_email', 'alice+' + Date.now() + '@example.com');",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.test('Response has data.id', function () { pm.expect(json).to.have.property('data'); pm.expect(json.data).to.have.property('id'); });",
+              "pm.environment.set('vendor_id', json.data.id);",
+              "// keep vendor_email in environment for duplicate test",
+              "pm.environment.set('vendor_email', json.data.user.email || pm.environment.get('vendor_email'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Register Vendor (Validation Error)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"not-an-email\",\n  \"full_name\": \"Bob\",\n  \"phone\": \"123\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/v1/vendors/register", "host": [ "{{base_url}}" ], "path": [ "api", "v1", "vendors", "register" ] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+              "var json = pm.response.json();",
+              "pm.test('Validation error code', function () { pm.expect(json.error).to.eql('validation_failed'); });",
+              "pm.test('Meta contains errors', function () { pm.expect(json).to.have.property('meta'); pm.expect(json.meta).to.have.property('errors'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Register Vendor (Duplicate Email)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{vendor_email}}\",\n  \"full_name\": \"Alice Merchant\",\n  \"phone\": \"9876543210\",\n  \"password\": \"verysecurepassword\",\n  \"business_name\": \"Alice Stores\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/v1/vendors/register", "host": [ "{{base_url}}" ], "path": [ "api", "v1", "vendors", "register" ] }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": [ "// Ensure vendor_email is available from the success request or generated manually", "if (!pm.environment.get('vendor_email') || pm.environment.get('vendor_email') === '') {", "    postman.setNextRequest('1 - Register Vendor (Success)');", "}" ] }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Duplicate submission should return 409",
+              "pm.test('Status is 409', function () { pm.response.to.have.status(409); });",
+              "var json = pm.response.json();",
+              "pm.test('Error code present', function () { pm.expect(json).to.have.property('error'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

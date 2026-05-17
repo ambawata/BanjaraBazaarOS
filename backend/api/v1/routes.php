@@ -87,6 +87,27 @@ return function (Router $r): void {
     });
 
     // ---- Phase-1 vendor onboarding -----------------------------------------
+    $r->post('/api/v1/vendors/register', function (Request $request): Response {
+        try {
+            $service = new \Backend\Services\VendorRegistrationService();
+            $result = $service->register($request->json ?? [], $request);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = $e->getCode();
+            if ($status < 100 || $status >= 600) {
+                $status = 400;
+            }
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vendor_registration_failed', $message, $status);
+        }
+    });
+
     $r->post('/api/v1/vendors/apply', function (Request $request): Response {
         try {
             $service = new \Backend\Services\VendorService();
