@@ -33,6 +33,23 @@ final class JsonResponse
         return Response::json($payload, $status);
     }
 
+    public static function statusFromThrowable(\Throwable $e, int $fallback = 400): int
+    {
+        $code = $e->getCode();
+        if (is_int($code) && $code >= 100 && $code < 600) {
+            return $code;
+        }
+
+        if (is_string($code) && ctype_digit($code)) {
+            $status = (int) $code;
+            if ($status >= 100 && $status < 600) {
+                return $status;
+            }
+        }
+
+        return $fallback;
+    }
+
     public static function validation(array $errors, int $status = 422): Response
     {
         return self::error('validation_failed', 'One or more fields are invalid.', $status, ['errors' => $errors]);

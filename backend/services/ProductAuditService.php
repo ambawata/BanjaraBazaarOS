@@ -34,6 +34,11 @@ final class ProductAuditService
         ?int $userId = null,
         array $metadata = []
     ): void {
+        $metadataJson = json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($metadataJson === false) {
+            $metadataJson = '{}';
+        }
+
         $stmt = $this->pdo->prepare(
             'INSERT INTO `product_audit_log`
              (`product_id`, `vendor_id`, `user_id`, `event`, `ip_address`, `user_agent`, `metadata`, `created_at`)
@@ -45,10 +50,20 @@ final class ProductAuditService
             'vendor_id'   => $vendorId,
             'user_id'     => $userId,
             'event'       => $event,
-            'ip_address'  => $request->header('X-Forwarded-For') ?: $request->ip(),
+            'ip_address'  => $this->resolveIpAddress($request),
             'user_agent'  => $request->header('User-Agent'),
-            'metadata'    => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'metadata'    => $metadataJson,
         ]);
+    }
+
+    private function resolveIpAddress(Request $request): ?string
+    {
+        $forwarded = $request->header('X-Forwarded-For');
+        if ($forwarded !== null && trim($forwarded) !== '') {
+            $parts = explode(',', $forwarded);
+            return trim($parts[0]);
+        }
+        return $_SERVER['REMOTE_ADDR'] ?? null;
     }
 
     /**

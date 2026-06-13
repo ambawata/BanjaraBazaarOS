@@ -48,10 +48,7 @@ return function (Router $r): void {
             $result = $service->login($identifier, $password, $request, $deviceLabel);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 401;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 401);
             return \Backend\Helpers\JsonResponse::error('authentication_failed', $e->getMessage(), $status);
         }
     });
@@ -67,10 +64,7 @@ return function (Router $r): void {
             $result = $service->refresh($refreshToken, $request, (string) $request->input('device_label', '')); 
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 401;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 401);
             return \Backend\Helpers\JsonResponse::error('refresh_failed', $e->getMessage(), $status);
         }
     });
@@ -93,10 +87,7 @@ return function (Router $r): void {
             $result = $service->register($request->json ?? [], $request);
             return \Backend\Helpers\JsonResponse::success($result, 201);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             $message = $e->getMessage();
             if ($status === 422) {
                 $payload = json_decode($message, true);
@@ -114,10 +105,7 @@ return function (Router $r): void {
             $result = $service->apply($request->json ?? [], $request);
             return \Backend\Helpers\JsonResponse::success($result, 201);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             $message = $e->getMessage();
             if ($status === 422) {
                 $payload = json_decode($message, true);
@@ -164,10 +152,7 @@ return function (Router $r): void {
             $result = $service->approve($vendorId, $actorId ?? 0, $request, $notes);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             return \Backend\Helpers\JsonResponse::error('vendor_approval_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
@@ -191,11 +176,15 @@ return function (Router $r): void {
             $result = $service->reject($vendorId, $actorId ?? 0, $request, $reason);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
             }
-            return \Backend\Helpers\JsonResponse::error('vendor_rejection_failed', $e->getMessage(), $status);
+            return \Backend\Helpers\JsonResponse::error('vendor_rejection_failed', $message, $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 
@@ -218,11 +207,15 @@ return function (Router $r): void {
             $result = $service->suspend($vendorId, $actorId ?? 0, $request, $reason);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
             }
-            return \Backend\Helpers\JsonResponse::error('vendor_suspension_failed', $e->getMessage(), $status);
+            return \Backend\Helpers\JsonResponse::error('vendor_suspension_failed', $message, $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 
@@ -247,10 +240,7 @@ return function (Router $r): void {
             $result = $service->create($vendorId, $request->json ?? [], $request);
             return \Backend\Helpers\JsonResponse::success($result, 201);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             $message = $e->getMessage();
             if ($status === 422) {
                 $payload = json_decode($message, true);
@@ -285,7 +275,15 @@ return function (Router $r): void {
             $result = $service->listByVendor($vendorId, $limit, $offset, $status);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), 400);
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('product_list_failed', $message, $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
 
@@ -313,10 +311,7 @@ return function (Router $r): void {
             $result = $service->update($productId, $vendorId, $request->json ?? [], $request);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             $message = $e->getMessage();
             if ($status === 422) {
                 $payload = json_decode($message, true);
@@ -352,10 +347,7 @@ return function (Router $r): void {
             $result = $service->submitForApproval($productId, $vendorId, $request);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             return \Backend\Helpers\JsonResponse::error('product_submit_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['vendor'])]);
@@ -384,10 +376,7 @@ return function (Router $r): void {
             $result = $service->approve($productId, (int) $product['vendor_id'], $userId, $request, $notes);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
-            }
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
             return \Backend\Helpers\JsonResponse::error('product_approval_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
@@ -420,11 +409,15 @@ return function (Router $r): void {
             $result = $service->reject($productId, (int) $product['vendor_id'], $userId, $request, $reason);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            $status = $e->getCode();
-            if ($status < 100 || $status >= 600) {
-                $status = 400;
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
             }
-            return \Backend\Helpers\JsonResponse::error('product_rejection_failed', $e->getMessage(), $status);
+            return \Backend\Helpers\JsonResponse::error('product_rejection_failed', $message, $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 
@@ -437,7 +430,8 @@ return function (Router $r): void {
             $result = $service->listPending($limit, $offset);
             return \Backend\Helpers\JsonResponse::success($result);
         } catch (\Throwable $e) {
-            return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), 400);
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
 };

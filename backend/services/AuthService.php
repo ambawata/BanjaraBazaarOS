@@ -166,9 +166,12 @@ final class AuthService
     private function findUserByIdentifier(string $identifier): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT * FROM `users` WHERE (LOWER(`email`) = LOWER(:identifier) OR `phone` = :identifier) AND `deleted_at` IS NULL LIMIT 1'
+            'SELECT * FROM `users` WHERE (LOWER(`email`) = LOWER(:email_identifier) OR `phone` = :phone_identifier) AND `deleted_at` IS NULL LIMIT 1'
         );
-        $stmt->execute(['identifier' => $identifier]);
+        $stmt->execute([
+            'email_identifier' => $identifier,
+            'phone_identifier' => $identifier,
+        ]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user === false ? null : $user;
     }

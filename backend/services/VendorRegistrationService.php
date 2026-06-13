@@ -36,6 +36,9 @@ final class VendorRegistrationService
         if ($this->emailExists($data['email'])) {
             throw new RuntimeException('Email address is already registered.', 409);
         }
+        if ($this->phoneExists($data['phone'])) {
+            throw new RuntimeException('Phone number is already registered.', 409);
+        }
 
         $this->pdo->beginTransaction();
         try {
@@ -158,6 +161,15 @@ final class VendorRegistrationService
         return $stmt->rowCount() > 0;
     }
 
+    private function phoneExists(string $phone): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1 FROM `users` WHERE `phone` = :phone AND `deleted_at` IS NULL LIMIT 1'
+        );
+        $stmt->execute(['phone' => $phone]);
+        return $stmt->rowCount() > 0;
+    }
+
     private function createUser(array $data): int
     {
         $passwordHash = PasswordHelper::hash($data['password']);
@@ -205,7 +217,7 @@ final class VendorRegistrationService
         );
         $stmt->execute([
             'vendor_id' => $vendorId,
-            'business_name' => $data['business_name'] ?: null,
+            'business_name' => $data['business_name'],
             'gst_number' => $data['gst_number'] ?: null,
             'pan_number' => $data['pan_number'] ?: null,
             'business_type' => $data['business_type'] ?: null,

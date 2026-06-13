@@ -38,20 +38,31 @@ final class VendorService
         if ($this->findUserByEmail($data['email']) !== null) {
             throw new RuntimeException('Email address is already registered.', 409);
         }
-
-        $passwordHash = PasswordHelper::hash($data['password']);
-        $userId = $this->createUser($data['email'], $data['phone'], $data['full_name'], $passwordHash);
-        $status = $this->settings->bool('vendor.approval_required', true) ? 'pending' : 'active';
-        $vendorId = $this->createVendor($userId, $status);
-        $this->createVendorProfile($vendorId, $data);
-
-        if ($status === 'active') {
-            $this->assignRole($userId, 'vendor');
+        if ($this->findUserByPhone($data['phone']) !== null) {
+            throw new RuntimeException('Phone number is already registered.', 409);
         }
 
-        $this->audit->log($vendorId, null, 'vendor.application.submitted', $request, ['status' => $status]);
-        if ($status === 'active') {
-            $this->audit->log($vendorId, null, 'vendor.application.auto_approved', $request, []);
+        $this->pdo->beginTransaction();
+        try {
+            $passwordHash = PasswordHelper::hash($data['password']);
+            $userId = $this->createUser($data['email'], $data['phone'], $data['full_name'], $passwordHash);
+            $status = $this->settings->bool('vendor.approval_required', true) ? 'pending' : 'active';
+            $vendorId = $this->createVendor($userId, $status);
+            $this->createVendorProfile($vendorId, $data);
+
+            if ($status === 'active') {
+                $this->assignRole($userId, 'vendor');
+            }
+
+            $this->audit->log($vendorId, null, 'vendor.application.submitted', $request, ['status' => $status]);
+            if ($status === 'active') {
+                $this->audit->log($vendorId, null, 'vendor.application.auto_approved', $request, []);
+            }
+
+            $this->pdo->commit();
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
         }
 
         return $this->getById($vendorId);
@@ -59,6 +70,7 @@ final class VendorService
 
     public function approve(int $vendorId, int $actorId, Request $request, ?string $notes = null): array
     {
+        $notes = $notes !== null ? $this->cleanString($notes, 255) : null;
         $vendor = $this->findVendorById($vendorId);
         if ($vendor === null) {
             throw new RuntimeException('Vendor application not found.', 404);
@@ -68,18 +80,30 @@ final class VendorService
             throw new RuntimeException('Vendor is already active.', 400);
         }
 
-        $this->pdo->prepare(
-            'UPDATE `vendors` SET `status` = :status, `approved_at` = CURRENT_TIMESTAMP, `rejected_at` = NULL, `rejected_reason` = NULL, `suspended_at` = NULL, `suspended_reason` = NULL WHERE `id` = :id'
-        )->execute(['status' => 'active', 'id' => $vendorId]);
+        $this->pdo->beginTransaction();
+        try {
+            $this->pdo->prepare(
+                'UPDATE `vendors` SET `status` = :status, `approved_at` = CURRENT_TIMESTAMP, `rejected_at` = NULL, `rejected_reason` = NULL, `suspended_at` = NULL, `suspended_reason` = NULL WHERE `id` = :id'
+            )->execute(['status' => 'active', 'id' => $vendorId]);
 
-        $this->assignRole((int) $vendor['user_id'], 'vendor');
-        $this->audit->log($vendorId, $actorId, 'vendor.application.approved', $request, ['notes' => $notes]);
+            $this->assignRole((int) $vendor['user_id'], 'vendor');
+            $this->audit->log($vendorId, $actorId, 'vendor.application.approved', $request, ['notes' => $notes]);
+            $this->pdo->commit();
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
 
         return $this->getById($vendorId);
     }
 
     public function reject(int $vendorId, int $actorId, Request $request, string $reason): array
     {
+        $reason = $this->cleanString($reason, 255);
+        if ($reason === '') {
+            throw new RuntimeException(json_encode(['errors' => ['reason' => 'Rejection reason is required.']]), 422);
+        }
+
         $vendor = $this->findVendorById($vendorId);
         if ($vendor === null) {
             throw new RuntimeException('Vendor application not found.', 404);
@@ -89,17 +113,29 @@ final class VendorService
             throw new RuntimeException('Vendor is already rejected.', 400);
         }
 
-        $this->pdo->prepare(
-            'UPDATE `vendors` SET `status` = :status, `rejected_at` = CURRENT_TIMESTAMP, `rejected_reason` = :reason WHERE `id` = :id'
-        )->execute(['status' => 'rejected', 'reason' => $reason, 'id' => $vendorId]);
+        $this->pdo->beginTransaction();
+        try {
+            $this->pdo->prepare(
+                'UPDATE `vendors` SET `status` = :status, `rejected_at` = CURRENT_TIMESTAMP, `rejected_reason` = :reason WHERE `id` = :id'
+            )->execute(['status' => 'rejected', 'reason' => $reason, 'id' => $vendorId]);
 
-        $this->audit->log($vendorId, $actorId, 'vendor.application.rejected', $request, ['reason' => $reason]);
+            $this->audit->log($vendorId, $actorId, 'vendor.application.rejected', $request, ['reason' => $reason]);
+            $this->pdo->commit();
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
 
         return $this->getById($vendorId);
     }
 
     public function suspend(int $vendorId, int $actorId, Request $request, string $reason): array
     {
+        $reason = $this->cleanString($reason, 255);
+        if ($reason === '') {
+            throw new RuntimeException(json_encode(['errors' => ['reason' => 'Suspension reason is required.']]), 422);
+        }
+
         $vendor = $this->findVendorById($vendorId);
         if ($vendor === null) {
             throw new RuntimeException('Vendor application not found.', 404);
@@ -109,11 +145,18 @@ final class VendorService
             throw new RuntimeException('Vendor is already suspended.', 400);
         }
 
-        $this->pdo->prepare(
-            'UPDATE `vendors` SET `status` = :status, `suspended_at` = CURRENT_TIMESTAMP, `suspended_reason` = :reason WHERE `id` = :id'
-        )->execute(['status' => 'suspended', 'reason' => $reason, 'id' => $vendorId]);
+        $this->pdo->beginTransaction();
+        try {
+            $this->pdo->prepare(
+                'UPDATE `vendors` SET `status` = :status, `suspended_at` = CURRENT_TIMESTAMP, `suspended_reason` = :reason WHERE `id` = :id'
+            )->execute(['status' => 'suspended', 'reason' => $reason, 'id' => $vendorId]);
 
-        $this->audit->log($vendorId, $actorId, 'vendor.account.suspended', $request, ['reason' => $reason]);
+            $this->audit->log($vendorId, $actorId, 'vendor.account.suspended', $request, ['reason' => $reason]);
+            $this->pdo->commit();
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
 
         return $this->getById($vendorId);
     }
@@ -139,8 +182,9 @@ final class VendorService
     public function getByUserId(int $userId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT v.*, p.business_name, p.gst_number, p.pan_number, p.business_type, p.business_category, p.address_line1, p.address_line2, p.city, p.state, p.postal_code, p.country, p.website, p.contact_name, p.contact_email, p.contact_phone, p.business_metadata
+            'SELECT v.*, u.email AS user_email, u.full_name AS user_full_name, p.business_name, p.gst_number, p.pan_number, p.business_type, p.business_category, p.address_line1, p.address_line2, p.city, p.state, p.postal_code, p.country, p.website, p.contact_name, p.contact_email, p.contact_phone, p.business_metadata
              FROM `vendors` v
+             JOIN `users` u ON u.id = v.user_id
              JOIN `vendor_profiles` p ON p.vendor_id = v.id
              WHERE v.user_id = :user_id LIMIT 1'
         );
@@ -152,7 +196,7 @@ final class VendorService
     public function listApplications(): array
     {
         $stmt = $this->pdo->query(
-            'SELECT v.id, v.user_id, v.status, v.created_at, v.updated_at, u.email AS user_email, u.full_name AS user_full_name, p.business_name, p.gst_number
+            'SELECT v.*, u.email AS user_email, u.full_name AS user_full_name, p.business_name, p.gst_number, p.pan_number, p.business_type, p.business_category, p.address_line1, p.address_line2, p.city, p.state, p.postal_code, p.country, p.website, p.contact_name, p.contact_email, p.contact_phone, p.business_metadata
              FROM `vendors` v
              JOIN `users` u ON u.id = v.user_id
              JOIN `vendor_profiles` p ON p.vendor_id = v.id
@@ -209,7 +253,7 @@ final class VendorService
     {
         $errors = [];
         $data = [
-            'email' => trim((string) ($payload['email'] ?? '')),
+            'email' => strtolower(trim((string) ($payload['email'] ?? ''))),
             'phone' => trim((string) ($payload['phone'] ?? '')),
             'full_name' => trim((string) ($payload['full_name'] ?? '')),
             'password' => (string) ($payload['password'] ?? ''),
@@ -226,7 +270,7 @@ final class VendorService
             'country' => trim((string) ($payload['country'] ?? 'India')),
             'website' => trim((string) ($payload['website'] ?? '')),
             'contact_name' => trim((string) ($payload['contact_name'] ?? '')),
-            'contact_email' => trim((string) ($payload['contact_email'] ?? '')),
+            'contact_email' => strtolower(trim((string) ($payload['contact_email'] ?? ''))),
             'contact_phone' => trim((string) ($payload['contact_phone'] ?? '')),
             'business_metadata' => is_array($payload['business_metadata'] ?? null) ? $payload['business_metadata'] : [],
         ];
@@ -237,6 +281,12 @@ final class VendorService
 
         if ($data['full_name'] === '') {
             $errors['full_name'] = 'Full name is required.';
+        }
+
+        if ($data['phone'] === '') {
+            $errors['phone'] = 'Phone number is required.';
+        } elseif (strlen($data['phone']) < 10 || strlen($data['phone']) > 20) {
+            $errors['phone'] = 'Phone number must be between 10-20 characters.';
         }
 
         $minLength = $this->settings->int('auth.password_min_length', 10);
@@ -266,6 +316,10 @@ final class VendorService
             $errors['contact_email'] = 'Contact email must be valid.';
         }
 
+        if ($data['website'] !== '' && !filter_var($data['website'], FILTER_VALIDATE_URL)) {
+            $errors['website'] = 'Website must be a valid URL.';
+        }
+
         return [$data, $errors];
     }
 
@@ -273,6 +327,18 @@ final class VendorService
     {
         $stmt = $this->pdo->prepare('SELECT * FROM `users` WHERE LOWER(`email`) = LOWER(:email) AND `deleted_at` IS NULL LIMIT 1');
         $stmt->execute(['email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user === false ? null : $user;
+    }
+
+    private function findUserByPhone(string $phone): ?array
+    {
+        if ($phone === '') {
+            return null;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT * FROM `users` WHERE `phone` = :phone AND `deleted_at` IS NULL LIMIT 1');
+        $stmt->execute(['phone' => $phone]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user === false ? null : $user;
     }
@@ -292,7 +358,7 @@ final class VendorService
         );
         $stmt->execute([
             'email' => $email,
-            'phone' => $phone,
+            'phone' => $phone ?: null,
             'full_name' => $fullName,
             'password_hash' => $passwordHash,
             'status' => 'active',
@@ -347,5 +413,13 @@ final class VendorService
              WHERE r.slug = :slug'
         );
         $stmt->execute(['user_id' => $userId, 'slug' => $roleSlug]);
+    }
+
+    private function cleanString(string $value, int $maxLength): string
+    {
+        $clean = strip_tags($value);
+        $clean = preg_replace('/[\x00-\x1F\x7F]/', ' ', $clean) ?? $clean;
+        $clean = preg_replace('/\s+/', ' ', $clean) ?? $clean;
+        return mb_substr(trim($clean), 0, $maxLength);
     }
 }

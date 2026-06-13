@@ -10,6 +10,9 @@ use RuntimeException;
 
 final class ProductService
 {
+    private const PRODUCT_STATUSES = ['draft', 'pending', 'approved', 'rejected'];
+    private const MAX_LIST_LIMIT = 100;
+
     private PDO $pdo;
     private ProductAuditService $audit;
     private SettingsService $settings;
@@ -32,14 +35,7 @@ final class ProductService
      */
     public function create(int $vendorId, array $payload, Request $request): array
     {
-        // Validate vendor exists and is active
-        $vendor = $this->getVendorById($vendorId);
-        if ($vendor === null) {
-            throw new RuntimeException('Vendor not found.', 404);
-        }
-        if ($vendor['status'] !== 'active') {
-            throw new RuntimeException('Vendor is not active. Cannot create products.', 403);
-        }
+        $this->assertVendorActive($vendorId);
 
         [$data, $errors] = $this->validateProductPayload($payload);
         if ($errors !== []) {
@@ -101,6 +97,8 @@ final class ProductService
      */
     public function update(int $productId, int $vendorId, array $payload, Request $request): array
     {
+        $this->assertVendorActive($vendorId);
+
         $product = $this->getProductById($productId);
         if ($product === null || (int) $product['vendor_id'] !== $vendorId) {
             throw new RuntimeException('Product not found.', 404);
@@ -121,31 +119,35 @@ final class ProductService
             $updates = [];
             $params = ['id' => $productId];
 
-            if (isset($data['name'])) {
+            if (array_key_exists('name', $data)) {
                 $updates[] = '`name` = :name';
                 $params['name'] = $data['name'];
             }
-            if (isset($data['description'])) {
+            if (array_key_exists('description', $data)) {
                 $updates[] = '`description` = :description';
                 $params['description'] = $data['description'] ?: null;
             }
-            if (isset($data['price'])) {
+            if (array_key_exists('price', $data)) {
                 $updates[] = '`price` = :price';
                 $params['price'] = $data['price'];
             }
-            if (isset($data['sku'])) {
+            if (array_key_exists('sku', $data)) {
                 $updates[] = '`sku` = :sku';
                 $params['sku'] = $data['sku'] ?: null;
             }
-            if (isset($data['stock_quantity'])) {
+            if (array_key_exists('currency', $data)) {
+                $updates[] = '`currency` = :currency';
+                $params['currency'] = $data['currency'];
+            }
+            if (array_key_exists('stock_quantity', $data)) {
                 $updates[] = '`stock_quantity` = :stock_quantity';
                 $params['stock_quantity'] = (int) $data['stock_quantity'];
             }
-            if (isset($data['tags'])) {
+            if (array_key_exists('tags', $data)) {
                 $updates[] = '`tags` = :tags';
                 $params['tags'] = $data['tags'] ? json_encode($data['tags'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
             }
-            if (isset($data['metadata'])) {
+            if (array_key_exists('metadata', $data)) {
                 $updates[] = '`metadata` = :metadata';
                 $params['metadata'] = $data['metadata'] ? json_encode($data['metadata'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
             }
@@ -157,7 +159,7 @@ final class ProductService
             }
 
             // Handle image replacements if provided
-            if (isset($data['images'])) {
+            if (array_key_exists('images', $data)) {
                 $this->pdo->prepare('DELETE FROM `product_images` WHERE `product_id` = :product_id')->execute(['product_id' => $productId]);
                 if (!empty($data['images'])) {
                     $this->addImages($productId, $data['images']);
@@ -186,13 +188,15 @@ final class ProductService
      */
     public function submitForApproval(int $productId, int $vendorId, Request $request): array
     {
+        $this->assertVendorActive($vendorId);
+
         $product = $this->getProductById($productId);
         if ($product === null || (int) $product['vendor_id'] !== $vendorId) {
             throw new RuntimeException('Product not found.', 404);
         }
 
-        if ($product['status'] !== 'draft') {
-            throw new RuntimeException('Only draft products can be submitted for approval.', 400);
+        if (!in_array($product['status'], ['draft', 'rejected'], true)) {
+            throw new RuntimeException('Only draft or rejected products can be submitted for approval.', 400);
         }
 
         $this->pdo->prepare(
@@ -221,9 +225,10 @@ final class ProductService
             throw new RuntimeException('Product not found.', 404);
         }
 
-        if ($product['status'] === 'approved') {
-            throw new RuntimeException('Product is already approved.', 400);
+        if ($product['status'] !== 'pending') {
+            throw new RuntimeException('Only pending products can be approved.', 400);
         }
+        $this->assertVendorActive((int) $product['vendor_id']);
 
         $this->pdo->prepare(
             'UPDATE `products` SET `status` = :status, `approved_at` = CURRENT_TIMESTAMP, `rejection_reason` = NULL, `rejected_at` = NULL, `updated_at` = CURRENT_TIMESTAMP WHERE `id` = :id'
@@ -251,8 +256,12 @@ final class ProductService
             throw new RuntimeException('Product not found.', 404);
         }
 
-        if ($product['status'] === 'rejected') {
-            throw new RuntimeException('Product is already rejected.', 400);
+        if ($product['status'] !== 'pending') {
+            throw new RuntimeException('Only pending products can be rejected.', 400);
+        }
+        $reason = $this->cleanString($reason, 255);
+        if ($reason === '') {
+            throw new RuntimeException(json_encode(['errors' => ['reason' => 'Rejection reason is required.']]), 422);
         }
 
         $this->pdo->prepare(
@@ -275,10 +284,17 @@ final class ProductService
      */
     public function listByVendor(int $vendorId, int $limit = 20, int $offset = 0, ?string $status = null): array
     {
+        $this->assertVendorActive($vendorId);
+        $limit = max(1, min($limit, self::MAX_LIST_LIMIT));
+        $offset = max(0, $offset);
+
         $where = '`vendor_id` = :vendor_id AND `deleted_at` IS NULL';
         $params = ['vendor_id' => $vendorId];
 
         if ($status !== null) {
+            if (!in_array($status, self::PRODUCT_STATUSES, true)) {
+                throw new RuntimeException(json_encode(['errors' => ['status' => 'Invalid product status filter.']]), 422);
+            }
             $where .= ' AND `status` = :status';
             $params['status'] = $status;
         }
@@ -314,6 +330,9 @@ final class ProductService
      */
     public function listPending(int $limit = 20, int $offset = 0): array
     {
+        $limit = max(1, min($limit, self::MAX_LIST_LIMIT));
+        $offset = max(0, $offset);
+
         $countStmt = $this->pdo->query("SELECT COUNT(*) as cnt FROM `products` WHERE `status` = 'pending' AND `deleted_at` IS NULL");
         $total = (int) $countStmt->fetch(PDO::FETCH_ASSOC)['cnt'];
 
@@ -361,39 +380,155 @@ final class ProductService
     private function validateProductPayload(array $payload, bool $requireAll = true): array
     {
         $errors = [];
-        $data = [
-            'name'            => trim((string) ($payload['name'] ?? '')),
-            'description'     => trim((string) ($payload['description'] ?? '')),
-            'price'           => (float) ($payload['price'] ?? 0),
-            'sku'             => trim((string) ($payload['sku'] ?? '')),
-            'currency'        => trim((string) ($payload['currency'] ?? 'INR')),
-            'stock_quantity'  => (int) ($payload['stock_quantity'] ?? 0),
-            'tags'            => is_array($payload['tags'] ?? null) ? $payload['tags'] : [],
-            'metadata'        => is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [],
-            'images'          => is_array($payload['images'] ?? null) ? $payload['images'] : [],
-        ];
+        $data = [];
+        $knownFields = ['name', 'description', 'price', 'sku', 'currency', 'stock_quantity', 'tags', 'metadata', 'images'];
+
+        if (!$requireAll && !$this->hasAnyKey($payload, $knownFields)) {
+            $errors['_payload'] = 'At least one product field is required.';
+            return [$data, $errors];
+        }
+
+        if ($requireAll || array_key_exists('name', $payload)) {
+            $data['name'] = $this->cleanString($payload['name'] ?? '', 255);
+        }
+
+        if ($requireAll || array_key_exists('description', $payload)) {
+            $data['description'] = $this->cleanString($payload['description'] ?? '', 5000);
+        }
+
+        if ($requireAll || array_key_exists('price', $payload)) {
+            $rawPrice = $payload['price'] ?? null;
+            if ($rawPrice === null || $rawPrice === '' || !is_numeric($rawPrice)) {
+                $errors['price'] = 'Price must be a valid number.';
+            } else {
+                $data['price'] = round((float) $rawPrice, 2);
+            }
+        }
+
+        if ($requireAll || array_key_exists('sku', $payload)) {
+            $data['sku'] = $this->cleanString($payload['sku'] ?? '', 100);
+        }
+
+        if ($requireAll || array_key_exists('currency', $payload)) {
+            $currency = strtoupper($this->cleanString($payload['currency'] ?? 'INR', 10));
+            $data['currency'] = $currency === '' ? 'INR' : $currency;
+        }
+
+        if ($requireAll || array_key_exists('stock_quantity', $payload)) {
+            $rawStock = $payload['stock_quantity'] ?? 0;
+            if ($rawStock === '' || !is_numeric($rawStock)) {
+                $errors['stock_quantity'] = 'Stock quantity must be a valid number.';
+            } else {
+                $data['stock_quantity'] = (int) $rawStock;
+            }
+        }
+
+        if ($requireAll || array_key_exists('tags', $payload)) {
+            if (isset($payload['tags']) && !is_array($payload['tags'])) {
+                $errors['tags'] = 'Tags must be an array.';
+            } else {
+                $data['tags'] = $this->sanitizeStringList($payload['tags'] ?? [], 64, 25);
+            }
+        }
+
+        if ($requireAll || array_key_exists('metadata', $payload)) {
+            if (isset($payload['metadata']) && !is_array($payload['metadata'])) {
+                $errors['metadata'] = 'Metadata must be an object.';
+            } else {
+                $data['metadata'] = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
+            }
+        }
+
+        if ($requireAll || array_key_exists('images', $payload)) {
+            if (isset($payload['images']) && !is_array($payload['images'])) {
+                $errors['images'] = 'Images must be an array.';
+            } else {
+                $data['images'] = $this->sanitizeImages($payload['images'] ?? [], $errors);
+            }
+        }
 
         if ($requireAll) {
-            if ($data['name'] === '') {
+            if (($data['name'] ?? '') === '') {
                 $errors['name'] = 'Product name is required.';
             }
-            if ($data['price'] <= 0) {
+            if (isset($data['price']) && $data['price'] <= 0) {
                 $errors['price'] = 'Price must be greater than 0.';
             }
         } else {
-            if (isset($payload['name']) && $data['name'] === '') {
+            if (array_key_exists('name', $payload) && ($data['name'] ?? '') === '') {
                 $errors['name'] = 'Product name cannot be empty.';
             }
-            if (isset($payload['price']) && $data['price'] <= 0) {
+            if (array_key_exists('price', $payload) && isset($data['price']) && $data['price'] <= 0) {
                 $errors['price'] = 'Price must be greater than 0.';
             }
         }
 
-        if ($data['stock_quantity'] < 0) {
+        if (isset($data['currency']) && !preg_match('/^[A-Z]{3,10}$/', $data['currency'])) {
+            $errors['currency'] = 'Currency must be 3-10 uppercase letters.';
+        }
+
+        if (isset($data['stock_quantity']) && $data['stock_quantity'] < 0) {
             $errors['stock_quantity'] = 'Stock quantity cannot be negative.';
         }
 
         return [$data, $errors];
+    }
+
+    /** @param list<string> $keys */
+    private function hasAnyKey(array $payload, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $payload)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function cleanString(mixed $value, int $maxLength): string
+    {
+        $clean = strip_tags((string) $value);
+        $clean = preg_replace('/[\x00-\x1F\x7F]/', ' ', $clean) ?? $clean;
+        $clean = preg_replace('/\s+/', ' ', $clean) ?? $clean;
+        return mb_substr(trim($clean), 0, $maxLength);
+    }
+
+    private function sanitizeStringList(array $values, int $maxLength, int $maxItems): array
+    {
+        $clean = [];
+        foreach (array_slice($values, 0, $maxItems) as $value) {
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $item = $this->cleanString($value, $maxLength);
+            if ($item !== '') {
+                $clean[] = $item;
+            }
+        }
+        return array_values(array_unique($clean));
+    }
+
+    private function sanitizeImages(array $images, array &$errors): array
+    {
+        $clean = [];
+        foreach (array_slice($images, 0, 10) as $index => $image) {
+            if (!is_array($image)) {
+                $errors["images.$index"] = 'Each image must be an object.';
+                continue;
+            }
+
+            $filePath = $this->cleanString($image['file_path'] ?? '', 255);
+            if ($filePath === '') {
+                $errors["images.$index.file_path"] = 'Image file path is required.';
+                continue;
+            }
+
+            $clean[] = [
+                'file_path' => $filePath,
+                'alt_text' => $this->cleanString($image['alt_text'] ?? '', 255),
+            ];
+        }
+        return $clean;
     }
 
     /**
@@ -527,6 +662,19 @@ final class ProductService
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row !== false ? $row : null;
+    }
+
+    private function assertVendorActive(int $vendorId): array
+    {
+        $vendor = $this->getVendorById($vendorId);
+        if ($vendor === null) {
+            throw new RuntimeException('Vendor not found.', 404);
+        }
+        if ($vendor['status'] !== 'active') {
+            throw new RuntimeException('Vendor is not active. Product actions are disabled.', 403);
+        }
+
+        return $vendor;
     }
 
     /**
