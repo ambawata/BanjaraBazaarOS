@@ -1,13 +1,28 @@
-import React from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 
-export default function PlotBoundaryDrawer({ points, onChange, width = 320, height = 220 }) {
-  
+export default function PlotBoundaryDrawer({ points, onChange }) {
+  const containerRef = useRef(null)
+  const [dims, setDims] = useState({ w: 320, h: 220 })
+
+  useEffect(() => {
+    function updateDims() {
+      if (!containerRef.current) return
+      const w = Math.min(360, containerRef.current.clientWidth - 16) // allowance for page margins
+      setDims({
+        w: w,
+        h: Math.round(w * 0.68)
+      })
+    }
+    updateDims()
+    window.addEventListener('resize', updateDims)
+    return () => window.removeEventListener('resize', updateDims)
+  }, [])
+
   const handleCanvasClick = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
     const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
     
-    // Add point (up to 12 points for custom shapes)
     if (points.length >= 12) return
     const updated = [...points, { x, y }]
     onChange(updated)
@@ -26,11 +41,11 @@ export default function PlotBoundaryDrawer({ points, onChange, width = 320, heig
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '12px 0', width: '100%' }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '12px 0', width: '100%' }}>
       <div 
         style={{ 
-          width: `${width}px`, 
-          height: `${height}px`, 
+          width: `${dims.w}px`, 
+          height: `${dims.h}px`, 
           background: 'var(--bg3)', 
           border: '2.5px dashed var(--border)', 
           borderRadius: '12px', 
@@ -51,7 +66,7 @@ export default function PlotBoundaryDrawer({ points, onChange, width = 320, heig
           {/* Polyline shape */}
           {points.length > 1 && (
             <polyline
-              points={points.map(p => `${(p.x / 100) * width}, ${(p.y / 100) * height}`).join(' ')}
+              points={points.map(p => `${(p.x / 100) * dims.w}, ${(p.y / 100) * dims.h}`).join(' ')}
               fill="rgba(124, 111, 247, 0.12)"
               stroke="var(--accent)"
               strokeWidth="2.5"
@@ -61,10 +76,10 @@ export default function PlotBoundaryDrawer({ points, onChange, width = 320, heig
           {/* Closing helper line */}
           {points.length > 2 && (
             <line 
-              x1={`${(points[points.length - 1].x / 100) * width}`}
-              y1={`${(points[points.length - 1].y / 100) * height}`}
-              x2={`${(points[0].x / 100) * width}`}
-              y2={`${(points[0].y / 100) * height}`}
+              x1={`${(points[points.length - 1].x / 100) * dims.w}`}
+              y1={`${(points[points.length - 1].y / 100) * dims.h}`}
+              x2={`${(points[0].x / 100) * dims.w}`}
+              y2={`${(points[0].y / 100) * dims.h}`}
               stroke="var(--accent)"
               strokeWidth="1.5"
               strokeDasharray="4 4"
@@ -101,7 +116,7 @@ export default function PlotBoundaryDrawer({ points, onChange, width = 320, heig
       </div>
 
       {/* Toolbar actions */}
-      <div style={{ display: 'flex', gap: '8px', marginTop: '10px', width: '100%', maxWidth: `${width}px` }}>
+      <div style={{ display: 'flex', gap: '8px', marginTop: '10px', width: '100%', maxWidth: `${dims.w}px` }}>
         <button 
           className="btn btn-sm" 
           style={{ flex: 1, padding: '8px', justifyContent: 'center' }} 
