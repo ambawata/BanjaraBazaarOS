@@ -6,6 +6,7 @@ import AnalysisPanel from './components/AnalysisPanel'
 import BanjaraBazaarShop from './components/BanjaraBazaarShop'
 import ReportGenerator from './components/ReportGenerator'
 import AiChat from './components/AiChat'
+import PlotConfig from './components/PlotConfig'
 
 const EXPANDED_ROOMS_CATALOG = {
   private: [
