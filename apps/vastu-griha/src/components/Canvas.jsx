@@ -7,7 +7,9 @@ export default function Canvas({
   onRoomsChange, 
   imageSettings, 
   selectedRoomId, 
-  onSelectRoom 
+  onSelectRoom,
+  showVastuGrid = true,
+  showNormalGrid = true
 }) {
   const containerRef = useRef(null)
   const plotRef = useRef(null)
@@ -177,7 +179,7 @@ export default function Canvas({
       onClick={() => onSelectRoom(null)}
     >
       <div 
-        className="plot-wrapper" 
+        className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`} 
         ref={plotRef}
         style={{
           width: `${plotDims.w}px`,
@@ -202,9 +204,11 @@ export default function Canvas({
         )}
 
         {/* 3x3 Vastu Mandala Grid */}
-        <div className="vastu-grid-overlay">
-          {renderVastuGrid()}
-        </div>
+        {showVastuGrid && (
+          <div className="vastu-grid-overlay">
+            {renderVastuGrid()}
+          </div>
+        )}
 
         {/* Placed Rooms */}
         {rooms.map((room) => {
