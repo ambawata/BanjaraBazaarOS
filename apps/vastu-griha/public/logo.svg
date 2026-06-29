@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#1e1f26" />
+      <stop offset="100%" stop-color="#0e0f11" />
+    </radialGradient>
+    <!-- Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5a623" />
+      <stop offset="30%" stop-color="#ffdf7a" />
+      <stop offset="70%" stop-color="#d48c06" />
+      <stop offset="100%" stop-color="#a36b00" />
+    </linearGradient>
+    <!-- Emerald Gradient -->
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6bebaf" />
+      <stop offset="100%" stop-color="#2e8a5e" />
+    </linearGradient>
+    <!-- Terracotta Gradient -->
+    <linearGradient id="terracottaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f08a5d" />
+      <stop offset="100%" stop-color="#b83b1d" />
+    </linearGradient>
+    <!-- Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="6" />
+
+  <!-- Concentric Rings -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="4 8" opacity="0.6" />
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.4" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="12 6" opacity="0.5" />
+  
+  <!-- 3x3 Vastu Mandala Grid overlay -->
+  <rect x="136" y="136" width="240" height="240" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.3" />
+  <!-- Grid dividers -->
+  <line x1="216" y1="136" x2="216" y2="376" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" />
+  <line x1="296" y1="136" x2="296" y2="376" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" />
+  <line x1="136" y1="216" x2="376" y2="216" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" />
+  <line x1="136" y1="296" x2="376" y2="296" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" />
+
+  <!-- Diagonal rays (8 major energy directions) -->
+  <line x1="256" y1="16" x2="256" y2="496" stroke="url(#goldGrad)" stroke-width="1" opacity="0.4" />
+  <line x1="16" y1="256" x2="496" y2="256" stroke="url(#goldGrad)" stroke-width="1" opacity="0.4" />
+  <line x1="86" y1="86" x2="426" y2="426" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" stroke-dasharray="6 6" />
+  <line x1="86" y1="426" x2="426" y2="86" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3" stroke-dasharray="6 6" />
+
+  <!-- Outer Star of Eight Directions -->
+  <polygon points="256,50 276,140 366,146 296,206 336,286 256,236 176,286 216,206 146,146 236,140" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.4" />
+  
+  <!-- Central Brahmasthan Lotus / Energy Core -->
+  <g filter="url(#glow)">
+    <circle cx="256" cy="256" r="36" fill="#151618" stroke="url(#goldGrad)" stroke-width="3" />
+    <circle cx="256" cy="256" r="12" fill="url(#emeraldGrad)" />
+    <!-- Lotus Petals -->
+    <path d="M 256 216 Q 246 236 256 256 Q 266 236 256 216 Z" fill="url(#goldGrad)" opacity="0.8" />
+    <path d="M 256 296 Q 246 276 256 256 Q 266 276 256 296 Z" fill="url(#goldGrad)" opacity="0.8" />
+    <path d="M 216 256 Q 236 246 256 256 Q 236 266 216 256 Z" fill="url(#goldGrad)" opacity="0.8" />
+    <path d="M 296 256 Q 276 246 256 256 Q 276 266 296 256 Z" fill="url(#goldGrad)" opacity="0.8" />
+    <!-- Diagonals petals -->
+    <path d="M 228 228 Q 244 238 256 256 Q 238 244 228 228 Z" fill="url(#goldGrad)" opacity="0.6" />
+    <path d="M 284 284 Q 268 274 256 256 Q 274 268 284 284 Z" fill="url(#goldGrad)" opacity="0.6" />
+    <path d="M 228 284 Q 244 274 256 256 Q 238 268 228 284 Z" fill="url(#goldGrad)" opacity="0.6" />
+    <path d="M 284 228 Q 268 238 256 256 Q 274 244 284 228 Z" fill="url(#goldGrad)" opacity="0.6" />
+  </g>
+
+  <!-- Elegant Compass Needle pointing North -->
+  <g transform="rotate(0, 256, 256)">
+    <!-- North Pointer (Terracotta/Red) -->
+    <polygon points="256,120 270,220 256,210" fill="url(#terracottaGrad)" stroke="url(#terracottaGrad)" stroke-width="1" filter="url(#glow)" />
+    <polygon points="256,120 242,220 256,210" fill="#a82811" stroke="#a82811" stroke-width="1" filter="url(#glow)" />
+    <!-- South Pointer (Slate/Gold outline) -->
+    <polygon points="256,392 270,292 256,302" fill="#5c5d63" opacity="0.8" />
+    <polygon points="256,392 242,292 256,302" fill="#3c3d43" opacity="0.8" />
+    <!-- Center Pin -->
+    <circle cx="256" cy="256" r="6" fill="#fff" />
+  </g>
+
+  <!-- Typography: Direction Indicators (N, E, S, W) -->
+  <text x="256" y="90" font-family="'Syne', 'Helvetica', sans-serif" font-size="28" font-weight="700" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="1">N</text>
+  <text x="422" y="266" font-family="'Syne', 'Helvetica', sans-serif" font-size="28" font-weight="700" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="1">E</text>
+  <text x="256" y="446" font-family="'Syne', 'Helvetica', sans-serif" font-size="28" font-weight="700" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="1">S</text>
+  <text x="90" y="266" font-family="'Syne', 'Helvetica', sans-serif" font-size="28" font-weight="700" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="1">W</text>
+
+  <!-- Intercardinal Directions (NE, SE, SW, NW) -->
+  <text x="360" y="152" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="#9a9ba0" text-anchor="middle" opacity="0.8">NE</text>
+  <text x="360" y="372" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="#9a9ba0" text-anchor="middle" opacity="0.8">SE</text>
+  <text x="152" y="372" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="#9a9ba0" text-anchor="middle" opacity="0.8">SW</text>
+  <text x="152" y="152" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="#9a9ba0" text-anchor="middle" opacity="0.8">NW</text>
+
+  <!-- Decorative Inner Border ticks -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="2 12" opacity="0.5" />
+</svg>
