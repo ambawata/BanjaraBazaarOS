@@ -249,7 +249,7 @@ export default function App() {
             className={`nav-item ${activeTab === 'chat' ? 'active' : ''}`}
             onClick={() => setActiveTab('chat')}
           >
-            <i className="ti ti-brand-assistant"></i> Ask Acharya
+            <i className="ti ti-message-chatbot"></i> Ask Acharya
           </div>
           <div 
             className={`nav-item ${activeTab === 'shop' ? 'active' : ''}`}
@@ -454,7 +454,7 @@ export default function App() {
             className={`bottom-nav-item ${activeTab === 'chat' ? 'active' : ''}`}
             onClick={() => setActiveTab('chat')}
           >
-            <i className="ti ti-brand-assistant"></i>
+            <i className="ti ti-message-chatbot"></i>
             <span>Acharya</span>
           </div>
           <div 

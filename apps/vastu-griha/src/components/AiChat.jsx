@@ -114,7 +114,7 @@ export default function AiChat({ rooms, plot, onSwitchTab, onGenerateLayout, cur
     <div className="chat-container" style={{ margin: '12px auto', maxWidth: '600px', width: '100%', height: 'calc(100vh - 100px)' }}>
       <div className="chat-header">
         <div className="chat-avatar">
-          <i className="ti ti-brand-assistant"></i>
+          <i className="ti ti-message-chatbot"></i>
         </div>
         <div className="chat-title-group">
           <span className="chat-bot-name">Vastu Acharya</span>
