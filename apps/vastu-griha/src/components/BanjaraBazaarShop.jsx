@@ -16,7 +16,7 @@ const PRODUCTS = [
     title: 'Vastu Lead Metal Boundary Strip',
     category: 'Remedies',
     price: '₹799',
-    remedyRelation: 'Fixes Southwest Entrance Defects',
+    remedyRelation: 'Fixes Southwest/South Entrance',
     icon: 'door-enter',
     desc: 'Heavy lead metal bar to install under the main threshold. Blocks negative energies from entering South/Southwest doors.'
   },
@@ -25,7 +25,7 @@ const PRODUCTS = [
     title: 'Agni Southeast Copper Helix',
     category: 'Remedies',
     price: '₹999',
-    remedyRelation: 'Fixes Northeast Kitchen Defects',
+    remedyRelation: 'Fixes Northeast Kitchen/Borewell',
     icon: 'brightness-half',
     desc: 'Pure copper spiral energizer. Relocates or balances kitchen flame violations in northern sectors.'
   },
@@ -34,7 +34,7 @@ const PRODUCTS = [
     title: 'Himalayan Pink Rock Salt (1kg)',
     category: 'Remedies',
     price: '₹349',
-    remedyRelation: 'Fixes Southwest/Northeast Toilet Defects',
+    remedyRelation: 'Fixes Toilet & Septic Tank Defects',
     icon: 'seeding',
     desc: 'Natural raw sea salt chunks. Place in a glass bowl inside restrooms to absorb negative bio-energies.'
   },
@@ -77,37 +77,36 @@ const PRODUCTS = [
 ]
 
 export default function BanjaraBazaarShop({ rooms, plot }) {
-  // Determine recommended products based on layout defects
   const recommendations = []
   
   rooms.forEach(room => {
     const evalRes = evaluateRoom(room, plot)
     if (evalRes.rating < 70) {
-      if (room.type === 'toilet') {
+      if (room.type === 'toilet' || room.type === 'septic-tank') {
         recommendations.push('raw_sea_salt')
         if (evalRes.zone === 'SW' || evalRes.zone === 'NE') {
           recommendations.push('lead_threshold_strip')
         }
       }
-      if (room.type === 'kitchen') {
+      if (room.type === 'kitchen' || room.type === 'solar') {
         recommendations.push('copper_helix')
       }
-      if (room.type === 'entrance' && evalRes.zone === 'SW') {
+      if (room.type === 'entrance' && (evalRes.zone === 'SW' || evalRes.zone === 'S')) {
         recommendations.push('lead_threshold_strip')
+      }
+      if (room.type === 'borewell' && (evalRes.zone === 'SE' || evalRes.zone === 'SW')) {
+        recommendations.push('copper_helix')
       }
     }
   })
 
-  // Fallback recommendations if no defects
+  // Fallbacks
   if (recommendations.length === 0) {
     recommendations.push('brass_puja_thali')
     recommendations.push('seven_horses_painting')
   }
 
-  // Deduplicate
   const uniqueRecIds = [...new Set(recommendations)]
-
-  // Split into personal recommendation products vs other products
   const recommendedProducts = PRODUCTS.filter(p => uniqueRecIds.includes(p.id))
   const catalogProducts = PRODUCTS.filter(p => !uniqueRecIds.includes(p.id))
 
@@ -121,10 +120,10 @@ export default function BanjaraBazaarShop({ rooms, plot }) {
       {/* Recommended Shelf */}
       <div style={{ padding: '24px 24px 0', flexShrink: 0 }}>
         <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 700, marginBottom: '6px' }}>
-          Personalized Vastu Recommendations
+          Personalized Home Remedies
         </h3>
         <p style={{ fontSize: '12px', color: 'var(--text2)', marginBottom: '14px' }}>
-          Based on your layout violations and placements, we recommend these items to restore energy balance:
+          Based on the aspects that can be improved in your plan, we recommend these items to balance household energies:
         </p>
         
         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '12px' }}>
@@ -134,7 +133,7 @@ export default function BanjaraBazaarShop({ rooms, plot }) {
               className="product-card" 
               style={{ flexShrink: 0, width: '280px', borderColor: 'var(--gold)' }}
             >
-              <div className="product-tag">Defect Remedy</div>
+              <div className="product-tag">Vastu Remedy</div>
               <div className="product-image-placeholder" style={{ background: 'var(--gold-dim)', color: 'var(--gold)' }}>
                 <i className={`ti ti-${p.icon}`}></i>
               </div>
@@ -147,7 +146,7 @@ export default function BanjaraBazaarShop({ rooms, plot }) {
                 <div className="product-footer">
                   <span className="product-price">{p.price}</span>
                   <button className="btn btn-primary btn-sm" onClick={() => handleBuyProduct(p.title)}>
-                    Buy Remedy
+                    Procure Remedy
                   </button>
                 </div>
               </div>
@@ -160,7 +159,7 @@ export default function BanjaraBazaarShop({ rooms, plot }) {
 
       {/* Main Catalog Grid */}
       <div style={{ padding: '20px 24px 0', flexShrink: 0 }}>
-        <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 700 }}>Banjara Bazaar Vastu Catalog</h3>
+        <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 700 }}>Vastu Remedies Store</h3>
       </div>
       
       <div className="shop-grid">

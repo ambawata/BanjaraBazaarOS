@@ -1185,3 +1185,107 @@ body {
     page-break-inside: avoid;
   }
 }
+
+/* Bottom Navigation Bar for Mobile viewports */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: none; /* Hidden on desktop */
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-size: 10px;
+  cursor: pointer;
+  flex: 1;
+  height: 100%;
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item i {
+  font-size: 20px;
+  margin-bottom: 3px;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent);
+}
+
+/* Mobile Responsive Breakpoints */
+@media (max-width: 768px) {
+  #sidebar {
+    display: none !important; /* Hide left sidebar on phone */
+  }
+  
+  .bottom-nav {
+    display: flex; /* Show bottom nav on phone */
+  }
+  
+  .page-workspace {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    padding-bottom: 80px !important;
+  }
+  
+  .designer-drawer {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    max-height: 250px;
+  }
+  
+  .canvas-area {
+    width: 100% !important;
+    height: 380px !important;
+    flex-shrink: 0;
+    padding: 12px !important;
+  }
+  
+  .analysis-panel {
+    width: 100% !important;
+    height: auto !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  
+  .templates-list {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    max-height: 250px;
+  }
+  
+  .upload-screen-panel {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    max-height: 280px;
+  }
+
+  .chat-container {
+    margin: 8px !important;
+    height: calc(100vh - 120px) !important;
+  }
+
+  .report-document {
+    padding: 16px !important;
+  }
+}
