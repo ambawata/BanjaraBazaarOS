@@ -6,6 +6,7 @@ import FloorPlanUpload from './components/FloorPlanUpload'
 import AnalysisPanel from './components/AnalysisPanel'
 import BanjaraBazaarShop from './components/BanjaraBazaarShop'
 import ReportGenerator from './components/ReportGenerator'
+import AiChat from './components/AiChat'
 
 const POPUP_ELEMENTS = {
   rooms: [

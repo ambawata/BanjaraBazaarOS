@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { VASTU_RULES } from './AnalysisPanel'
 
 export default function AiChat({ rooms, plot, onSwitchTab, onGenerateLayout, currentStep, onNextStep }) {
   const [messages, setMessages] = useState([
@@ -89,7 +90,7 @@ export default function AiChat({ rooms, plot, onSwitchTab, onGenerateLayout, cur
             let row = cy < 33.3 ? 0 : cy >= 66.6 ? 2 : 1
             const zoneMap = [['NW', 'N', 'NE'], ['W', 'C', 'E'], ['SW', 'S', 'SE']]
             const z = zoneMap[row][col]
-            const rules = require('./AnalysisPanel').VASTU_RULES[r.type]
+            const rules = VASTU_RULES[r.type]
             return rules && rules.ratings[z] < 70
           }).length
           
