@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 export const VASTU_RULES = {
   pooja: {
@@ -66,7 +66,7 @@ export const VASTU_RULES = {
     name: 'Toilet / Bathroom',
     ratings: { NW: 100, W: 85, S: 70, N: 20, E: 20, SE: 10, SW: 0, NE: 0, C: 0 },
     descriptions: {
-      NW: 'Perfect placement! Vayavya (Wind) quadrant easily blows away negative energies and drains waste safely.',
+      NW: 'Perfect placement! Vayavya (Wind) quadrant easily drains negative energies and drains waste safely.',
       W: 'Very good. Safe direction for drainage.',
       S: 'Acceptable. Safe if drainage is toward the Northwest or West.',
       SE: 'Placing toilet in the fire corner drains financial resources and health.',
@@ -297,13 +297,15 @@ export function evaluateRoom(room, plot) {
   const cx = room.x + room.width / 2
   const cy = room.y + room.height / 2
   
-  let col = 1
+  let col = 0
   if (cx < 33.3) col = 0
   else if (cx >= 66.6) col = 2
+  else col = 1
   
-  let row = 1
+  let row = 0
   if (cy < 33.3) row = 0
   else if (cy >= 66.6) row = 2
+  else row = 1
   
   const zoneMap = [
     ['NW', 'N', 'NE'],
@@ -313,7 +315,6 @@ export function evaluateRoom(room, plot) {
   
   const zone = zoneMap[row][col]
   const config = VASTU_RULES[room.type] || VASTU_RULES.custom
-  
   const rating = config.ratings[zone] !== undefined ? config.ratings[zone] : 80
   
   let status = 'Neutral'
@@ -335,7 +336,9 @@ export function evaluateRoom(room, plot) {
   }
 }
 
-export default function AnalysisPanel({ rooms, plot }) {
+export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopItem }) {
+  const [activeSubTab, setActiveSubTab] = useState('overview') // overview | positives | improvements
+  
   let totalRating = 0
   let count = 0
   
@@ -351,25 +354,35 @@ export default function AnalysisPanel({ rooms, plot }) {
   const complianceExcellent = evaluatedRooms.filter(r => r.analysis.status === 'Excellent' || r.analysis.status === 'Good' || r.analysis.status === 'Neutral')
   const complianceIssues = evaluatedRooms.filter(r => r.analysis.status === 'Can Be Improved' || r.analysis.status === 'Needs Attention')
 
-  let scoreColor = 'var(--emerald)'
-  let ratingText = 'Very Harmonious Home'
+  let scoreColor = '#22c55e' // Green
+  let ratingText = 'Excellent Vastu Design'
   if (score < 50) {
-    scoreColor = 'var(--terracotta)'
-    ratingText = 'Needs Remedial Actions'
+    scoreColor = '#ef4444' // Red
+    ratingText = 'Needs Attention'
   } else if (score < 80) {
-    scoreColor = 'var(--gold)'
-    ratingText = 'Can Be Improved with Remedies'
+    scoreColor = '#f59e0b' // Amber
+    ratingText = 'Can Be Improved'
   }
 
   const radius = 28
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (score / 100) * circumference
 
+  const handleRowClick = (room) => {
+    if (room.analysis.status === 'Can Be Improved' || room.analysis.status === 'Needs Attention') {
+      onSelectShopItem(room)
+      onSwitchTab('shop')
+    }
+  }
+
   return (
-    <div className="analysis-panel">
-      <div className="analysis-header">
-        <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 700 }}>Vastu Health Check</h3>
-        <div className="score-widget">
+    <div className="analysis-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      
+      {/* Visual Header */}
+      <div className="analysis-header" style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
+        <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 700 }}>Vastu Analysis</h3>
+        
+        <div className="score-widget" style={{ marginTop: '12px' }}>
           <div className="score-circle-container">
             <svg className="score-svg">
               <circle className="score-svg-bg" cx="32" cy="32" r={radius} />
@@ -388,69 +401,131 @@ export default function AnalysisPanel({ rooms, plot }) {
             <div className="score-text" style={{ color: scoreColor }}>{score}%</div>
           </div>
           <div className="score-details">
-            <span className="score-label">Harmony Rating</span>
-            <span className="score-rating" style={{ color: scoreColor, fontSize: '13.5px' }}>{ratingText}</span>
+            <span className="score-label" style={{ fontSize: '10px' }}>Vastu Score</span>
+            <span className="score-rating" style={{ color: scoreColor, fontSize: '15px', fontWeight: 'bold' }}>{ratingText}</span>
+            <span style={{ fontSize: '11px', color: 'var(--text2)' }}>This is a very positive Vastu home.</span>
           </div>
         </div>
       </div>
 
-      <div className="analysis-content">
-        {/* Needs Attention / remedies */}
-        {complianceIssues.length > 0 && (
-          <div>
-            <div className="rule-group-title" style={{ color: 'var(--terracotta)' }}>Needs Attention ({complianceIssues.length})</div>
-            <div className="rule-list">
-              {complianceIssues.map((room) => (
-                <div key={room.id} className={`rule-card rule-${room.analysis.status === 'Needs Attention' ? 'poor' : 'warning'}`}>
-                  <i className={`rule-card-icon ti ti-${room.analysis.status === 'Needs Attention' ? 'circle-x-filled' : 'alert-triangle-filled'}`}></i>
-                  <div className="rule-card-content">
-                    <span className="rule-card-title">{room.label} in {room.analysis.zone}</span>
-                    <span className="rule-card-desc">{room.analysis.desc}</span>
-                    {room.analysis.remedy && (
-                      <span className="rule-card-remedy">
-                        <i className="ti ti-heart-handshake" style={{ marginRight: '4px' }}></i>
-                        <strong>Remedy Solution:</strong> {room.analysis.remedy}
-                      </span>
-                    )}
+      {/* Tabs */}
+      <div className="tabs" style={{ padding: '0 16px', marginBottom: '8px' }}>
+        <div 
+          className={`tab-btn ${activeSubTab === 'overview' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('overview')}
+          style={{ padding: '10px 14px', fontSize: '12.5px', fontWeight: 600 }}
+        >
+          Overview
+        </div>
+        <div 
+          className={`tab-btn ${activeSubTab === 'positives' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('positives')}
+          style={{ padding: '10px 14px', fontSize: '12.5px', fontWeight: 600 }}
+        >
+          Positives ({complianceExcellent.length})
+        </div>
+        <div 
+          className={`tab-btn ${activeSubTab === 'improvements' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('improvements')}
+          style={{ padding: '10px 14px', fontSize: '12.5px', fontWeight: 600 }}
+        >
+          Improvements ({complianceIssues.length})
+        </div>
+      </div>
+
+      {/* Content List */}
+      <div className="analysis-content" style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+        
+        {activeSubTab === 'overview' && (
+          <div className="rule-list">
+            {evaluatedRooms.map((room) => {
+              const isExcellent = room.analysis.status === 'Excellent' || room.analysis.status === 'Good' || room.analysis.status === 'Neutral'
+              const statusColor = isExcellent ? '#22c55e' : (room.analysis.status === 'Can Be Improved' ? '#f59e0b' : '#ef4444')
+              
+              return (
+                <div 
+                  key={room.id} 
+                  className={`remedy-item-row`} 
+                  onClick={() => handleRowClick(room)}
+                  style={{ cursor: isExcellent ? 'default' : 'pointer' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <i className={`ti ti-${isExcellent ? 'circle-check-filled' : 'alert-triangle-filled'}`} style={{ color: statusColor, fontSize: '18px' }}></i>
+                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600 }}>{room.label} in {room.analysis.zone}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text2)' }}>{isExcellent ? 'Highly auspicious placement.' : 'Click to view recommended remedies.'}</span>
+                    </div>
                   </div>
+                  <i className="ti ti-chevron-right" style={{ color: 'var(--text3)' }}></i>
                 </div>
-              ))}
-            </div>
+              )
+            })}
+            {evaluatedRooms.length === 0 && (
+              <p style={{ color: 'var(--text3)', fontStyle: 'italic', fontSize: '12px' }}>Your blueprint is empty. Add rooms in Editor tab.</p>
+            )}
           </div>
         )}
 
-        {/* Positive Alignments */}
-        <div>
-          <div className="rule-group-title" style={{ color: 'var(--emerald)' }}>Positive Alignments ({complianceExcellent.length})</div>
-          {complianceExcellent.length === 0 ? (
-            <p style={{ fontSize: '12px', color: 'var(--text3)', fontStyle: 'italic' }}>Place items or use AI templates to find positive alignments.</p>
-          ) : (
-            <div className="rule-list">
-              {complianceExcellent.map((room) => (
-                <div key={room.id} className="rule-card rule-excellent">
-                  <i className="ti ti-circle-check-filled rule-card-icon"></i>
-                  <div className="rule-card-content">
-                    <span className="rule-card-title">{room.label} in {room.analysis.zone}</span>
-                    <span className="rule-card-desc">{room.analysis.desc}</span>
+        {activeSubTab === 'positives' && (
+          <div className="rule-list">
+            {complianceExcellent.map((room) => (
+              <div key={room.id} className="remedy-item-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <i className="ti ti-circle-check-filled" style={{ color: '#22c55e', fontSize: '18px' }}></i>
+                  <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 600 }}>{room.label} in {room.analysis.zone}</span>
+                    <span style={{ fontSize: '11.5px', color: 'var(--text2)' }}>{room.analysis.desc}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Brahmasthan Check */}
-        <div style={{ background: 'var(--bg3)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', marginTop: 'auto' }}>
-          <h4 style={{ fontSize: '11px', fontFamily: 'var(--fm)', color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '8px' }}>Center Space Clearance</h4>
-          <p style={{ fontSize: '12px', color: 'var(--text2)', lineHeight: '1.4' }}>
-            {rooms.some(r => evaluateRoom(r, plot).zone === 'C') ? (
-              <span style={{ color: 'var(--terracotta)' }}><i className="ti ti-circle-x"></i> The central space is occupied. For peace, keep the center completely open and free of walls.</span>
-            ) : (
-              <span style={{ color: 'var(--emerald)' }}><i className="ti ti-circle-check"></i> Center space is clear. Energy flows smoothly in the middle of your home.</span>
+              </div>
+            ))}
+            {complianceExcellent.length === 0 && (
+              <p style={{ color: 'var(--text3)', fontStyle: 'italic', fontSize: '12px' }}>No positive Vastu alignments noted yet.</p>
             )}
-          </p>
-        </div>
+          </div>
+        )}
+
+        {activeSubTab === 'improvements' && (
+          <div className="rule-list">
+            {complianceIssues.map((room) => {
+              const statusColor = room.analysis.status === 'Needs Attention' ? '#ef4444' : '#f59e0b'
+              return (
+                <div 
+                  key={room.id} 
+                  className="remedy-item-row"
+                  onClick={() => handleRowClick(room)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <i className="ti ti-alert-triangle-filled" style={{ color: statusColor, fontSize: '18px' }}></i>
+                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600 }}>{room.label} in {room.analysis.zone}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text2)', textDecoration: 'underline' }}>Click to view remedies ➔</span>
+                    </div>
+                  </div>
+                  <i className="ti ti-chevron-right" style={{ color: 'var(--text3)' }}></i>
+                </div>
+              )
+            })}
+            {complianceIssues.length === 0 && (
+              <p style={{ color: 'var(--text3)', fontStyle: 'italic', fontSize: '12px' }}>Excellent! Zero Vastu issues detected.</p>
+            )}
+          </div>
+        )}
+
       </div>
+
+      {/* Footer view report */}
+      <div style={{ padding: '16px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
+        <button 
+          className="btn btn-primary" 
+          style={{ width: '100%', padding: '12px', justifyContent: 'center' }}
+          onClick={() => onSwitchTab('reports')}
+        >
+          View Detailed Report
+        </button>
+      </div>
+
     </div>
   )
 }
