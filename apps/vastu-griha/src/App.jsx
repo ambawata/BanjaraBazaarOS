@@ -196,6 +196,14 @@ export default function App() {
     setCustomRoomName('')
   }
 
+  // Clear visual canvas
+  const handleClearCanvas = () => {
+    if (window.confirm('Reset current layout design?')) {
+      setRooms([])
+      setSelectedRoomId(null)
+    }
+  }
+
   // Easy Mode Canvas Nudge handlers
   const handleNudge = (direction) => {
     if (!selectedRoomId) return
