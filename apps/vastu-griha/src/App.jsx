@@ -340,12 +340,16 @@ export default function App() {
 
     setTimeout(() => {
       setRooms([
-        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 62, width: 27, height: 33 },
-        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 5, y: 5, width: 27, height: 33 },
-        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 68, y: 5, width: 27, height: 33 },
-        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 34, y: 22, width: 32, height: 42 },
-        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 68, y: 62, width: 27, height: 33 },
-        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 74, y: 40, width: 21, height: 18 }
+        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 2, y: 63, width: 28, height: 35 },
+        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 2, y: 2, width: 28, height: 35 },
+        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 70, y: 2, width: 28, height: 35 },
+        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 30, y: 2, width: 40, height: 50 },
+        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 70, y: 63, width: 28, height: 35 },
+        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 70, y: 46, width: 20, height: 17 },
+        { id: 't7', type: 'toilet', label: 'Left Toilet / Bath', x: 2, y: 37, width: 18, height: 26 },
+        { id: 't8', type: 'toilet', label: 'Right Toilet / Bath', x: 78, y: 37, width: 20, height: 26 },
+        { id: 't9', type: 'staircase', label: 'Staircase Block', x: 42, y: 60, width: 16, height: 38 },
+        { id: 't10', type: 'entrance', label: 'Main Entrance', x: 30, y: 52, width: 12, height: 46 }
       ])
       setIsTracing(false)
       setTraceStatus('')
