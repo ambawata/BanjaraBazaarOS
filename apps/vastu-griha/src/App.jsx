@@ -8,6 +8,76 @@ import ReportGenerator from './components/ReportGenerator'
 import AiChat from './components/AiChat'
 import PlotConfig from './components/PlotConfig'
 
+// Reusable SVG Graphics for Onboarding Cards
+const GOAL_SVGS = {
+  build: (
+    <svg viewBox="0 0 100 80" width="60" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="25" y="35" width="50" height="40" rx="4" />
+      <polygon points="20,35 50,10 80,35" />
+      <rect x="42" y="50" width="16" height="25" />
+      <circle cx="70" cy="50" r="3" fill="var(--emerald)" />
+    </svg>
+  ),
+  renovate: (
+    <svg viewBox="0 0 100 80" width="60" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <path d="M20,55 H80 V70 H20 Z" />
+      <rect x="28" y="38" width="44" height="18" rx="6" />
+      <line x1="15" y1="20" x2="15" y2="55" stroke="var(--gold)" />
+      <circle cx="15" cy="18" r="4" fill="var(--gold)" />
+    </svg>
+  ),
+  audit: (
+    <svg viewBox="0 0 100 80" width="60" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="30" y="15" width="40" height="55" rx="4" />
+      <line x1="38" y1="30" x2="62" y2="30" />
+      <line x1="38" y1="42" x2="62" y2="42" />
+      <circle cx="70" cy="60" r="10" stroke="var(--accent)" />
+      <line x1="77" y1="67" x2="85" y2="75" strokeWidth="3" />
+    </svg>
+  ),
+  remedy: (
+    <svg viewBox="0 0 100 80" width="60" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <circle cx="35" cy="65" r="5" fill="var(--accent)" />
+      <circle cx="75" cy="65" r="5" fill="var(--accent)" />
+      <path d="M15,20 H30 L45,55 H80 L90,28 H25" />
+      <path d="M55,20 Q60,10 65,22 Q70,30 55,30" fill="var(--emerald)" stroke="var(--emerald)" />
+    </svg>
+  )
+}
+
+const STYLE_SVGS = {
+  modern: (
+    <svg viewBox="0 0 100 60" width="80" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="15" y="10" width="70" height="40" rx="2" />
+      <rect x="25" y="20" width="20" height="30" />
+      <line x1="55" y1="10" x2="55" y2="50" />
+      <rect x="62" y="22" width="16" height="12" />
+    </svg>
+  ),
+  traditional: (
+    <svg viewBox="0 0 100 60" width="80" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="25" y="28" width="50" height="26" />
+      <polygon points="15,28 50,2 85,28" />
+      <polygon points="30,16 50,4 70,16" />
+      <rect x="44" y="38" width="12" height="16" />
+    </svg>
+  ),
+  contemporary: (
+    <svg viewBox="0 0 100 60" width="80" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="15" y="25" width="45" height="28" rx="2" />
+      <rect x="45" y="10" width="40" height="25" rx="2" />
+      <circle cx="70" cy="22" r="4" fill="var(--gold)" />
+    </svg>
+  ),
+  minimalist: (
+    <svg viewBox="0 0 100 60" width="80" height="50" style={{ fill: 'none', stroke: 'var(--accent)', strokeWidth: 2 }}>
+      <rect x="20" y="15" width="60" height="38" />
+      <rect x="46" y="32" width="8" height="21" />
+      <circle cx="35" cy="28" r="3" fill="var(--accent)" />
+    </svg>
+  )
+}
+
 const EXPANDED_ROOMS_CATALOG = {
   private: [
     { type: 'bedroom', label: 'Master Bedroom', icon: 'bed', w: 30, h: 25 },
@@ -58,9 +128,9 @@ const EXPANDED_ROOMS_CATALOG = {
 
 export default function App() {
   const [screenState, setScreenState] = useState('welcome') 
-  // welcome | step_prop | step_size | step_shape | step_facing | step_family | step_needs | step_special | step_summary | designing | preview | workspace
+  // welcome | step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
   
-  const [activeTab, setActiveTab] = useState('designer') // designer | upload | chat | shop | reports
+  const [activeTab, setActiveTab] = useState('designer') // designer | upload | chat | analysis | shop | reports
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
   const [theme, setTheme] = useState(() => localStorage.getItem('vg-theme') || 'dark')
   
@@ -88,7 +158,7 @@ export default function App() {
   const [customRoomName, setCustomRoomName] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Onboarding lifestyle answers state
+  // Consolidated Onboarding answers state
   const [onboarding, setOnboarding] = useState({
     propertyType: 'Independent Villa',
     sizePreset: '30 x 40 ft',
@@ -96,19 +166,14 @@ export default function App() {
     customLength: '',
     plotShape: 'Rectangular Plot',
     facing: 'East Road ☀️',
-    familySetup: 'Joint Family',
-    seniorCitizens: true,
-    youngChildren: false,
-    hasPets: false,
-    wfh: true,
-    dailyPooja: true,
-    multipleCars: false,
-    needsElevator: false,
-    homeTheatre: false,
-    gymRoom: false,
-    servantQuarters: false,
-    swimmingPool: false,
-    evCharger: false
+    
+    // Preferences mockup states
+    goal: 'Build New Home',
+    membersCount: '4',
+    occupantType: 'Self',
+    budget: 'Up to 25 Lakhs',
+    preferredStyle: 'Modern',
+    customRequirements: ''
   })
 
   // Simulated AI design progress loader
@@ -276,24 +341,23 @@ export default function App() {
     list.push('Dining Area')
     list.push('Bathroom / Toilet')
 
-    if (onboarding.familySetup === 'Joint Family') {
+    if (onboarding.goal === 'Build New Home') {
       list.push('Master Bedroom')
       list.push('Parents Bedroom')
       list.push('Kids Bedroom')
     } else {
       list.push('Master Bedroom')
-      list.push('Guest Bedroom')
     }
 
-    if (onboarding.dailyPooja) list.push('Pooja Temple Mandir')
-    if (onboarding.wfh) list.push('Home Office')
-    if (onboarding.seniorCitizens) list.push('Parents Bedroom (Ground Floor)')
-    if (onboarding.needsElevator) list.push('Elevator / Lift Shaft')
-    if (onboarding.evCharger) list.push('EV Charging Station')
-    if (onboarding.homeTheatre) list.push('Home Theatre')
-    if (onboarding.gymRoom) list.push('Gym Room')
-    if (onboarding.swimmingPool) list.push('Swimming Pool')
-    if (onboarding.servantQuarters) list.push('Servant Room')
+    if (onboarding.customRequirements.toLowerCase().includes('pooja')) {
+      list.push('Pooja Temple Mandir')
+    } else {
+      list.push('Pooja Temple Mandir (Recommended)')
+    }
+
+    if (onboarding.customRequirements.toLowerCase().includes('office') || onboarding.customRequirements.toLowerCase().includes('study')) {
+      list.push('Home Office')
+    }
 
     return list
   }
@@ -349,9 +413,7 @@ export default function App() {
     tplRooms.push({ id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 80, y: 5, width: 15, height: 8 })
     
     // Pooja: Northeast (Ishanya)
-    if (onboarding.dailyPooja) {
-      tplRooms.push({ id: 'r2', type: 'pooja', label: 'Pooja Mandir', x: 75, y: 15, width: 20, height: 15 })
-    }
+    tplRooms.push({ id: 'r2', type: 'pooja', label: 'Pooja Mandir', x: 75, y: 15, width: 20, height: 15 })
     
     // Kitchen: Southeast (Agneya)
     tplRooms.push({ id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 75, y: 70, width: 20, height: 20 })
@@ -365,19 +427,79 @@ export default function App() {
     // Toilet: West or Northwest
     tplRooms.push({ id: 'r6', type: 'toilet', label: 'Bathroom Toilet', x: 5, y: 35, width: 20, height: 20 })
 
-    // Home Office: Northwest or North
-    if (onboarding.wfh) {
-      tplRooms.push({ id: 'r7', type: 'custom', label: 'Home Office Study', x: 35, y: 5, width: 22, height: 18 })
-    }
-
-    // Lift shaft
-    if (onboarding.needsElevator) {
-      tplRooms.push({ id: 'r8', type: 'lift', label: 'Elevator Lift', x: 5, y: 10, width: 12, height: 12 })
-    }
-
     setPlot(tplPlot)
     setRooms(tplRooms)
     setScreenState('preview')
+  }
+
+  // Wizard header matching mockup
+  const renderWizardHeader = (activeStep, backState) => {
+    return (
+      <div className="wizard-layout-header" style={{ width: '100%', padding: '16px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <button className="btn" style={{ padding: '8px 16px', background: 'none', border: '1px solid var(--border)', borderRadius: '20px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setScreenState(backState)}>
+            <i className="ti ti-arrow-left"></i> Back
+          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo.svg" style={{ width: '32px', height: '32px' }} alt="Vastu Logo" />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: 'var(--fd)', fontSize: '18px', fontWeight: 700, lineHeight: 1.1 }}>Vastu Griha</span>
+              <span style={{ fontSize: '10px', color: 'var(--text2)' }}>AI + Vastu. Perfect Harmony.</span>
+            </div>
+          </div>
+
+          {/* Ask Acharya Button in header */}
+          <button className="btn" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '24px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => { setScreenState('workspace'); setActiveTab('chat'); }}>
+            {/* Friendly Guru mini icon avatar */}
+            <svg viewBox="0 0 40 40" width="24" height="24">
+              <circle cx="20" cy="20" r="18" fill="var(--gold-dim)" />
+              <circle cx="20" cy="16" r="6" fill="var(--gold)" />
+              <path d="M10,32 Q20,22 30,32" fill="none" stroke="var(--gold)" strokeWidth="2.5" />
+            </svg>
+            <span style={{ fontSize: '12px', fontWeight: 600 }}>Ask Acharya</span>
+          </button>
+        </div>
+
+        {/* Wizard Steps indicator bar */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', gap: '8px', margin: '4px 0' }}>
+          {[
+            { step: 1, label: 'Start Type' },
+            { step: 2, label: 'Project Info' },
+            { step: 3, label: 'Upload & Scale' },
+            { step: 4, label: 'Preferences' }
+          ].map((item, idx) => {
+            const isCompleted = activeStep > item.step
+            const isActive = activeStep === item.step
+            return (
+              <React.Fragment key={item.step}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                  <div style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: isCompleted ? 'var(--accent)' : (isActive ? 'var(--accent-dim)' : 'var(--bg3)'),
+                    border: `2px solid ${isActive || isCompleted ? 'var(--accent)' : 'var(--border2)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isCompleted || isActive ? 'var(--accent)' : 'var(--text3)',
+                    fontWeight: 'bold',
+                    fontSize: '12px'
+                  }}>
+                    {isCompleted ? <i className="ti ti-check" style={{ color: '#fff', fontSize: '14px' }}></i> : item.step}
+                  </div>
+                  <span style={{ fontSize: '10px', fontWeight: 600, color: isActive || isCompleted ? 'var(--accent)' : 'var(--text3)' }}>{item.label}</span>
+                </div>
+                {idx < 3 && (
+                  <div style={{ flex: 1, maxWidth: '80px', height: '2px', background: isCompleted ? 'var(--accent)' : 'var(--border2)', margin: '0 4px', marginBottom: '14px' }}></div>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </div>
+      </div>
+    )
   }
 
   // 1. Welcome / Home Screen
@@ -401,7 +523,6 @@ export default function App() {
             Find positive energy alignments in your plot. Let the Vastu Acharya guide your home plan step-by-step.
           </p>
 
-          {/* Preset paths */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '360px' }}>
             <button className="btn btn-primary" style={{ padding: '16px', borderRadius: '30px', fontWeight: 'bold', justifyContent: 'center' }} onClick={() => setScreenState('step_prop')}>
               Design My Home <i className="ti ti-arrow-right" style={{ marginLeft: '8px' }}></i>
@@ -420,17 +541,12 @@ export default function App() {
     )
   }
 
-  // Step 1: Property Type selection
+  // Step 1: Start Type selection
   if (screenState === 'step_prop') {
     const props = ['Independent Villa', 'Raw Land / Plot', 'Apartment Flat', 'Renovation Project']
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('welcome')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Property Type</span>
-          </div>
-        </header>
+        {renderWizardHeader(1, 'welcome')}
 
         <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
           <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>What type of property is this?</h2>
@@ -457,60 +573,70 @@ export default function App() {
     )
   }
 
-  // Step 2: Plot Size
+  // Step 2: Project Info (Combines dimensions + Street facing in one screen)
   if (screenState === 'step_size') {
     const presets = ['20 x 30 ft', '30 x 40 ft', '30 x 50 ft', '40 x 60 ft', '50 x 80 ft']
+    const sides = ['North Road 🧭', 'East Road ☀️', 'South Road 🔥', 'West Road 🌅']
+    
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_prop')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Plot Size</span>
-          </div>
-        </header>
+        {renderWizardHeader(2, 'step_prop')}
 
         <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>What is your plot size?</h2>
+          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '14px', textAlign: 'center' }}>Tell us about your plot</h2>
           
-          <div className="onboarding-options-grid" style={{ maxWidth: '400px' }}>
-            {presets.map(pr => (
-              <div 
-                key={pr}
-                className={`option-button-card ${onboarding.sizePreset === pr ? 'selected' : ''}`}
-                onClick={() => selectSizePreset(pr)}
-              >
-                {pr}
+          <div style={{ width: '100%', maxWidth: '420px', textAlign: 'left', marginBottom: '16px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>1. Select Plot Size</span>
+            <div className="onboarding-options-grid">
+              {presets.map(pr => (
+                <div 
+                  key={pr}
+                  className={`option-button-card ${onboarding.sizePreset === pr ? 'selected' : ''}`}
+                  onClick={() => selectSizePreset(pr)}
+                >
+                  {pr}
+                </div>
+              ))}
+            </div>
+
+            {/* Custom dimensions */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: '10px', color: 'var(--text2)', display: 'block', marginBottom: '4px' }}>Custom Width (ft)</span>
+                <input 
+                  type="number" className="chat-input" style={{ width: '100%', padding: '10px' }}
+                  placeholder="e.g. 35" value={onboarding.customWidth}
+                  onChange={(e) => typeCustomDimension('customWidth', e.target.value)}
+                />
               </div>
-            ))}
-          </div>
-
-          {/* Custom dimensions */}
-          <div style={{ width: '100%', maxWidth: '400px', display: 'flex', gap: '12px', marginTop: '16px', textAlign: 'left' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontSize: '11px', color: 'var(--text2)', display: 'block', marginBottom: '6px' }}>Custom Width (ft)</span>
-              <input 
-                type="number" 
-                className="chat-input"
-                style={{ width: '100%', padding: '12px' }}
-                placeholder="e.g. 35"
-                value={onboarding.customWidth}
-                onChange={(e) => typeCustomDimension('customWidth', e.target.value)}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontSize: '11px', color: 'var(--text2)', display: 'block', marginBottom: '6px' }}>Custom Length (ft)</span>
-              <input 
-                type="number" 
-                className="chat-input"
-                style={{ width: '100%', padding: '12px' }}
-                placeholder="e.g. 45"
-                value={onboarding.customLength}
-                onChange={(e) => typeCustomDimension('customLength', e.target.value)}
-              />
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: '10px', color: 'var(--text2)', display: 'block', marginBottom: '4px' }}>Custom Length (ft)</span>
+                <input 
+                  type="number" className="chat-input" style={{ width: '100%', padding: '10px' }}
+                  placeholder="e.g. 45" value={onboarding.customLength}
+                  onChange={(e) => typeCustomDimension('customLength', e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
+          {/* Road facing */}
+          <div style={{ width: '100%', maxWidth: '420px', textAlign: 'left' }}>
+            <span style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>2. Which side is the road?</span>
+            <div className="onboarding-options-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+              {sides.map(sd => (
+                <div 
+                  key={sd}
+                  className={`option-button-card ${onboarding.facing === sd ? 'selected' : ''}`}
+                  onClick={() => setOnboarding(prev => ({ ...prev, facing: sd }))}
+                >
+                  {sd}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', width: '100%', maxWidth: '420px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
             <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_prop')}>Back</button>
             <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_shape')}>Next</button>
           </div>
@@ -519,24 +645,18 @@ export default function App() {
     )
   }
 
-  // Step 3: Plot Boundary shape & Corner-taps
+  // Step 3: Upload & Scale / Shape Boundary
   if (screenState === 'step_shape') {
     const shapes = ['Square Plot', 'Rectangular Plot', 'L-Shape Plot', 'Irregular Plot']
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_size')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Plot Shape & Boundary</span>
-          </div>
-        </header>
+        {renderWizardHeader(3, 'step_size')}
 
         <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '4px', textAlign: 'center' }}>What is the plot shape?</h2>
-          <span style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '16px' }}>Select preset or tap points to draw boundary</span>
+          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '6px', textAlign: 'center' }}>Plot Boundary drawing</h2>
+          <span style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '16px' }}>Select shape preset or tap corner points below</span>
 
-          {/* Quick choices */}
-          <div className="onboarding-options-grid" style={{ maxWidth: '400px', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+          <div className="onboarding-options-grid" style={{ width: '100%', maxWidth: '420px', gridTemplateColumns: 'repeat(2, 1fr)' }}>
             {shapes.map(sh => (
               <div 
                 key={sh}
@@ -548,232 +668,303 @@ export default function App() {
             ))}
           </div>
 
-          {/* Corner points drawing */}
           <PlotBoundaryDrawer points={boundaryPoints} onChange={handlePointsChange} />
 
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
+          <div style={{ display: 'flex', width: '100%', maxWidth: '420px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
             <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_size')}>Back</button>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_facing')}>Next</button>
+            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_preferences')}>Next</button>
           </div>
         </div>
       </div>
     )
   }
 
-  // Step 4: Street Facing side
-  if (screenState === 'step_facing') {
-    const sides = ['North Road 🧭', 'East Road ☀️', 'South Road 🔥', 'West Road 🌅']
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_shape')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Street Facing</span>
-          </div>
-        </header>
-
-        <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>Which side is the street/road?</h2>
-
-          <div style={{ width: '100%', maxWidth: '400px' }}>
-            {sides.map(sd => (
-              <div 
-                key={sd}
-                className={`option-list-card ${onboarding.facing === sd ? 'selected' : ''}`}
-                onClick={() => setOnboarding(prev => ({ ...prev, facing: sd }))}
-              >
-                <span style={{ fontSize: '14px', fontWeight: 600 }}>{sd}</span>
-                <div className="option-circle">
-                  {onboarding.facing === sd && <div className="option-circle-dot"></div>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
-            <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_shape')}>Back</button>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_family')}>Next</button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Step 5: Family Size setup
-  if (screenState === 'step_family') {
-    const families = ['1 Family', '2 Families', 'Joint Family', 'Shared with Tenant']
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_facing')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Household size</span>
-          </div>
-        </header>
-
-        <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>How many families will live here?</h2>
-
-          <div style={{ width: '100%', maxWidth: '400px' }}>
-            {families.map(fm => (
-              <div 
-                key={fm}
-                className={`option-list-card ${onboarding.familySetup === fm ? 'selected' : ''}`}
-                onClick={() => setOnboarding(prev => ({ ...prev, familySetup: fm }))}
-              >
-                <span style={{ fontSize: '14px', fontWeight: 600 }}>{fm}</span>
-                <div className="option-circle">
-                  {onboarding.familySetup === fm && <div className="option-circle-dot"></div>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
-            <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_facing')}>Back</button>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_needs')}>Next</button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Step 6: Family demographics & mobility needs (Checklist)
-  if (screenState === 'step_needs') {
-    const checklist = [
-      { key: 'seniorCitizens', label: 'Senior Citizens (50-70+ years)', icon: 'users' },
-      { key: 'youngChildren', label: 'Young Children / Toddlers', icon: 'mood-kid' },
-      { key: 'hasPets', label: 'Pets (Dog / Cat)', icon: 'dog' },
-      { key: 'wfh', label: 'Work from Home (WFH)', icon: 'device-laptop' },
-      { key: 'dailyPooja', label: 'Daily Pooja / Prayer', icon: 'flame' },
-      { key: 'multipleCars', label: 'Multiple Vehicles (2+)', icon: 'car' },
-      { key: 'needsElevator', label: 'Mobility / Accessibility Needs (Elevator)', icon: 'arrows-up-down' }
+  // Step 4: PREFERENCES (Exact Mockup Layout!)
+  if (screenState === 'step_preferences') {
+    const goals = [
+      { id: 'Build New Home', desc: 'Planning & designing a new home', key: 'build' },
+      { id: 'Renovate / Remodel', desc: 'Making changes to existing home', key: 'renovate' },
+      { id: 'Vastu Audit', desc: 'Check Vastu of existing home', key: 'audit' },
+      { id: 'Find Remedies', desc: 'Get Vastu remedies & suggestions', key: 'remedy' }
     ]
+
+    const budgets = ['Up to 25 Lakhs', '25 - 50 Lakhs', '50 - 1 Crore', 'Above 1 Crore']
+    const styles = ['Modern', 'Traditional', 'Contemporary', 'Minimalist']
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_family')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Demographics & Needs</span>
+        {renderWizardHeader(4, 'step_shape')}
+
+        <div style={{ flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
+          
+          {/* Headline */}
+          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+            <div style={{ textAlign: 'left' }}>
+              <h2 style={{ fontFamily: 'var(--fd)', fontSize: '22px', fontWeight: 700, margin: 0 }}>Set your preferences</h2>
+              <p style={{ fontSize: '12.5px', color: 'var(--text2)', marginTop: '4px' }}>Tell us your needs so our AI can give better Vastu recommendations.</p>
+            </div>
+            <button className="btn btn-sm" style={{ gap: '6px', background: 'none', border: '1px solid var(--border)', borderRadius: '16px', fontSize: '11px', whiteSpace: 'nowrap' }}>
+              <i className="ti ti-bulb" style={{ color: 'var(--gold)' }}></i> Why these preferences?
+            </button>
           </div>
-        </header>
 
-        <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>Are there any special family needs?</h2>
+          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            {/* 1. Goal choice */}
+            <div style={{ textAlign: 'left' }}>
+              <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                <i className="ti ti-target" style={{ color: 'var(--accent)' }}></i> 1. Which best describes your goal?
+              </span>
 
-          <div style={{ width: '100%', maxWidth: '400px' }}>
-            {checklist.map(item => (
-              <div 
-                key={item.key}
-                className={`option-list-card ${onboarding[item.key] ? 'selected' : ''}`}
-                onClick={() => setOnboarding(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <i className={`ti ti-${item.icon}`} style={{ color: onboarding[item.key] ? 'var(--accent)' : 'var(--text3)' }}></i>
-                  <span style={{ fontSize: '13.5px', fontWeight: 500 }}>{item.label}</span>
-                </div>
-                <div style={{ 
-                  width: '18px', 
-                  height: '18px', 
-                  borderRadius: '4px', 
-                  border: '2px solid var(--border2)',
-                  background: onboarding[item.key] ? 'var(--accent)' : 'none',
-                  borderColor: onboarding[item.key] ? 'var(--accent)' : 'var(--border2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifycontent: 'center',
-                  color: '#fff'
-                }}>
-                  {onboarding[item.key] && <i className="ti ti-check" style={{ fontSize: '12px' }}></i>}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {goals.map(g => {
+                  const isSelected = onboarding.goal === g.id
+                  return (
+                    <div 
+                      key={g.id}
+                      onClick={() => setOnboarding(prev => ({ ...prev, goal: g.id }))}
+                      style={{
+                        background: 'var(--bg2)',
+                        border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        position: 'relative'
+                      }}
+                    >
+                      {GOAL_SVGS[g.key]}
+                      <span style={{ fontSize: '12.5px', fontWeight: 'bold', marginTop: '6px', color: isSelected ? 'var(--accent)' : 'var(--text)' }}>{g.id}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--text2)', marginTop: '2px', lineHeight: 1.2 }}>{g.desc}</span>
+                      
+                      {/* Checkmark overlay */}
+                      {isSelected && (
+                        <div style={{ position: 'absolute', top: '8px', right: '8px', width: '16px', height: '16px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                          <i className="ti ti-check" style={{ fontSize: '10px' }}></i>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 2 & 3: Family details & Budget Row */}
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              {/* 2. Family Details */}
+              <div style={{ flex: 1, minWidth: '220px', textAlign: 'left' }}>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                  <i className="ti ti-users" style={{ color: 'var(--accent)' }}></i> 2. Family Details <span style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 'normal' }}>(Optional)</span>
+                </span>
+                
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: '10px', color: 'var(--text2)', display: 'block', marginBottom: '4px' }}>Number of Members</span>
+                      <select 
+                        className="chat-input" style={{ width: '100%', padding: '8px' }}
+                        value={onboarding.membersCount}
+                        onChange={(e) => setOnboarding(prev => ({ ...prev, membersCount: e.target.value }))}
+                      >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5+</option>
+                      </select>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: '10px', color: 'var(--text2)', display: 'block', marginBottom: '4px' }}>Main Occupant</span>
+                      <select 
+                        className="chat-input" style={{ width: '100%', padding: '8px' }}
+                        value={onboarding.occupantType}
+                        onChange={(e) => setOnboarding(prev => ({ ...prev, occupantType: e.target.value }))}
+                      >
+                        <option value="Self">Self</option>
+                        <option value="Parents">Parents</option>
+                        <option value="Children">Children</option>
+                        <option value="Rentals">Rentals</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', background: 'var(--accent-dim)', borderRadius: '6px', fontSize: '11px', color: 'var(--accent)' }}>
+                    <i className="ti ti-info-circle"></i>
+                    This helps us personalize room usage and Vastu suggestions.
+                  </div>
                 </div>
               </div>
-            ))}
+
+              {/* 3. Budget details */}
+              <div style={{ flex: 1, minWidth: '220px', textAlign: 'left' }}>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                  <i className="ti ti-wallet" style={{ color: 'var(--accent)' }}></i> 3. Budget Range <span style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 'normal' }}>(Optional)</span>
+                </span>
+
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                    {budgets.map(b => {
+                      const isSelected = onboarding.budget === b
+                      return (
+                        <div 
+                          key={b}
+                          onClick={() => setOnboarding(prev => ({ ...prev, budget: b }))}
+                          style={{
+                            padding: '8px 4px',
+                            borderRadius: '8px',
+                            background: isSelected ? 'var(--accent-dim)' : 'var(--bg3)',
+                            border: isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            color: isSelected ? 'var(--accent)' : 'var(--text2)'
+                          }}
+                        >
+                          ₹ {b}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', background: 'var(--emerald-dim)', borderRadius: '6px', fontSize: '11px', color: 'var(--emerald)' }}>
+                    <i className="ti ti-circle-check"></i>
+                    Helps us suggest suitable materials & remedies.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Preferred Style */}
+            <div style={{ textAlign: 'left' }}>
+              <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                <i className="ti ti-palette" style={{ color: 'var(--accent)' }}></i> 4. Preferred Style <span style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 'normal' }}>(Optional)</span>
+              </span>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                {styles.map(s => {
+                  const isSelected = onboarding.preferredStyle === s
+                  return (
+                    <div
+                      key={s}
+                      onClick={() => setOnboarding(prev => ({ ...prev, preferredStyle: s }))}
+                      style={{
+                        background: 'var(--bg2)',
+                        border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
+                        borderRadius: '10px',
+                        padding: '10px 4px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        position: 'relative'
+                      }}
+                    >
+                      {STYLE_SVGS[s.toLowerCase()]}
+                      <span style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '6px', color: isSelected ? 'var(--accent)' : 'var(--text2)' }}>{s}</span>
+                      
+                      {isSelected && (
+                        <div style={{ position: 'absolute', top: '4px', right: '4px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifycontent: 'center', color: '#fff' }}>
+                          <i className="ti ti-check" style={{ fontSize: '8px' }}></i>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                {/* Other category */}
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <i className="ti ti-dots" style={{ fontSize: '20px', color: 'var(--text3)', marginBottom: '8px' }}></i>
+                  <span style={{ fontSize: '11px', color: 'var(--text2)', fontWeight: 'bold' }}>Other</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Specific Requirements */}
+            <div style={{ textAlign: 'left' }}>
+              <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <i className="ti ti-file-text" style={{ color: 'var(--accent)' }}></i> 5. Any specific requirements? <span style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 'normal' }}>(Optional)</span>
+              </span>
+              
+              <div style={{ position: 'relative' }}>
+                <textarea 
+                  className="chat-input"
+                  style={{ width: '100%', height: '70px', padding: '10px 12px', fontSize: '12.5px', borderRadius: '10px' }}
+                  placeholder="E.g. Need Pooja room in North-East, Two kitchens, Separate entrance, Home office etc."
+                  value={onboarding.customRequirements}
+                  maxLength={250}
+                  onChange={(e) => setOnboarding(prev => ({ ...prev, customRequirements: e.target.value }))}
+                />
+                <div style={{ position: 'absolute', bottom: '6px', right: '10px', fontSize: '10px', color: 'var(--text3)' }}>
+                  {onboarding.customRequirements.length} / 250
+                </div>
+              </div>
+            </div>
+
+            {/* Tip & Security Footers */}
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '4px' }}>
+              
+              {/* Acharya Tip */}
+              <div style={{ flex: 1, minWidth: '220px', background: 'var(--gold-dim)', border: '1px solid var(--border)', borderRadius: '12px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'left' }}>
+                <svg viewBox="0 0 40 40" width="34" height="34" style={{ flexShrink: 0 }}>
+                  <circle cx="20" cy="20" r="18" fill="var(--gold)" />
+                  <path d="M12,32 Q20,20 28,32" fill="none" stroke="#fff" strokeWidth="2" />
+                  <circle cx="20" cy="15" r="5" fill="#fff" />
+                </svg>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--gold)' }}>✦ Acharya Tip</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text2)', lineHeight: 1.2 }}>The more details you share, the more accurate and personalized your Vastu results will be.</span>
+                </div>
+              </div>
+
+              {/* Private & Secure */}
+              <div style={{ flex: 1, minWidth: '220px', background: 'var(--emerald-dim)', border: '1px solid var(--border)', borderRadius: '12px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'left' }}>
+                <i className="ti ti-shield-check" style={{ fontSize: '24px', color: 'var(--emerald)', flexShrink: 0 }}></i>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--emerald)' }}>100% Private & Secure</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text2)', lineHeight: 1.2 }}>Your data is safe with us and never shared.</span>
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
-            <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_family')}>Back</button>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_special')}>Next</button>
+          {/* Wizard CTA Navigation buttons */}
+          <div style={{ display: 'flex', width: '100%', maxWidth: '520px', gap: '16px', marginTop: 'auto', paddingTop: '24px' }}>
+            <button className="btn" style={{ flex: 1, padding: '12px', borderRadius: '30px', justifyContent: 'center' }} onClick={() => setScreenState('step_shape')}>
+              <i className="ti ti-arrow-left" style={{ marginRight: '6px' }}></i> Back
+            </button>
+            <button 
+              className="btn btn-primary" 
+              style={{ flex: 1.5, padding: '12px', borderRadius: '30px', justifyContent: 'center', display: 'flex', flexDirection: 'column', height: '48px', lineHeight: 1 }}
+              onClick={() => setScreenState('step_summary')}
+            >
+              <span style={{ fontWeight: 'bold', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>Continue <i className="ti ti-arrow-right"></i></span>
+              <span style={{ fontSize: '9px', opacity: 0.8, marginTop: '2px' }}>Next: AI will analyze your plan</span>
+            </button>
           </div>
+
         </div>
       </div>
     )
   }
 
-  // Step 7: Special rooms / accessories
-  if (screenState === 'step_special') {
-    const specials = [
-      { key: 'homeTheatre', label: 'Home Theatre Room', icon: 'movie' },
-      { key: 'gymRoom', label: 'Home Gym Space', icon: 'barbell' },
-      { key: 'servantQuarters', label: 'Servant Quarters / Rooms', icon: 'user-cog' },
-      { key: 'swimmingPool', label: 'Swimming Pool', icon: 'ripple' },
-      { key: 'evCharger', label: 'EV Charger Stand', icon: 'charging-pile' }
-    ]
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_needs')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>Special Spaces</span>
-          </div>
-        </header>
-
-        <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
-          <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '20px', textAlign: 'center' }}>Any secondary rooms or settings?</h2>
-
-          <div style={{ width: '100%', maxWidth: '400px' }}>
-            {specials.map(item => (
-              <div 
-                key={item.key}
-                className={`option-list-card ${onboarding[item.key] ? 'selected' : ''}`}
-                onClick={() => setOnboarding(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <i className={`ti ti-${item.icon}`} style={{ color: onboarding[item.key] ? 'var(--accent)' : 'var(--text3)' }}></i>
-                  <span style={{ fontSize: '13.5px', fontWeight: 500 }}>{item.label}</span>
-                </div>
-                <div style={{ 
-                  width: '18px', 
-                  height: '18px', 
-                  borderRadius: '4px', 
-                  border: '2px solid var(--border2)',
-                  background: onboarding[item.key] ? 'var(--accent)' : 'none',
-                  borderColor: onboarding[item.key] ? 'var(--accent)' : 'var(--border2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff'
-                }}>
-                  {onboarding[item.key] && <i className="ti ti-check" style={{ fontSize: '12px' }}></i>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', width: '100%', maxWidth: '400px', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
-            <button className="btn" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_needs')}>Back</button>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '12px', justifyContent: 'center' }} onClick={() => setScreenState('step_summary')}>Next</button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Step 8: AI Summary & Determined Rooms Listing
+  // Step 5: AI Summary & Determined Rooms Listing
   if (screenState === 'step_summary') {
     const list = getDeterminedRoomsList()
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <button className="btn btn-icon" onClick={() => setScreenState('step_special')}><i className="ti ti-chevron-left"></i></button>
-          <div className="topbar-left" style={{ width: '100%', textAlign: 'center', paddingRight: '40px' }}>
-            <span className="page-title" style={{ fontSize: '14px' }}>AI Determined Rooms</span>
-          </div>
-        </header>
+        {renderWizardHeader(4, 'step_preferences')}
 
         <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto' }}>
           <h2 style={{ fontFamily: 'var(--fd)', fontSize: '20px', fontWeight: 700, marginBottom: '6px', textAlign: 'center' }}>Your Vastu Home Blueprint Checklist</h2>
           <p style={{ fontSize: '12.5px', color: 'var(--text2)', lineHeight: '1.4', marginBottom: '20px', maxWidth: '420px', textAlign: 'center' }}>
-            Based on your answers (Joint Family, Senior Citizens, WFH, daily pooja), the AI Vastu consultant has selected these required home structures:
+            Based on your answers (Goal: {onboarding.goal}, Budget: {onboarding.budget}, Style: {onboarding.preferredStyle}), the AI Vastu consultant has selected these required home structures:
           </p>
 
           <div className="summary-meta-card" style={{ maxWidth: '420px', textAlign: 'left' }}>
@@ -793,8 +984,8 @@ export default function App() {
             >
               Looks Good, Design My Vastu Home ✨
             </button>
-            <button className="btn" style={{ padding: '10px', justifyContent: 'center', fontSize: '12px' }} onClick={() => setScreenState('step_prop')}>
-              Restart Answers
+            <button className="btn" style={{ padding: '10px', justifyContent: 'center', fontSize: '12px' }} onClick={() => setScreenState('step_preferences')}>
+              Back to Preferences
             </button>
           </div>
         </div>
@@ -900,7 +1091,7 @@ export default function App() {
           <button 
             className="btn btn-primary" 
             style={{ width: '100%', maxWidth: '440px', padding: '14px', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold' }}
-            onClick={() => { setScreenState('workspace'); setActiveTab('reports') }}
+            onClick={() => { setScreenState('workspace'); setActiveTab('analysis') }}
           >
             View Vastu Audit
           </button>
@@ -1149,7 +1340,6 @@ export default function App() {
           {/* Floorplan Calibration Screen */}
           {activeTab === 'upload' && (
             <>
-              {/* Opacity/Scale Backdrop adjustment sliders */}
               <div className="upload-screen-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Align Sketch Backdrop</span>
                 
