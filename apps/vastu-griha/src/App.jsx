@@ -340,16 +340,17 @@ export default function App() {
 
     setTimeout(() => {
       setRooms([
-        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 2, y: 63, width: 28, height: 35 },
-        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 2, y: 2, width: 28, height: 35 },
-        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 70, y: 2, width: 28, height: 35 },
-        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 30, y: 2, width: 40, height: 50 },
-        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 70, y: 63, width: 28, height: 35 },
-        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 70, y: 46, width: 20, height: 17 },
-        { id: 't7', type: 'toilet', label: 'Left Toilet / Bath', x: 2, y: 37, width: 18, height: 26 },
-        { id: 't8', type: 'toilet', label: 'Right Toilet / Bath', x: 78, y: 37, width: 20, height: 26 },
-        { id: 't9', type: 'staircase', label: 'Staircase Block', x: 42, y: 60, width: 16, height: 38 },
-        { id: 't10', type: 'entrance', label: 'Main Entrance', x: 30, y: 52, width: 12, height: 46 }
+        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 2.8, y: 60.5, width: 29.2, height: 31.5 },
+        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 2.8, y: 2, width: 29.2, height: 32 },
+        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 61.2, y: 6, width: 29.5, height: 33.2 },
+        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 35, y: 5, width: 26.2, height: 24.5 },
+        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 61.8, y: 59, width: 29.2, height: 33.2 },
+        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 74.6, y: 39.2, width: 16.1, height: 19.8 },
+        { id: 't7', type: 'toilet', label: 'Left Toilet / Bath', x: 16.5, y: 34, width: 15.5, height: 22 },
+        { id: 't8', type: 'toilet', label: 'Right Toilet / Bath', x: 61.8, y: 39.2, width: 12.8, height: 19.8 },
+        { id: 't9', type: 'staircase', label: 'Staircase Block', x: 32, y: 55.5, width: 14.8, height: 36.5 },
+        { id: 't10', type: 'dining', label: 'Dining Area', x: 46.8, y: 59.8, width: 15, height: 32.2 },
+        { id: 't11', type: 'entrance', label: 'Main Entrance', x: 46.8, y: 92, width: 15, height: 8 }
       ])
       setIsTracing(false)
       setTraceStatus('')
