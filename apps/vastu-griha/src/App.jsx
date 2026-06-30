@@ -61,8 +61,17 @@ export default function App() {
   // welcome | step_prop | step_size | step_shape | step_facing | step_family | step_needs | step_special | step_summary | designing | preview | workspace
   
   const [activeTab, setActiveTab] = useState('designer') // designer | upload | chat | shop | reports
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
   const [theme, setTheme] = useState(() => localStorage.getItem('vg-theme') || 'dark')
   
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // Custom Boundary Corner points
   const [boundaryPoints, setBoundaryPoints] = useState([])
 
@@ -934,6 +943,12 @@ export default function App() {
             <i className="ti ti-message-chatbot"></i> Ask Acharya
           </div>
           <div 
+            className={`nav-item ${activeTab === 'analysis' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analysis')}
+          >
+            <i className="ti ti-clipboard-check"></i> Vastu Audit
+          </div>
+          <div 
             className={`nav-item ${activeTab === 'shop' ? 'active' : ''}`}
             onClick={() => setActiveTab('shop')}
           >
@@ -965,6 +980,7 @@ export default function App() {
               {activeTab === 'designer' && 'Plan Editor (Easy Mode)'}
               {activeTab === 'upload' && 'Align Custom Sketch'}
               {activeTab === 'chat' && 'Vastu Acharya Consultant'}
+              {activeTab === 'analysis' && 'Vastu Compliance Audit'}
               {activeTab === 'shop' && 'Vastu Remedies Shop'}
               {activeTab === 'reports' && 'Vastu Health Report'}
             </span>
@@ -972,6 +988,7 @@ export default function App() {
               {activeTab === 'designer' && 'Tap elements to place, and use nudge buttons to align'}
               {activeTab === 'upload' && 'Place existing plans behind grid lines and adjust alignment'}
               {activeTab === 'chat' && 'Query paint colors, entrances, or element balance suggestions'}
+              {activeTab === 'analysis' && 'Detailed sector evaluations and graded remedies'}
               {activeTab === 'shop' && 'Procure Vedic remedies to align home energy fields'}
               {activeTab === 'reports' && 'Check and print family Vastu layout checklist reports'}
             </span>
@@ -994,30 +1011,32 @@ export default function App() {
           {activeTab === 'designer' && (
             <>
               {/* Canva Room Sidebar */}
-              <div className="designer-drawer">
-                <div className="drawer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Elements Catalog</span>
-                  <button className="btn btn-sm btn-primary" onClick={() => setShowAddPopup(true)}>
-                    <i className="ti ti-plus"></i> Add Item
-                  </button>
+              {!isMobile && (
+                <div className="designer-drawer">
+                  <div className="drawer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Elements Catalog</span>
+                    <button className="btn btn-sm btn-primary" onClick={() => setShowAddPopup(true)}>
+                      <i className="ti ti-plus"></i> Add Item
+                    </button>
+                  </div>
+                  <div className="drawer-body">
+                    <div className="sidebar-section-title">Living rooms</div>
+                    {EXPANDED_ROOMS_CATALOG.private.map((tmpl) => (
+                      <div 
+                        key={tmpl.type + tmpl.label}
+                        className="room-template-card"
+                        onClick={() => handleAddRoom(tmpl)}
+                      >
+                        <i className={`ti ti-${tmpl.icon}`}></i>
+                        <span>{tmpl.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="drawer-body">
-                  <div className="sidebar-section-title">Living rooms</div>
-                  {EXPANDED_ROOMS_CATALOG.private.map((tmpl) => (
-                    <div 
-                      key={tmpl.type + tmpl.label}
-                      className="room-template-card"
-                      onClick={() => handleAddRoom(tmpl)}
-                    >
-                      <i className={`ti ti-${tmpl.icon}`}></i>
-                      <span>{tmpl.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Editor Workspace */}
-              <div className="canvas-area">
+              <div className="canvas-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div className="canvas-toolbar">
                   {/* Grid toggles */}
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -1045,6 +1064,30 @@ export default function App() {
                   showVastuGrid={showVastuGrid}
                   showNormalGrid={showNormalGrid}
                 />
+
+                {/* Mobile Floating Action Button (FAB) to insert elements */}
+                {isMobile && (
+                  <button 
+                    className="btn btn-primary fab-add-room" 
+                    onClick={() => setShowAddPopup(true)}
+                    style={{
+                      position: 'fixed',
+                      bottom: '80px',
+                      right: '20px',
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '50%',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.35)',
+                      zIndex: 90,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0
+                    }}
+                  >
+                    <i className="ti ti-plus" style={{ fontSize: '22px' }}></i>
+                  </button>
+                )}
 
                 {/* Arrow Nudge toolbar for Easy mobile positioning */}
                 {selectedRoomId && (
@@ -1092,12 +1135,14 @@ export default function App() {
               </div>
 
               {/* Analysis Sidebar panel */}
-              <AnalysisPanel 
-                rooms={rooms} 
-                plot={plot} 
-                onSwitchTab={setActiveTab}
-                onSelectShopItem={setSelectedIssueRoom}
-              />
+              {!isMobile && (
+                <AnalysisPanel 
+                  rooms={rooms} 
+                  plot={plot} 
+                  onSwitchTab={setActiveTab}
+                  onSelectShopItem={setSelectedIssueRoom}
+                />
+              )}
             </>
           )}
 
@@ -1168,6 +1213,19 @@ export default function App() {
                 plot={plot} 
                 currentStep="chat"
                 onSwitchTab={setActiveTab} 
+              />
+            </div>
+          )}
+
+          {/* Dedicated Vastu Analysis Audit Screen */}
+          {activeTab === 'analysis' && (
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <AnalysisPanel 
+                rooms={rooms} 
+                plot={plot} 
+                onSwitchTab={setActiveTab}
+                onSelectShopItem={setSelectedIssueRoom}
+                isFullPage={true}
               />
             </div>
           )}
@@ -1309,6 +1367,13 @@ export default function App() {
           >
             <i className="ti ti-layout-grid"></i>
             <span>Blueprint</span>
+          </div>
+          <div 
+            className={`bottom-nav-item ${activeTab === 'analysis' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analysis')}
+          >
+            <i className="ti ti-clipboard-check"></i>
+            <span>Analysis</span>
           </div>
           <div 
             className={`bottom-nav-item ${activeTab === 'shop' ? 'active' : ''}`}

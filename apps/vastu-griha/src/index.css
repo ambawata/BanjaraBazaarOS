@@ -1259,16 +1259,19 @@ body {
   
   .canvas-area {
     width: 100% !important;
-    height: 380px !important;
-    flex-shrink: 0;
-    padding: 12px !important;
+    height: 100% !important;
+    flex: 1 !important;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
   }
   
   .analysis-panel {
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
+    flex: 1 !important;
     border-left: none !important;
-    border-top: 1px solid var(--border);
+    border-top: none !important;
     flex-shrink: 0;
   }
   
