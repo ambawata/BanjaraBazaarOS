@@ -439,7 +439,7 @@ body {
   font-family: var(--fd);
   font-weight: 600;
   font-size: 12px;
-  color: var(--text);
+  color: #f8fafc !important; /* Always light on dark room box background */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -448,12 +448,12 @@ body {
 .placed-room-size {
   font-size: 9px;
   font-family: var(--fm);
-  color: var(--text3);
+  color: #cbd5e1 !important; /* Always light on dark room box background */
 }
 
 .placed-room-close {
   cursor: pointer;
-  color: var(--text3);
+  color: #94a3b8 !important; /* Always light on dark room box background */
   font-size: 14px;
   padding: 2px;
   border-radius: 4px;

@@ -1688,8 +1688,18 @@ export default function App() {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text2)', textTransform: 'uppercase', fontWeight: 600 }}>Easy Align Controls</span>
-                      <button className="btn btn-sm btn-danger" onClick={handleDeleteSelected}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Easy Align Controls</span>
+                        {(() => {
+                          const selectedRoom = rooms.find(r => r.id === selectedRoomId)
+                          return selectedRoom ? (
+                            <span style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--accent)', marginTop: '2px' }}>
+                              Editing: {selectedRoom.label} ({Math.round((selectedRoom.width / 100) * plot.width)}x{Math.round((selectedRoom.height / 100) * plot.length)} ft)
+                            </span>
+                          ) : null
+                        })()}
+                      </div>
+                      <button className="btn btn-sm btn-danger" style={{ padding: '6px 12px', fontSize: '11px', borderRadius: '16px' }} onClick={handleDeleteSelected}>
                         <i className="ti ti-trash"></i> Delete
                       </button>
                     </div>
