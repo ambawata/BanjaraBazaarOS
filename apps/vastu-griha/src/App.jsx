@@ -130,7 +130,8 @@ export default function App() {
   const [screenState, setScreenState] = useState('welcome') 
   // welcome | step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
   
-  const [activeTab, setActiveTab] = useState('designer') // designer | upload | chat | analysis | shop | reports
+  const [activeTab, setActiveTab] = useState('home') // home | designer | upload | analysis | shop | reports
+  const [showAcharyaModal, setShowAcharyaModal] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
   const [theme, setTheme] = useState(() => localStorage.getItem('vg-theme') || 'dark')
   
@@ -450,7 +451,7 @@ export default function App() {
           </div>
 
           {/* Ask Acharya Button in header */}
-          <button className="btn" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '24px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => { setScreenState('workspace'); setActiveTab('chat'); }}>
+          <button className="btn" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '24px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => { setScreenState('workspace'); setShowAcharyaModal(true); }}>
             {/* Friendly Guru mini icon avatar */}
             <svg viewBox="0 0 40 40" width="24" height="24">
               <circle cx="20" cy="20" r="18" fill="var(--gold-dim)" />
@@ -1114,6 +1115,12 @@ export default function App() {
         <div className="sidebar-nav">
           <div className="sidebar-section-title">Home Blueprint</div>
           <div 
+            className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveTab('home')}
+          >
+            <i className="ti ti-home-2"></i> Dashboard Home
+          </div>
+          <div 
             className={`nav-item ${activeTab === 'designer' ? 'active' : ''}`}
             onClick={() => setActiveTab('designer')}
           >
@@ -1128,8 +1135,8 @@ export default function App() {
 
           <div className="sidebar-section-title" style={{ marginTop: '16px' }}>Vedic Audit</div>
           <div 
-            className={`nav-item ${activeTab === 'chat' ? 'active' : ''}`}
-            onClick={() => setActiveTab('chat')}
+            className="nav-item"
+            onClick={() => setShowAcharyaModal(true)}
           >
             <i className="ti ti-message-chatbot"></i> Ask Acharya
           </div>
@@ -1168,6 +1175,7 @@ export default function App() {
         <header id="topbar">
           <div className="topbar-left">
             <span className="page-title">
+              {activeTab === 'home' && 'Vastu Home Dashboard'}
               {activeTab === 'designer' && 'Plan Editor (Easy Mode)'}
               {activeTab === 'upload' && 'Align Custom Sketch'}
               {activeTab === 'chat' && 'Vastu Acharya Consultant'}
@@ -1176,6 +1184,7 @@ export default function App() {
               {activeTab === 'reports' && 'Vastu Health Report'}
             </span>
             <span className="page-subtitle">
+              {activeTab === 'home' && 'Summary of home blueprint, energy health scores, and quick actions'}
               {activeTab === 'designer' && 'Tap elements to place, and use nudge buttons to align'}
               {activeTab === 'upload' && 'Place existing plans behind grid lines and adjust alignment'}
               {activeTab === 'chat' && 'Query paint colors, entrances, or element balance suggestions'}
@@ -1198,6 +1207,82 @@ export default function App() {
         {/* Dynamic Workspace Screens */}
         <div className="page-workspace" style={{ paddingBottom: '60px' }}>
           
+          {/* 1. Dedicated Home Dashboard Screen */}
+          {activeTab === 'home' && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px', gap: '20px', width: '100%', maxWidth: '600px', margin: '0 auto', textAlign: 'left', overflowY: 'auto' }}>
+              
+              {/* Home project metadata */}
+              <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Active Project Parameters</span>
+                <h3 style={{ fontFamily: 'var(--fd)', fontSize: '18px', fontWeight: 'bold', margin: 0 }}>My Vastu Dream House</h3>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+                  <span className="badge" style={{ background: 'var(--bg3)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>🏡 {onboarding.propertyType}</span>
+                  <span className="badge" style={{ background: 'var(--bg3)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>🧭 {plot.width} x {plot.length} ft</span>
+                  <span className="badge" style={{ background: 'var(--bg3)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>☀️ {onboarding.facing}</span>
+                  <span className="badge" style={{ background: 'var(--bg3)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: '4px', fontSize: '11px' }}>👥 {onboarding.membersCount} Occupants</span>
+                </div>
+              </div>
+
+              {/* Compliance score widget */}
+              <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '5px solid var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px', color: 'var(--emerald)', boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)' }}>
+                  92%
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Vastu Score rating</span>
+                  <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--emerald)' }}>Excellent Energy Alignment</span>
+                  <span style={{ fontSize: '11.5px', color: 'var(--text2)' }}>Your room configuration matches traditional Vedic layout flows.</span>
+                </div>
+              </div>
+
+              {/* Strength & Tension Overview */}
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '140px', background: 'var(--emerald-dim)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                  <i className="ti ti-circle-check" style={{ fontSize: '24px', color: 'var(--emerald)' }}></i>
+                  <h4 style={{ fontSize: '20px', fontWeight: 'bold', margin: '4px 0', color: 'var(--emerald)' }}>5 Zones</h4>
+                  <span style={{ fontSize: '11px', color: 'var(--text2)' }}>Perfect Vastu Alignments</span>
+                </div>
+                <div style={{ flex: 1, minWidth: '140px', background: 'var(--gold-dim)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                  <i className="ti ti-alert-triangle" style={{ fontSize: '24px', color: 'var(--gold)' }}></i>
+                  <h4 style={{ fontSize: '20px', fontWeight: 'bold', margin: '4px 0', color: 'var(--gold)' }}>1 Zone</h4>
+                  <span style={{ fontSize: '11px', color: 'var(--text2)' }}>Remediable Friction Points</span>
+                </div>
+              </div>
+
+              {/* Quick Actions Grid */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Quick Actions</span>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                  <div onClick={() => setActiveTab('designer')} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer' }}>
+                    <i className="ti ti-layout-grid" style={{ fontSize: '20px', color: 'var(--accent)' }}></i>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px' }}>Edit Blueprint</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text3)' }}>Place and align custom rooms</span>
+                  </div>
+
+                  <div onClick={() => setShowAcharyaModal(true)} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer' }}>
+                    <i className="ti ti-message-chatbot" style={{ fontSize: '20px', color: 'var(--gold)' }}></i>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px' }}>Consult AI Acharya</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text3)' }}>Ask room advice and colors</span>
+                  </div>
+
+                  <div onClick={() => setActiveTab('shop')} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer' }}>
+                    <i className="ti ti-shopping-cart" style={{ fontSize: '20px', color: 'var(--emerald)' }}></i>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px' }}>Shop Remedies</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text3)' }}>Procure Vedic correction helixes</span>
+                  </div>
+
+                  <div onClick={() => setActiveTab('reports')} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer' }}>
+                    <i className="ti ti-file-text" style={{ fontSize: '20px', color: 'var(--accent)' }}></i>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px' }}>Print Vastu Report</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text3)' }}>Download detailed layouts PDF</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
           {/* Main Visual Editor Screen */}
           {activeTab === 'designer' && (
             <>
@@ -1543,27 +1628,52 @@ export default function App() {
         )}
 
         {/* Mobile bottom navigation bar */}
-        <div className="bottom-nav">
+        <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
           <div 
-            className={`bottom-nav-item ${activeTab === 'chat' ? 'active' : ''}`}
-            onClick={() => setActiveTab('chat')}
+            className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveTab('home')}
           >
-            <i className="ti ti-message-chatbot"></i>
-            <span>Acharya</span>
+            <i className="ti ti-home-2"></i>
+            <span>Home</span>
           </div>
           <div 
             className={`bottom-nav-item ${activeTab === 'designer' ? 'active' : ''}`}
             onClick={() => setActiveTab('designer')}
           >
             <i className="ti ti-layout-grid"></i>
-            <span>Blueprint</span>
+            <span>Design</span>
           </div>
-          <div 
-            className={`bottom-nav-item ${activeTab === 'analysis' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analysis')}
+          
+          {/* Central Add FAB button matching mockup */}
+          <button 
+            className="bottom-nav-fab-btn" 
+            onClick={() => setShowAddPopup(true)}
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '50%',
+              background: 'var(--accent)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)',
+              marginTop: '-16px',
+              cursor: 'pointer',
+              zIndex: 110,
+              padding: 0
+            }}
           >
-            <i className="ti ti-clipboard-check"></i>
-            <span>Analysis</span>
+            <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
+          </button>
+
+          <div 
+            className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reports')}
+          >
+            <i className="ti ti-file-text"></i>
+            <span>Reports</span>
           </div>
           <div 
             className={`bottom-nav-item ${activeTab === 'shop' ? 'active' : ''}`}
@@ -1572,14 +1682,66 @@ export default function App() {
             <i className="ti ti-shopping-cart"></i>
             <span>Remedies</span>
           </div>
-          <div 
-            className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reports')}
-          >
-            <i className="ti ti-file-text"></i>
-            <span>Report</span>
-          </div>
         </div>
+
+        {/* Global Acharya Chat Dialog Popup Modal */}
+        {showAcharyaModal && (
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              background: 'rgba(0,0,0,0.6)', 
+              zIndex: 900, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              padding: '16px'
+            }}
+            onClick={() => setShowAcharyaModal(false)}
+          >
+            <div 
+              style={{ 
+                width: '100%', 
+                maxWidth: '480px', 
+                height: '80vh', 
+                background: 'var(--bg)', 
+                borderRadius: '16px', 
+                border: '1px solid var(--border)', 
+                overflow: 'hidden', 
+                display: 'flex', 
+                flexDirection: 'column' 
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ background: 'var(--bg2)', padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <svg viewBox="0 0 40 40" width="30" height="30">
+                    <circle cx="20" cy="20" r="18" fill="var(--gold-dim)" />
+                    <circle cx="20" cy="15" r="5" fill="var(--gold)" />
+                    <path d="M12,32 Q20,20 28,32" fill="none" stroke="var(--gold)" strokeWidth="2" />
+                  </svg>
+                  <div style={{ textAlign: 'left' }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>Ask Vastu Acharya</h4>
+                    <span style={{ fontSize: '10px', color: 'var(--text2)' }}>AI Vedic layout consultant</span>
+                  </div>
+                </div>
+                <i className="ti ti-x" style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowAcharyaModal(false)}></i>
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+                <AiChat 
+                  rooms={rooms} 
+                  plot={plot} 
+                  currentStep="chat"
+                  onSwitchTab={(tab) => { setShowAcharyaModal(false); setActiveTab(tab); }} 
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
