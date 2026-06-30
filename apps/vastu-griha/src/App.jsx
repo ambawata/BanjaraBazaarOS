@@ -823,27 +823,29 @@ export default function App() {
         </button>
 
         {/* Bottom Navigation */}
-        <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-          <div className="bottom-nav-item active" onClick={() => setScreenState('welcome')}>
-            <i className="ti ti-home-2"></i>
-            <span>Home</span>
+        {isMobile && (
+          <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            <div className="bottom-nav-item active" onClick={() => setScreenState('welcome')}>
+              <i className="ti ti-home-2"></i>
+              <span>Home</span>
+            </div>
+            <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('designer'); }}>
+              <i className="ti ti-layout-grid"></i>
+              <span>Design</span>
+            </div>
+            <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifycontent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
+              <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
+            </button>
+            <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }}>
+              <i className="ti ti-file-text"></i>
+              <span>Reports</span>
+            </div>
+            <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('shop'); }}>
+              <i className="ti ti-shopping-cart"></i>
+              <span>Remedies</span>
+            </div>
           </div>
-          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('designer'); }}>
-            <i className="ti ti-layout-grid"></i>
-            <span>Design</span>
-          </div>
-          <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifycontent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
-            <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
-          </button>
-          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }}>
-            <i className="ti ti-file-text"></i>
-            <span>Reports</span>
-          </div>
-          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('shop'); }}>
-            <i className="ti ti-shopping-cart"></i>
-            <span>Remedies</span>
-          </div>
-        </div>
+        )}
 
       </div>
     )
@@ -1945,61 +1947,63 @@ export default function App() {
         )}
 
         {/* Mobile bottom navigation bar */}
-        <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-          <div 
-            className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-            onClick={() => setActiveTab('home')}
-          >
-            <i className="ti ti-home-2"></i>
-            <span>Home</span>
-          </div>
-          <div 
-            className={`bottom-nav-item ${activeTab === 'designer' ? 'active' : ''}`}
-            onClick={() => setActiveTab('designer')}
-          >
-            <i className="ti ti-layout-grid"></i>
-            <span>Design</span>
-          </div>
-          
-          {/* Central Add FAB button matching mockup */}
-          <button 
-            className="bottom-nav-fab-btn" 
-            onClick={() => setShowAddPopup(true)}
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '50%',
-              background: 'var(--accent)',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-              boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)',
-              marginTop: '-16px',
-              cursor: 'pointer',
-              zIndex: 110,
-              padding: 0
-            }}
-          >
-            <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
-          </button>
+        {isMobile && (
+          <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            <div 
+              className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+              onClick={() => setActiveTab('home')}
+            >
+              <i className="ti ti-home-2"></i>
+              <span>Home</span>
+            </div>
+            <div 
+              className={`bottom-nav-item ${activeTab === 'designer' ? 'active' : ''}`}
+              onClick={() => setActiveTab('designer')}
+            >
+              <i className="ti ti-layout-grid"></i>
+              <span>Design</span>
+            </div>
+            
+            {/* Central Add FAB button matching mockup */}
+            <button 
+              className="bottom-nav-fab-btn" 
+              onClick={() => setShowAddPopup(true)}
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                background: 'var(--accent)',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)',
+                marginTop: '-16px',
+                cursor: 'pointer',
+                zIndex: 110,
+                padding: 0
+              }}
+            >
+              <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
+            </button>
 
-          <div 
-            className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reports')}
-          >
-            <i className="ti ti-file-text"></i>
-            <span>Reports</span>
+            <div 
+              className={`bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+              onClick={() => setActiveTab('reports')}
+            >
+              <i className="ti ti-file-text"></i>
+              <span>Reports</span>
+            </div>
+            <div 
+              className={`bottom-nav-item ${activeTab === 'shop' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('shop'); setSelectedIssueRoom(null); }}
+            >
+              <i className="ti ti-shopping-cart"></i>
+              <span>Remedies</span>
+            </div>
           </div>
-          <div 
-            className={`bottom-nav-item ${activeTab === 'shop' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('shop'); setSelectedIssueRoom(null); }}
-          >
-            <i className="ti ti-shopping-cart"></i>
-            <span>Remedies</span>
-          </div>
-        </div>
+        )}
 
         {/* Global Acharya Chat Dialog Popup Modal */}
         {showAcharyaModal && (
