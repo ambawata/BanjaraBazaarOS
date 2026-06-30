@@ -127,8 +127,8 @@ const EXPANDED_ROOMS_CATALOG = {
 }
 
 export default function App() {
-  const [screenState, setScreenState] = useState('step_prop') 
-  // step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
+  const [screenState, setScreenState] = useState('welcome') 
+  // welcome | step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
   
   const [activeTab, setActiveTab] = useState('home') // home | designer | upload | analysis | shop | reports
   const [showAcharyaModal, setShowAcharyaModal] = useState(false)
@@ -327,6 +327,31 @@ export default function App() {
   }
 
   // Background sketch calibration file reader
+  const handleContinueProject = (project) => {
+    if (project === 'gupta') {
+      setPlot({ width: 30, length: 40, shape: 'Rectangular', facing: 'East', tilt: 0 })
+      setRooms([
+        { id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 80, y: 5, width: 15, height: 8 },
+        { id: 'r2', type: 'pooja', label: 'Pooja Mandir', x: 75, y: 15, width: 20, height: 15 },
+        { id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 75, y: 70, width: 20, height: 20 },
+        { id: 'r4', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 70, width: 35, height: 25 },
+        { id: 'r5', type: 'living', label: 'Living Room Lounge', x: 30, y: 25, width: 40, height: 35 }
+      ])
+      setScreenState('workspace')
+      setActiveTab('designer')
+    } else {
+      setPlot({ width: 60, length: 90, shape: 'Rectangular', facing: 'North', tilt: 0 })
+      setRooms([
+        { id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 45, y: 5, width: 15, height: 8 },
+        { id: 'r2', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 65, width: 30, height: 25 },
+        { id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 65, y: 65, width: 25, height: 25 },
+        { id: 'r4', type: 'pooja', label: 'Pooja Room', x: 75, y: 10, width: 20, height: 20 }
+      ])
+      setScreenState('workspace')
+      setActiveTab('designer')
+    }
+  }
+
   const handleBackdropFile = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -506,38 +531,320 @@ export default function App() {
   // 1. Welcome / Home Screen
   if (screenState === 'welcome') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-        <header id="topbar" style={{ flexShrink: 0 }}>
-          <div className="topbar-left" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-            <i className="ti ti-menu-2" style={{ fontSize: '20px', cursor: 'pointer' }}></i>
-            <span className="page-title" style={{ fontFamily: 'var(--fd)', fontSize: '18px', fontWeight: 700 }}>Vastu Griha</span>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden' }}>
+        
+        {/* Header */}
+        <header id="topbar" style={{ flexShrink: 0, padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--bg2)' }}>
+          <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <i className="ti ti-menu-2" style={{ fontSize: '22px', cursor: 'pointer', color: 'var(--text)' }}></i>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '6px' }}>
+              <img src="/logo.svg" style={{ width: '28px', height: '28px' }} alt="Logo" />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <span style={{ fontFamily: 'var(--fd)', fontSize: '16px', fontWeight: 700, lineHeight: 1.1 }}>Vastu Griha</span>
+                <span style={{ fontSize: '9px', color: 'var(--text2)' }}>AI + Vastu. Perfect Harmony.</span>
+              </div>
+            </div>
           </div>
-          <button className="btn btn-icon theme-toggle" onClick={toggleTheme}>
-            <i className={`ti ti-${theme === 'light' ? 'moon-filled' : 'sun-filled'}`}></i>
-          </button>
+          
+          <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Bell notification icon */}
+            <div style={{ position: 'relative', cursor: 'pointer' }}>
+              <i className="ti ti-bell" style={{ fontSize: '20px', color: 'var(--text)' }}></i>
+              <div style={{ position: 'absolute', top: '2px', right: '2px', width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent)' }}></div>
+            </div>
+            {/* Profile Avatar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-dim)', border: '1.5px solid var(--accent)', display: 'flex', alignItems: 'center', justifycontent: 'center', fontWeight: 'bold', fontSize: '12px', color: 'var(--accent)' }}>
+                AM
+              </div>
+              <i className="ti ti-chevron-down" style={{ fontSize: '12px', color: 'var(--text3)' }}></i>
+            </div>
+          </div>
         </header>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-          <img src="/logo.svg" style={{ width: '100px', height: '100px', marginBottom: '20px', animation: 'rotateCompass 60s linear infinite' }} alt="Vastu Logo" />
-          <h1 style={{ fontFamily: 'var(--fd)', fontSize: '28px', fontWeight: 700, marginBottom: '6px' }}>Vastu Griha</h1>
-          <p style={{ fontSize: '13.5px', color: 'var(--text2)', maxWidth: '360px', lineHeight: '1.5', marginBottom: '28px' }}>
-            Find positive energy alignments in your plot. Let the Vastu Acharya guide your home plan step-by-step.
-          </p>
+        {/* Dashboard Content Workspace */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '640px', margin: '0 auto', width: '100%', paddingBottom: '100px' }}>
+          
+          {/* Welcome Banner Card */}
+          <div 
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(124,111,247,0.06), rgba(124,111,247,0.12))', 
+              border: '1px solid var(--border)', 
+              borderRadius: '16px', 
+              padding: '20px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              gap: '16px',
+              textAlign: 'left'
+            }}
+          >
+            <div style={{ flex: 1.2 }}>
+              <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 600 }}>Welcome back, Amit! 👋</span>
+              <h2 style={{ fontFamily: 'var(--fd)', fontSize: '22px', fontWeight: 700, marginTop: '6px', lineHeight: 1.2 }}>
+                Let's design your dream home <span style={{ color: 'var(--accent)' }}>with Vastu Guidance</span>
+              </h2>
+              <p style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '8px', lineHeight: 1.4 }}>
+                Create a happy, healthy and prosperous home for you and your family.
+              </p>
+            </div>
+            
+            {/* Elegant Vector SVG drawing of the premium modern villa house */}
+            <div style={{ flex: 0.8, display: 'flex', justifyContent: 'center' }}>
+              <svg viewBox="0 0 260 180" style={{ width: '100%', height: 'auto', maxWidth: '140px', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.12))' }}>
+                <circle cx="180" cy="80" r="28" fill="#fdba74" opacity="0.6" />
+                <path d="M-20,180 L40,110 L100,180 Z" fill="#fca5a5" opacity="0.4" />
+                <path d="M60,180 L140,90 L220,180 Z" fill="#fca5a5" opacity="0.3" />
+                
+                <rect x="30" y="90" width="160" height="65" fill="#ffffff" rx="3" stroke="#e2e8f0" strokeWidth="1" />
+                <rect x="70" y="45" width="100" height="50" fill="#f8fafc" rx="3" stroke="#e2e8f0" strokeWidth="1" />
+                <rect x="20" y="87" width="180" height="5" fill="#475569" rx="1" />
+                <rect x="60" y="42" width="120" height="5" fill="#475569" rx="1" />
+                <rect x="110" y="50" width="50" height="40" fill="#b45309" opacity="0.75" />
+                <rect x="40" y="100" width="10" height="50" fill="#78350f" />
+                
+                <rect x="50" y="102" width="50" height="48" fill="#bae6fd" opacity="0.4" stroke="#475569" strokeWidth="1" />
+                <rect x="78" y="52" width="28" height="36" fill="#bae6fd" opacity="0.4" stroke="#475569" strokeWidth="1" />
+                <rect x="116" y="52" width="38" height="36" fill="#bae6fd" opacity="0.4" stroke="#475569" strokeWidth="1" />
+                
+                <rect x="120" y="102" width="30" height="53" fill="#451a03" />
+                <circle cx="142" cy="128" r="1.5" fill="#eab308" />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '360px' }}>
-            <button className="btn btn-primary" style={{ padding: '16px', borderRadius: '30px', fontWeight: 'bold', justifyContent: 'center' }} onClick={() => setScreenState('step_prop')}>
-              Design My Home <i className="ti ti-arrow-right" style={{ marginLeft: '8px' }}></i>
-            </button>
-            
-            <button className="btn" style={{ padding: '14px', borderRadius: '30px', justifyContent: 'center' }} onClick={() => { setScreenState('workspace'); setActiveTab('upload') }}>
-              I Have a Plan (Upload sketch)
-            </button>
-            
-            <button className="btn" style={{ padding: '14px', borderRadius: '30px', justifyContent: 'center' }} onClick={() => { setScreenState('workspace'); setActiveTab('designer') }}>
-              Draw My Plot Boundary
-            </button>
+                <rect x="190" y="110" width="60" height="45" fill="none" stroke="#64748b" strokeWidth="2" />
+                <line x1="205" y1="110" x2="205" y2="155" stroke="#64748b" strokeWidth="1.5" />
+                <line x1="220" y1="110" x2="220" y2="155" stroke="#64748b" strokeWidth="1.5" />
+                <line x1="235" y1="110" x2="235" y2="155" stroke="#64748b" strokeWidth="1.5" />
+
+                <path d="M215,155 Q230,95 240,40" stroke="#78350f" strokeWidth="4.5" fill="none" />
+                <path d="M240,40 Q210,25 185,35" stroke="#16a34a" strokeWidth="3" fill="none" />
+                <path d="M240,40 Q255,10 270,25" stroke="#16a34a" strokeWidth="3" fill="none" />
+                
+                <rect x="0" y="152" width="260" height="28" fill="#22c55e" opacity="0.25" />
+                <rect x="0" y="155" width="260" height="25" fill="#166534" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Option Core Actions Grid */}
+          <div style={{ textAlign: 'left' }}>
+            <span style={{ fontSize: '13.5px', fontWeight: 'bold', display: 'block', margin: 0 }}>How would you like to start today?</span>
+            <span style={{ fontSize: '11px', color: 'var(--text3)', display: 'block', marginTop: '2px', marginBottom: '14px' }}>Choose the best option that suits your needs</span>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+              {/* Option 1: Upload Floor Plan */}
+              <div 
+                onClick={() => { setScreenState('workspace'); setActiveTab('upload'); }}
+                style={{ background: 'rgba(124, 111, 247, 0.04)', border: '1.5px solid rgba(124, 111, 247, 0.15)', borderRadius: '16px', padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+              >
+                <svg viewBox="0 0 100 100" width="72" height="72" style={{ marginBottom: '8px' }}>
+                  <rect x="25" y="15" width="46" height="60" rx="6" fill="#fff" stroke="#8b5cf6" strokeWidth="2.5" />
+                  <line x1="35" y1="30" x2="61" y2="30" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="35" y1="42" x2="61" y2="42" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="35" y1="54" x2="50" y2="54" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" />
+                  <circle cx="68" cy="65" r="14" fill="#8b5cf6" />
+                  <path d="M68,73 V57 M61,64 L68,57 L75,64" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e1b4b', marginTop: '4px' }}>Upload Existing Floor Plan</span>
+                <span style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px', height: '28px', lineHeight: 1.2 }}>Upload PDF, JPG or PNG of your floor plan</span>
+                <div style={{ marginTop: '14px', width: '28px', height: '28px', borderRadius: '50%', background: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)' }}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
+                </div>
+              </div>
+
+              {/* Option 2: Draw New Plot */}
+              <div 
+                onClick={() => setScreenState('step_shape')}
+                style={{ background: 'rgba(34, 197, 94, 0.04)', border: '1.5px solid rgba(34, 197, 94, 0.15)', borderRadius: '16px', padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+              >
+                <svg viewBox="0 0 100 100" width="72" height="72" style={{ marginBottom: '8px' }}>
+                  <polygon points="35,25 75,28 65,72 25,65" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" strokeDasharray="3 3" />
+                  <polygon points="35,25 75,28 65,72 25,65" fill="none" stroke="#22c55e" strokeWidth="2.5" />
+                  <circle cx="35" cy="25" r="5" fill="#15803d" stroke="#fff" strokeWidth="1.5" />
+                  <circle cx="75" cy="28" r="5" fill="#15803d" stroke="#fff" strokeWidth="1.5" />
+                  <circle cx="65" cy="72" r="5" fill="#15803d" stroke="#fff" strokeWidth="1.5" />
+                  <circle cx="25" cy="65" r="5" fill="#15803d" stroke="#fff" strokeWidth="1.5" />
+                  <path d="M15,35 Q18,30 22,38 Q25,32 18,42" fill="#22c55e" opacity="0.8" />
+                  <path d="M80,60 Q85,55 88,64 Q92,58 84,70" fill="#22c55e" opacity="0.8" />
+                </svg>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#064e3b', marginTop: '4px' }}>Draw New Plot</span>
+                <span style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px', height: '28px', lineHeight: 1.2 }}>Start with plot size and create your plan</span>
+                <div style={{ marginTop: '14px', width: '28px', height: '28px', borderRadius: '50%', background: '#22c55e', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(34, 197, 94, 0.3)' }}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
+                </div>
+              </div>
+
+              {/* Option 3: AI Design My Home */}
+              <div 
+                onClick={() => setScreenState('step_prop')}
+                style={{ background: 'rgba(249, 115, 22, 0.04)', border: '1.5px solid rgba(249, 115, 22, 0.15)', borderRadius: '16px', padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+              >
+                <svg viewBox="0 0 100 100" width="72" height="72" style={{ marginBottom: '8px' }}>
+                  <line x1="50" y1="28" x2="50" y2="16" stroke="#f97316" strokeWidth="3" />
+                  <circle cx="50" cy="14" r="4.5" fill="#f97316" />
+                  <rect x="18" y="42" width="6" height="16" rx="3" fill="#ea580c" />
+                  <rect x="76" y="42" width="6" height="16" rx="3" fill="#ea580c" />
+                  <rect x="22" y="26" width="56" height="48" rx="20" fill="#fff" stroke="#f97316" strokeWidth="3" />
+                  <rect x="30" y="34" width="40" height="32" rx="14" fill="#1e1b4b" />
+                  <circle cx="42" cy="50" r="5" fill="#a7f3d0" />
+                  <circle cx="58" cy="50" r="5" fill="#a7f3d0" />
+                  <path d="M 46 58 Q 50 61 54 58" stroke="#a7f3d0" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+                  <path d="M78,16 L80,22 L86,24 L80,26 L78,32 L76,26 L70,24 L76,22 Z" fill="#fbbf24" />
+                  <path d="M86,34 L87,37 L90,38 L87,39 L86,42 L85,39 L82,38 L85,37 Z" fill="#fbbf24" />
+                </svg>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#7c2d12', marginTop: '4px' }}>AI Design My Home</span>
+                <span style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px', height: '28px', lineHeight: 1.2 }}>Answer a few questions and let AI design</span>
+                <div style={{ marginTop: '14px', width: '28px', height: '28px', borderRadius: '50%', background: '#f97316', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(249, 115, 22, 0.3)' }}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
+                </div>
+              </div>
+
+              {/* Option 4: Check My Home (Vastu Audit) */}
+              <div 
+                onClick={() => { setScreenState('workspace'); setActiveTab('analysis'); }}
+                style={{ background: 'rgba(59, 130, 246, 0.04)', border: '1.5px solid rgba(59, 130, 246, 0.15)', borderRadius: '16px', padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+              >
+                <svg viewBox="0 0 100 100" width="72" height="72" style={{ marginBottom: '8px' }}>
+                  <circle cx="46" cy="44" r="24" fill="#eff6ff" stroke="#3b82f6" strokeWidth="3" />
+                  <line x1="63" y1="61" x2="82" y2="80" stroke="#3b82f6" strokeWidth="7" strokeLinecap="round" />
+                  <rect x="36" y="44" width="20" height="16" fill="none" stroke="#d97706" strokeWidth="2" />
+                  <polygon points="32,44 46,32 60,44" fill="none" stroke="#d97706" strokeWidth="2" strokeLinejoin="round" />
+                  <rect x="43" y="50" width="6" height="10" fill="#d97706" />
+                </svg>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#172554', marginTop: '4px' }}>Check My Home (Vastu Audit)</span>
+                <span style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px', height: '28px', lineHeight: 1.2 }}>Get instant Vastu analysis of your home</span>
+                <div style={{ marginTop: '14px', width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)' }}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Continue Your Home recent list */}
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '13.5px', fontWeight: 'bold' }}>Continue Your Home</span>
+              <span style={{ fontSize: '11.5px', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>View All Projects <i className="ti ti-chevron-right" style={{ fontSize: '10px' }}></i></span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              
+              {/* Gupta House Project */}
+              <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  {/* Plan thumbnail SVG */}
+                  <div style={{ width: '56px', height: '46px', background: 'var(--bg3)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', padding: '4px' }}>
+                    <svg viewBox="0 0 30 20" style={{ width: '100%', height: '100%' }}>
+                      <rect x="2" y="2" width="26" height="16" fill="none" stroke="var(--border2)" strokeWidth="1" />
+                      <line x1="10" y1="2" x2="10" y2="18" stroke="var(--border2)" strokeWidth="0.8" />
+                      <line x1="20" y1="2" x2="20" y2="18" stroke="var(--border2)" strokeWidth="0.8" />
+                    </svg>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Gupta House <i className="ti ti-edit-2" style={{ fontSize: '10px', color: 'var(--text3)' }}></i></span>
+                    <span style={{ fontSize: '10px', color: 'var(--text2)' }}>30' x 40' • East Facing</span>
+                    {/* Completion bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                      <div style={{ width: '60px', height: '4px', background: 'var(--bg3)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ width: '68%', height: '100%', background: 'var(--accent)' }}></div>
+                      </div>
+                      <span style={{ fontSize: '9px', color: 'var(--text3)' }}>68% Complete</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                  <span style={{ fontSize: '9px', color: 'var(--text3)' }}>Today, 10:30 AM</span>
+                  <button className="btn btn-sm btn-primary" style={{ padding: '4px 12px', fontSize: '11px', borderRadius: '16px' }} onClick={() => handleContinueProject('gupta')}>
+                    Continue <i className="ti ti-arrow-right" style={{ fontSize: '9px', marginLeft: '4px' }}></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* Sharma Villa Project */}
+              <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  {/* Plan thumbnail SVG */}
+                  <div style={{ width: '56px', height: '46px', background: 'var(--bg3)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', padding: '4px' }}>
+                    <svg viewBox="0 0 30 20" style={{ width: '100%', height: '100%' }}>
+                      <rect x="2" y="2" width="26" height="16" fill="none" stroke="var(--border2)" strokeWidth="1" />
+                      <line x1="15" y1="2" x2="15" y2="18" stroke="var(--border2)" strokeWidth="0.8" />
+                    </svg>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Sharma Villa <i className="ti ti-edit-2" style={{ fontSize: '10px', color: 'var(--text3)' }}></i></span>
+                    <span style={{ fontSize: '10px', color: 'var(--text2)' }}>60' x 90' • North Facing</span>
+                    {/* Completion bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                      <div style={{ width: '60px', height: '4px', background: 'var(--bg3)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ width: '42%', height: '100%', background: 'var(--accent)' }}></div>
+                      </div>
+                      <span style={{ fontSize: '9px', color: 'var(--text3)' }}>42% Complete</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                  <span style={{ fontSize: '9px', color: 'var(--text3)' }}>Yesterday, 7:45 PM</span>
+                  <button className="btn btn-sm btn-primary" style={{ padding: '4px 12px', fontSize: '11px', borderRadius: '16px' }} onClick={() => handleContinueProject('sharma')}>
+                    Continue <i className="ti ti-arrow-right" style={{ fontSize: '9px', marginLeft: '4px' }}></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* Floating Acharya pill button */}
+        <button 
+          onClick={() => setShowAcharyaModal(true)}
+          style={{
+            position: 'fixed',
+            bottom: '76px',
+            right: '16px',
+            background: 'var(--accent)',
+            color: '#fff',
+            borderRadius: '24px',
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 12px rgba(124, 111, 247, 0.45)',
+            border: 'none',
+            cursor: 'pointer',
+            zIndex: 110
+          }}
+        >
+          <svg viewBox="0 0 40 40" width="22" height="22" style={{ flexShrink: 0 }}>
+            <circle cx="20" cy="20" r="18" fill="var(--gold)" />
+            <path d="M12,32 Q20,20 28,32" fill="none" stroke="#fff" strokeWidth="2" />
+            <circle cx="20" cy="15" r="5" fill="#fff" />
+          </svg>
+          <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Ask Acharya</span>
+        </button>
+
+        {/* Bottom Navigation */}
+        <div className="bottom-nav" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+          <div className="bottom-nav-item active" onClick={() => setScreenState('welcome')}>
+            <i className="ti ti-home-2"></i>
+            <span>Home</span>
+          </div>
+          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('designer'); }}>
+            <i className="ti ti-layout-grid"></i>
+            <span>Design</span>
+          </div>
+          <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifycontent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
+            <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
+          </button>
+          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }}>
+            <i className="ti ti-file-text"></i>
+            <span>Reports</span>
+          </div>
+          <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('shop'); }}>
+            <i className="ti ti-shopping-cart"></i>
+            <span>Remedies</span>
           </div>
         </div>
+
       </div>
     )
   }
