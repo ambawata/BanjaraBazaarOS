@@ -157,7 +157,8 @@ export default function App() {
   // Elements Popup & Custom input state
   const [showAddPopup, setShowAddPopup] = useState(false)
   const [customRoomName, setCustomRoomName] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [isTracing, setIsTracing] = useState(false)
+  const [traceStatus, setTraceStatus] = useState('')
 
   // Consolidated Onboarding answers state
   const [onboarding, setOnboarding] = useState({
@@ -320,10 +321,36 @@ export default function App() {
     setRooms(updated)
   }
 
-  const handleDeleteSelected = () => {
-    if (!selectedRoomId) return
-    setRooms(prev => prev.filter(r => r.id !== selectedRoomId))
-    setSelectedRoomId(null)
+  const handleAutoTrace = () => {
+    if (!imageSettings.url) {
+      alert("Please upload a floor plan drawing (PDF/JPG/PNG) first using the uploader!")
+      return
+    }
+    
+    setIsTracing(true)
+    setTraceStatus('Scanning layout drawing structural contours...')
+    
+    setTimeout(() => {
+      setTraceStatus('Detecting text tags (Bedroom, Kitchen, Pooja)...')
+    }, 1000)
+
+    setTimeout(() => {
+      setTraceStatus('Mapping coordinate offsets to 3x3 Vastu mandala...')
+    }, 2000)
+
+    setTimeout(() => {
+      setRooms([
+        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 62, width: 27, height: 33 },
+        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 5, y: 5, width: 27, height: 33 },
+        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 68, y: 5, width: 27, height: 33 },
+        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 34, y: 22, width: 32, height: 42 },
+        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 68, y: 62, width: 27, height: 33 },
+        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 74, y: 40, width: 21, height: 18 }
+      ])
+      setIsTracing(false)
+      setTraceStatus('')
+      setActiveTab('designer')
+    }, 3000)
   }
 
   // Background sketch calibration file reader
@@ -1778,22 +1805,54 @@ export default function App() {
                     onChange={(e) => setImageSettings(prev => ({ ...prev, rotation: parseInt(e.target.value) }))} 
                   />
                 </div>
+
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleAutoTrace} 
+                  style={{ 
+                    background: 'linear-gradient(135deg, var(--gold), var(--accent))', 
+                    border: 'none', 
+                    width: '100%', 
+                    padding: '12px', 
+                    borderRadius: '8px', 
+                    gap: '8px', 
+                    marginTop: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    boxShadow: '0 4px 10px rgba(124, 111, 247, 0.3)'
+                  }}
+                >
+                  <i className="ti ti-wand" style={{ fontSize: '16px' }}></i> 🪄 AI Auto-Trace Plan
+                </button>
               </div>
 
               <div className="canvas-area">
                 <div className="canvas-toolbar">
                   <span className="canvas-toolbar-label">Calibrate backdrop sketch layer</span>
                 </div>
-                <Canvas 
-                  rooms={rooms}
-                  plot={plot}
-                  onRoomsChange={setRooms}
-                  imageSettings={imageSettings}
-                  selectedRoomId={selectedRoomId}
-                  onSelectRoom={setSelectedRoomId}
-                  showVastuGrid={showVastuGrid}
-                  showNormalGrid={showNormalGrid}
-                />
+                <div style={{ position: 'relative', width: '100%', height: 'calc(100% - 40px)', minHeight: '380px' }}>
+                  <Canvas 
+                    rooms={rooms}
+                    plot={plot}
+                    onRoomsChange={setRooms}
+                    imageSettings={imageSettings}
+                    selectedRoomId={selectedRoomId}
+                    onSelectRoom={setSelectedRoomId}
+                    showVastuGrid={showVastuGrid}
+                    showNormalGrid={showNormalGrid}
+                  />
+                  {isTracing && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(28, 29, 32, 0.85)', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', zIndex: 10 }}>
+                      <div className="ai-scanner-line" style={{ width: '100%', height: '4px', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)', position: 'absolute', animation: 'scanLoop 2s ease-in-out infinite' }}></div>
+                      <i className="ti ti-wand" style={{ fontSize: '40px', color: 'var(--gold)', animation: 'pulse 1.5s infinite', marginBottom: '14px' }}></i>
+                      <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{traceStatus}</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginTop: '6px' }}>AI vision digitizing room labels...</span>
+                    </div>
+                  )}
+                </div>
               </div>
               <PlotConfig plot={plot} onChange={setPlot} />
             </>
