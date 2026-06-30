@@ -630,7 +630,7 @@ export default function App() {
             <span style={{ fontSize: '13.5px', fontWeight: 'bold', display: 'block', margin: 0 }}>How would you like to start today?</span>
             <span style={{ fontSize: '11px', color: 'var(--text3)', display: 'block', marginTop: '2px', marginBottom: '14px' }}>Choose the best option that suits your needs</span>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '12px' }}>
               {/* Option 1: Upload Floor Plan */}
               <div 
                 onClick={() => { setScreenState('workspace'); setActiveTab('upload'); }}
@@ -1024,7 +1024,7 @@ export default function App() {
                 <i className="ti ti-target" style={{ color: 'var(--accent)' }}></i> 1. Which best describes your goal?
               </span>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '12px' }}>
                 {goals.map(g => {
                   const isSelected = onboarding.goal === g.id
                   return (
@@ -1154,7 +1154,7 @@ export default function App() {
                 <i className="ti ti-palette" style={{ color: 'var(--accent)' }}></i> 4. Preferred Style <span style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 'normal' }}>(Optional)</span>
               </span>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '10px' }}>
                 {styles.map(s => {
                   const isSelected = onboarding.preferredStyle === s
                   return (

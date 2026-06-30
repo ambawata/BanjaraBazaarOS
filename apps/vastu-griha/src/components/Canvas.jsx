@@ -72,6 +72,26 @@ export default function Canvas({
     })
   }
 
+  const handleTouchStart = (e, roomId, type) => {
+    e.stopPropagation()
+    const touch = e.touches[0]
+    const room = rooms.find(r => r.id === roomId)
+    if (!room) return
+    
+    onSelectRoom(roomId)
+    
+    setDragState({
+      type,
+      roomId,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      startW: room.width,
+      startH: room.height,
+      startXCoord: room.x,
+      startYCoord: room.y
+    })
+  }
+
   const handleMouseMove = (e) => {
     if (!dragState || !plotRef.current) return
     e.preventDefault()
@@ -95,16 +115,58 @@ export default function Canvas({
       let newY = dragState.startYCoord + deltaYPercent
       
       newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
-      newY = Math.max(0, Math.min(100 - targetRoom.height, newY))
+      let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
       
       targetRoom.x = Math.round(newX * 10) / 10
-      targetRoom.y = Math.round(newY * 10) / 10
+      targetRoom.y = Math.round(newYClamped * 10) / 10
     } 
     else if (dragState.type === 'resize') {
       let newW = dragState.startW + deltaXPercent
       let newH = dragState.startH + deltaYPercent
       
       // Min size 10%
+      newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
+      newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
+      
+      targetRoom.width = Math.round(newW * 10) / 10
+      targetRoom.height = Math.round(newH * 10) / 10
+    }
+    
+    newRooms[roomIndex] = targetRoom
+    onRoomsChange(newRooms)
+  }
+
+  const handleTouchMove = (e) => {
+    if (!dragState || !plotRef.current) return
+    e.preventDefault()
+    
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - dragState.startX
+    const deltaY = touch.clientY - dragState.startY
+    
+    const deltaXPercent = (deltaX / plotDims.w) * 100
+    const deltaYPercent = (deltaY / plotDims.h) * 100
+    
+    const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
+    if (roomIndex === -1) return
+    
+    const newRooms = [...rooms]
+    const targetRoom = { ...newRooms[roomIndex] }
+    
+    if (dragState.type === 'move') {
+      let newX = dragState.startXCoord + deltaXPercent
+      let newY = dragState.startYCoord + deltaYPercent
+      
+      newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
+      let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
+      
+      targetRoom.x = Math.round(newX * 10) / 10
+      targetRoom.y = Math.round(newYClamped * 10) / 10
+    } 
+    else if (dragState.type === 'resize') {
+      let newW = dragState.startW + deltaXPercent
+      let newH = dragState.startH + deltaYPercent
+      
       newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
       newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
       
@@ -124,13 +186,19 @@ export default function Canvas({
     if (dragState) {
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleMouseUp)
     } else {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleMouseUp)
     }
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleMouseUp)
     }
   }, [dragState, plotDims])
 
@@ -226,6 +294,7 @@ export default function Canvas({
                 height: `${room.height}%`
               }}
               onMouseDown={(e) => handleMouseDown(e, room.id, 'move')}
+              onTouchStart={(e) => handleTouchStart(e, room.id, 'move')}
             >
               <div className="placed-room-header">
                 <span className="placed-room-title">{room.label}</span>
@@ -249,6 +318,7 @@ export default function Canvas({
               <div 
                 className="placed-room-resize-handle"
                 onMouseDown={(e) => handleMouseDown(e, room.id, 'resize')}
+                onTouchStart={(e) => handleTouchStart(e, room.id, 'resize')}
               />
             </div>
           )
