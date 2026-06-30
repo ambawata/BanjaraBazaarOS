@@ -127,8 +127,8 @@ const EXPANDED_ROOMS_CATALOG = {
 }
 
 export default function App() {
-  const [screenState, setScreenState] = useState('welcome') 
-  // welcome | step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
+  const [screenState, setScreenState] = useState('step_prop') 
+  // step_prop | step_size | step_shape | step_preferences | step_summary | designing | preview | workspace
   
   const [activeTab, setActiveTab] = useState('home') // home | designer | upload | analysis | shop | reports
   const [showAcharyaModal, setShowAcharyaModal] = useState(false)
@@ -438,7 +438,7 @@ export default function App() {
     return (
       <div className="wizard-layout-header" style={{ width: '100%', padding: '16px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <button className="btn" style={{ padding: '8px 16px', background: 'none', border: '1px solid var(--border)', borderRadius: '20px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setScreenState(backState)}>
+          <button className="btn" style={{ padding: '8px 16px', background: 'none', border: '1px solid var(--border)', borderRadius: '20px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px', visibility: activeStep === 1 ? 'hidden' : 'visible' }} onClick={() => setScreenState(backState)}>
             <i className="ti ti-arrow-left"></i> Back
           </button>
           
@@ -1166,7 +1166,7 @@ export default function App() {
 
         <div className="sidebar-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>Vastu Griha v1.0</span>
-          <button className="btn btn-sm" onClick={() => setScreenState('welcome')}><i className="ti ti-rotate"></i> Reset</button>
+          <button className="btn btn-sm" onClick={() => setScreenState('step_prop')}><i className="ti ti-rotate"></i> Reset</button>
         </div>
       </nav>
 
