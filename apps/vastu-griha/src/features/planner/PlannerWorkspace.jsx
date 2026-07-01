@@ -63,6 +63,14 @@ export default function PlannerWorkspace() {
     redoLayout
   } = useCanvasStore()
 
+  const [showTip, setShowTip] = React.useState(() => {
+    return typeof window !== 'undefined' ? !localStorage.getItem('vg-dismiss-tip') : true
+  })
+  const dismissTip = () => {
+    localStorage.setItem('vg-dismiss-tip', 'true')
+    setShowTip(false)
+  }
+
   // Preset vs Corner Taps shape handler
   const selectShapePreset = (shape) => {
     setBoundaryPoints([])
@@ -714,17 +722,20 @@ export default function PlannerWorkspace() {
                     </button>
                   </div>
                 </div>
+
+                {showTip && (
+                  <div className="guided-tips-banner">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}>
+                      <i className="ti ti-bulb" style={{ color: 'var(--gold)', fontSize: '18px' }}></i>
+                      <span style={{ fontSize: '11.5px', color: 'var(--text2)' }}>
+                        <strong>Guided Tip:</strong> Tap any room on the canvas to open alignment handles. Drag corner handles to resize, or use nudge buttons below for precise Vastu alignments.
+                      </span>
+                    </div>
+                    <i className="ti ti-x" style={{ cursor: 'pointer', color: 'var(--text3)' }} onClick={dismissTip}></i>
+                  </div>
+                )}
                 
-                <Canvas 
-                  rooms={rooms}
-                  plot={plot}
-                  onRoomsChange={setRooms}
-                  imageSettings={imageSettings}
-                  selectedRoomId={selectedRoomId}
-                  onSelectRoom={setSelectedRoomId}
-                  showVastuGrid={showVastuGrid}
-                  showNormalGrid={showNormalGrid}
-                />
+                <Canvas />
 
                 {isMobile && (
                   <button 
@@ -749,7 +760,8 @@ export default function PlannerWorkspace() {
                   </button>
                 )}
 
-                {selectedRoomId && (
+                {/* Desktop Property Inspector panel */}
+                {!isMobile && selectedRoomId && (
                   <div 
                     style={{ 
                       marginTop: '12px', 
@@ -799,6 +811,77 @@ export default function PlannerWorkspace() {
                     </div>
                   </div>
                 )}
+
+                {/* Mobile Property Bottom Sheet */}
+                {isMobile && selectedRoomId && rooms.find(r => r.id === selectedRoomId) && (() => {
+                  const selectedRoom = rooms.find(r => r.id === selectedRoomId)
+                  return (
+                    <div className="mobile-bottom-sheet-overlay" onClick={() => setSelectedRoomId(null)}>
+                      <div className="mobile-bottom-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="bottom-sheet-drag-bar"></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <h4 style={{ fontFamily: 'var(--fd)', fontWeight: 'bold', margin: 0 }}>Configure {selectedRoom.label}</h4>
+                          <button className="btn btn-sm btn-danger" onClick={handleDeleteSelected}><i className="ti ti-trash"></i> Delete</button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Room Label</span>
+                          <input 
+                            type="text" className="chat-input" style={{ width: '100%', padding: '8px' }}
+                            value={selectedRoom.label}
+                            onChange={(e) => {
+                              const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, label: e.target.value } : r)
+                              setRooms(updated)
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Width (ft)</span>
+                            <input 
+                              type="number" className="chat-input" style={{ width: '100%', padding: '8px' }}
+                              value={Math.round((selectedRoom.width / 100) * plot.width)}
+                              onChange={(e) => {
+                                const wPct = Math.round((parseInt(e.target.value) / plot.width) * 100 * 10) / 10
+                                if (wPct > 5 && wPct < 95) {
+                                  const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, width: wPct } : r)
+                                  setRooms(updated)
+                                }
+                              }}
+                            />
+                          </div>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Length (ft)</span>
+                            <input 
+                              type="number" className="chat-input" style={{ width: '100%', padding: '8px' }}
+                              value={Math.round((selectedRoom.height / 100) * plot.length)}
+                              onChange={(e) => {
+                                const hPct = Math.round((parseInt(e.target.value) / plot.length) * 100 * 10) / 10
+                                if (hPct > 5 && hPct < 95) {
+                                  const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, height: hPct } : r)
+                                  setRooms(updated)
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text3)', textAlign: 'left' }}>Fine-tune Position (Nudge)</span>
+                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'left')}><i className="ti ti-arrow-left"></i> Left</button>
+                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'up')}><i className="ti ti-arrow-up"></i> Up</button>
+                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'down')}><i className="ti ti-arrow-down"></i> Down</button>
+                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'right')}><i className="ti ti-arrow-right"></i> Right</button>
+                          </div>
+                        </div>
+                        
+                        <button className="btn btn-primary" style={{ marginTop: '8px', padding: '12px' }} onClick={() => setSelectedRoomId(null)}>Save & Close</button>
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
 
               {!isMobile && (

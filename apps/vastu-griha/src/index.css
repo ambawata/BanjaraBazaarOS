@@ -1766,3 +1766,221 @@ body {
   0%, 100% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.15); opacity: 1; }
 }
+
+/* ==========================================
+   VASTU GRIHA SMART PLANNER UX IMPROVEMENTS
+   ========================================== */
+
+/* Context Sensitive Floating Toolbar */
+.floating-context-toolbar {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  z-index: 120;
+  pointer-events: auto;
+  animation: slideUpFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-context-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.floating-context-btn:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.floating-context-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 2px;
+}
+
+/* Touch Handles */
+.touch-handle-rotate {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #fff;
+  cursor: grab;
+  z-index: 110;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.touch-handle-rotate::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+  background: var(--gold);
+}
+
+.placed-room-resize-handle {
+  width: 24px !important;
+  height: 24px !important;
+  right: -6px !important;
+  bottom: -6px !important;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transition: transform 0.2s;
+}
+
+.placed-room-resize-handle:hover {
+  transform: scale(1.25);
+}
+
+/* Alignment Smart Guides */
+.smart-guide-x, .smart-guide-y {
+  position: absolute;
+  pointer-events: none;
+  z-index: 85;
+}
+
+.smart-guide-x {
+  border-top: 1.5px dashed var(--accent);
+  left: 0;
+  right: 0;
+  height: 0;
+}
+
+.smart-guide-y {
+  border-left: 1.5px dashed var(--accent);
+  top: 0;
+  bottom: 0;
+  width: 0;
+}
+
+/* Empty Canvas State */
+.empty-canvas-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: var(--text2);
+  padding: 40px;
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+/* Guided Pro Tips */
+.guided-tips-banner {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  animation: slideDownIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow);
+}
+
+/* Mobile Property Bottom Sheet */
+.mobile-bottom-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 800;
+  display: flex;
+  align-items: flex-end;
+}
+
+.mobile-bottom-sheet {
+  width: 100%;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+  animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bottom-sheet-drag-bar {
+  width: 40px;
+  height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  align-self: center;
+}
+
+/* Floating measurements badge overlay */
+.floating-measurement-badge {
+  position: absolute;
+  background: rgba(12,13,16,0.9);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  font-family: var(--fm);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 110;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideDownIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+

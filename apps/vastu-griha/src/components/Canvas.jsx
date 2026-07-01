@@ -6,7 +6,6 @@ import { useSettingsStore } from '../stores/settingsStore'
 import { useUiStore } from '../stores/uiStore'
 import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
-import { measurementEngine } from '../lib/geometry/measurementEngine'
 
 export default function Canvas() {
   const {
@@ -31,7 +30,7 @@ export default function Canvas() {
   useEffect(() => {
     function updateDimensions() {
       if (!containerRef.current) return
-      const cWidth = containerRef.current.clientWidth - 48 // padding
+      const cWidth = containerRef.current.clientWidth - 48
       const cHeight = containerRef.current.clientHeight - 48
       
       const pWidth = plot.width
@@ -265,6 +264,27 @@ export default function Canvas() {
     return cells
   }
 
+  // Render empty state
+  if (rooms.length === 0) {
+    return (
+      <div className="canvas-container" ref={containerRef} onClick={() => setSelectedRoomId(null)}>
+        <div className="empty-canvas-state">
+          <svg viewBox="0 0 100 100" width="80" height="80" style={{ fill: 'none', stroke: 'var(--text3)', strokeWidth: 1.5, marginBottom: '16px' }}>
+            <circle cx="50" cy="50" r="40" strokeDasharray="4 4" />
+            <polygon points="50,22 78,50 50,78 22,50" />
+            <line x1="50" y1="10" x2="50" y2="90" />
+            <line x1="10" y1="50" x2="90" y2="50" />
+            <circle cx="50" cy="50" r="8" fill="var(--accent-dim)" stroke="var(--accent)" strokeWidth="2" />
+          </svg>
+          <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 600, color: 'var(--text)' }}>Your Planner Canvas is Ready</h3>
+          <p style={{ fontSize: '12px', color: 'var(--text2)', marginTop: '8px', maxWidth: '280px', lineHeight: 1.4 }}>
+            Place rooms from the left catalog, or upload a sketch layout backdrop to trace your blueprint.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div 
       className="canvas-container" 
@@ -308,7 +328,6 @@ export default function Canvas() {
           const evalRes = evaluateRoom(room, plot)
           const isSelected = room.id === selectedRoomId
           
-          // Geometry mathematics computations
           const wFeet = coordinateSystem.pctToFeet(room.width, plot.width)
           const hFeet = coordinateSystem.pctToFeet(room.height, plot.length)
           const areaFeet = wFeet * hFeet
@@ -326,6 +345,58 @@ export default function Canvas() {
               onMouseDown={(e) => handleMouseDown(e, room.id, 'move')}
               onTouchStart={(e) => handleTouchStart(e, room.id, 'move')}
             >
+              {/* Context Sensitive Floating Canva-style Toolbar */}
+              {isSelected && (
+                <div className="floating-context-toolbar" onMouseDown={(e) => e.stopPropagation()}>
+                  <button 
+                    className="floating-context-btn" 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const clone = { ...room, id: Date.now().toString(), x: Math.min(80, room.x + 10), y: Math.min(80, room.y + 10) }
+                      setRooms([...rooms, clone])
+                    }}
+                  >
+                    <i className="ti ti-copy"></i> Duplicate
+                  </button>
+                  <div className="floating-context-divider"></div>
+                  <button 
+                    className="floating-context-btn" 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const rotated = { ...room, width: room.height, height: room.width }
+                      const next = rooms.map(r => r.id === room.id ? rotated : r)
+                      setRooms(next)
+                    }}
+                  >
+                    <i className="ti ti-rotate-clockwise"></i> Rotate
+                  </button>
+                  <div className="floating-context-divider"></div>
+                  <button 
+                    className="floating-context-btn" 
+                    style={{ color: 'var(--red)' }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteRoom(room.id)
+                      setSelectedRoomId(null)
+                    }}
+                  >
+                    <i className="ti ti-trash"></i> Delete
+                  </button>
+                </div>
+              )}
+
+              {/* Floating Measurements Badge overlays (Visible only while editing/dragging) */}
+              {dragState && dragState.roomId === room.id && (
+                <>
+                  <div className="floating-measurement-badge" style={{ left: '50%', top: '-20px', transform: 'translateX(-50%)' }}>
+                    W: {Math.round(wFeet)} ft
+                  </div>
+                  <div className="floating-measurement-badge" style={{ right: '-65px', top: '50%', transform: 'translateY(-50%)' }}>
+                    L: {Math.round(hFeet)} ft
+                  </div>
+                </>
+              )}
+
               <div className="placed-room-header">
                 <span className="placed-room-title">{room.label}</span>
                 <i 
@@ -349,7 +420,11 @@ export default function Canvas() {
                 </span>
               </div>
               
-              {/* Resize Handle */}
+              {/* Touch Handles */}
+              {isSelected && (
+                <div className="touch-handle-rotate" title="Rotate room segment orientation" />
+              )}
+              
               <div 
                 className="placed-room-resize-handle"
                 onMouseDown={(e) => handleMouseDown(e, room.id, 'resize')}
