@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
+import { useCanvasStore } from '../stores/canvasStore'
 
-export default function FloorPlanUpload({ imageSettings, onSettingsChange }) {
+export default function FloorPlanUpload() {
+  const { imageSettings, setImageSettings } = useCanvasStore()
   const { url, scale, opacity, rotation, xOffset, yOffset } = imageSettings
   const fileInputRef = useRef(null)
 
@@ -8,7 +10,7 @@ export default function FloorPlanUpload({ imageSettings, onSettingsChange }) {
     const file = e.target.files[0]
     if (file) {
       const localUrl = URL.createObjectURL(file)
-      onSettingsChange({
+      setImageSettings({
         ...imageSettings,
         url: localUrl
       })
@@ -16,7 +18,7 @@ export default function FloorPlanUpload({ imageSettings, onSettingsChange }) {
   }
 
   const handleSettingChange = (key, val) => {
-    onSettingsChange({
+    setImageSettings({
       ...imageSettings,
       [key]: val
     })
@@ -27,7 +29,7 @@ export default function FloorPlanUpload({ imageSettings, onSettingsChange }) {
   }
 
   const resetImage = () => {
-    onSettingsChange({
+    setImageSettings({
       url: '',
       scale: 1,
       opacity: 0.5,

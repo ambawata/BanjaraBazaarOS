@@ -1,10 +1,12 @@
 import React from 'react'
+import { useProjectStore } from '../stores/projectStore'
 
-export default function PlotConfig({ plot, onChange }) {
+export default function PlotConfig() {
+  const { plot, setPlot } = useProjectStore()
   const { width, length, shape, facing, tilt } = plot
 
   const handleChange = (key, val) => {
-    onChange({ ...plot, [key]: val })
+    setPlot({ ...plot, [key]: val })
   }
 
   return (

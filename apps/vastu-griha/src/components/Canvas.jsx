@@ -1,21 +1,31 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { evaluateRoom } from './AnalysisPanel'
+import { useCanvasStore } from '../stores/canvasStore'
+import { useProjectStore } from '../stores/projectStore'
+import { useSettingsStore } from '../stores/settingsStore'
+import { useUiStore } from '../stores/uiStore'
+import { snapEngine } from '../lib/geometry/snapEngine'
+import { coordinateSystem } from '../lib/geometry/coordinateSystem'
+import { measurementEngine } from '../lib/geometry/measurementEngine'
 
-export default function Canvas({ 
-  rooms, 
-  plot, 
-  onRoomsChange, 
-  imageSettings, 
-  selectedRoomId, 
-  onSelectRoom,
-  showVastuGrid = true,
-  showNormalGrid = true
-}) {
+export default function Canvas() {
+  const {
+    rooms,
+    setRooms,
+    imageSettings,
+    selectedRoomId,
+    setSelectedRoomId,
+    deleteRoom
+  } = useCanvasStore()
+
+  const { plot } = useProjectStore()
+  const { snapToGrid, gridSize } = useSettingsStore()
+  const showVastuGrid = useUiStore((state) => state.showVastuGrid)
+  const showNormalGrid = useUiStore((state) => state.showNormalGrid)
+
   const containerRef = useRef(null)
   const plotRef = useRef(null)
-  const [dragState, setDragState] = useState(null) // { type: 'move'|'resize', roomId, startX, startY, startW, startH, startPx, startPy }
-  
-  // Calculate relative aspect ratio sizing to fit inside canvas container
+  const [dragState, setDragState] = useState(null)
   const [plotDims, setPlotDims] = useState({ w: 400, h: 400 })
 
   useEffect(() => {
@@ -31,16 +41,13 @@ export default function Canvas({
       
       let w, h
       if (aspect > cWidth / cHeight) {
-        // Width constrained
         w = cWidth
         h = cWidth / aspect
       } else {
-        // Height constrained
         h = cHeight
         w = cHeight * aspect
       }
       
-      // Safety boundaries
       setPlotDims({
         w: Math.max(200, Math.min(w, cWidth)),
         h: Math.max(200, Math.min(h, cHeight))
@@ -58,7 +65,7 @@ export default function Canvas({
     const room = rooms.find(r => r.id === roomId)
     if (!room) return
     
-    onSelectRoom(roomId)
+    setSelectedRoomId(roomId)
     
     setDragState({
       type,
@@ -79,7 +86,7 @@ export default function Canvas({
     const room = rooms.find(r => r.id === roomId)
     if (!room) return
     
-    onSelectRoom(roomId)
+    setSelectedRoomId(roomId)
     
     setDragState({
       type,
@@ -100,7 +107,6 @@ export default function Canvas({
     const deltaX = e.clientX - dragState.startX
     const deltaY = e.clientY - dragState.startY
     
-    // Convert pixels deltas to percentages relative to plot bounding size
     const deltaXPercent = (deltaX / plotDims.w) * 100
     const deltaYPercent = (deltaY / plotDims.h) * 100
     
@@ -111,9 +117,13 @@ export default function Canvas({
     const targetRoom = { ...newRooms[roomIndex] }
     
     if (dragState.type === 'move') {
-      // Boundaries 0 to 100 - width/height
       let newX = dragState.startXCoord + deltaXPercent
       let newY = dragState.startYCoord + deltaYPercent
+      
+      if (snapToGrid) {
+        newX = snapEngine.snapToGrid(newX, gridSize)
+        newY = snapEngine.snapToGrid(newY, gridSize)
+      }
       
       newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
       let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
@@ -125,7 +135,11 @@ export default function Canvas({
       let newW = dragState.startW + deltaXPercent
       let newH = dragState.startH + deltaYPercent
       
-      // Min size 10%
+      if (snapToGrid) {
+        newW = snapEngine.snapToGrid(newW, gridSize)
+        newH = snapEngine.snapToGrid(newH, gridSize)
+      }
+      
       newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
       newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
       
@@ -134,7 +148,7 @@ export default function Canvas({
     }
     
     newRooms[roomIndex] = targetRoom
-    onRoomsChange(newRooms)
+    setRooms(newRooms)
   }
 
   const handleTouchMove = (e) => {
@@ -159,6 +173,11 @@ export default function Canvas({
       let newX = dragState.startXCoord + deltaXPercent
       let newY = dragState.startYCoord + deltaYPercent
       
+      if (snapToGrid) {
+        newX = snapEngine.snapToGrid(newX, gridSize)
+        newY = snapEngine.snapToGrid(newY, gridSize)
+      }
+      
       newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
       let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
       
@@ -169,6 +188,11 @@ export default function Canvas({
       let newW = dragState.startW + deltaXPercent
       let newH = dragState.startH + deltaYPercent
       
+      if (snapToGrid) {
+        newW = snapEngine.snapToGrid(newW, gridSize)
+        newH = snapEngine.snapToGrid(newH, gridSize)
+      }
+      
       newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
       newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
       
@@ -177,7 +201,7 @@ export default function Canvas({
     }
     
     newRooms[roomIndex] = targetRoom
-    onRoomsChange(newRooms)
+    setRooms(newRooms)
   }
 
   const handleMouseUp = () => {
@@ -207,8 +231,7 @@ export default function Canvas({
   // Remove room
   const handleRemoveRoom = (roomId, e) => {
     e.stopPropagation()
-    onRoomsChange(rooms.filter(r => r.id !== roomId))
-    if (selectedRoomId === roomId) onSelectRoom(null)
+    deleteRoom(roomId)
   }
 
   // Draw grid overlays
@@ -246,7 +269,7 @@ export default function Canvas({
     <div 
       className="canvas-container" 
       ref={containerRef}
-      onClick={() => onSelectRoom(null)}
+      onClick={() => setSelectedRoomId(null)}
     >
       <div 
         className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`} 
@@ -285,6 +308,11 @@ export default function Canvas({
           const evalRes = evaluateRoom(room, plot)
           const isSelected = room.id === selectedRoomId
           
+          // Geometry mathematics computations
+          const wFeet = coordinateSystem.pctToFeet(room.width, plot.width)
+          const hFeet = coordinateSystem.pctToFeet(room.height, plot.length)
+          const areaFeet = wFeet * hFeet
+          
           return (
             <div
               key={room.id}
@@ -308,9 +336,14 @@ export default function Canvas({
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: 'auto' }}>
-                <span className="placed-room-size">
-                  {Math.round((room.width / 100) * plot.width)}x{Math.round((room.height / 100) * plot.length)} ft
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+                  <span className="placed-room-size" style={{ fontSize: '9px' }}>
+                    {Math.round(wFeet)}x{Math.round(hFeet)} ft
+                  </span>
+                  <span className="placed-room-size" style={{ fontSize: '9px', opacity: 0.8 }}>
+                    ({Math.round(areaFeet)} sq ft)
+                  </span>
+                </div>
                 <span className="placed-room-status">
                   {evalRes.status}
                 </span>
