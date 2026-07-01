@@ -3,6 +3,7 @@ import { useUiStore } from './stores/uiStore'
 import { useCanvasStore } from './stores/canvasStore'
 import OnboardingWizard from './features/onboarding/OnboardingWizard'
 import PlannerWorkspace from './features/planner/PlannerWorkspace'
+import ProjectDashboard from './features/dashboard/ProjectDashboard'
 
 export default function App() {
   const screenState = useUiStore((state) => state.screenState)
@@ -33,6 +34,10 @@ export default function App() {
 
   const wizardStates = ['step_prop', 'step_size', 'step_shape', 'step_preferences', 'step_summary', 'designing', 'preview']
   
+  if (screenState === 'dashboard' || screenState === 'welcome') {
+    return <ProjectDashboard />
+  }
+
   if (wizardStates.includes(screenState)) {
     return <OnboardingWizard />
   }

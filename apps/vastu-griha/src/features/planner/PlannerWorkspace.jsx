@@ -509,6 +509,14 @@ export default function PlannerWorkspace() {
         </div>
 
         <div className="sidebar-nav">
+          <div 
+            className="nav-item"
+            style={{ borderBottom: '1px solid var(--border)', borderRadius: 0, paddingBottom: '12px', marginBottom: '12px', gap: '8px' }}
+            onClick={() => setScreenState('dashboard')}
+          >
+            <i className="ti ti-arrow-left"></i> Exit to Dashboard
+          </div>
+
           <div className="sidebar-section-title">Home Blueprint</div>
           <div 
             className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
