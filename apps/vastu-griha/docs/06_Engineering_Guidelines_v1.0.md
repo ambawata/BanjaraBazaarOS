@@ -1,8 +1,45 @@
-# Vastu Griha — Engineering Guidelines Specification v1.0
+Platform:
+BanjaraBazaarOS
 
-**Status**: Approved / Engineering Core Standard  
-**Version**: 1.0  
-**Authors**: Principal Architect, Director of Frontend Infrastructure  
+Module:
+Vastu Griha
+
+Document:
+Engineering Guidelines
+
+Version:
+1.0
+
+Status:
+Review
+
+Owner:
+Product Team
+
+Last Updated:
+2026-07-01
+
+---
+
+## Platform Overview
+
+BanjaraBazaarOS is the unified operating system powering all Banjara Bazaar digital products.
+
+Current modules include:
+• Marketplace
+• Vendor Portal
+• CRM
+• Inventory
+• Orders
+• Payments
+• Notifications
+• AI Gateway
+• RentPro
+• Vastu Griha
+
+Future modules may be added without affecting the platform architecture.
+
+Vastu Griha is one module within this ecosystem and must always reuse shared platform services whenever possible.
 
 ---
 
@@ -137,7 +174,7 @@ Every code file must adhere to these coding standards:
 
 ## 6. State Management
 
-The application state is split into three layers: local, global, and persistent.
+The Vastu Griha modulelication state is split into three layers: local, global, and persistent.
 
 ```mermaid
 graph TD
@@ -245,7 +282,7 @@ AI processing must follow prompt contracts to ensure consistent responses.
 
 * **Prompt Contracts**: Prompt files must have version headers specifying the model, temperature, max tokens, and JSON validation schemas (as detailed in the `AI Prompt Library`).
 * **Token Caching & Optimization**: Dynamic context payloads must group unchanged segments first to leverage input token caching.
-* **Fallbacks**: If a call to OpenAI fails, the system routes the request to Claude. If all cloud models fail, the app runs local Javascript rules.
+* **Fallbacks**: If a call to OpenAI fails, the system routes the request to Claude. If all cloud models fail, the Vastu Griha module runs local Javascript rules.
 
 ---
 
@@ -410,3 +447,17 @@ AI coding agents (such as Antigravity) must follow these strict operational rule
 * **Micro-Frontends**: Decoupling the Shop catalog and Vastu Acharya chat engine into separate lazy-loaded web apps to simplify builds.
 * **Desktop App Wrapper**: Packing Vastu Griha via Electron/Tauri wrapper frameworks to support offline layout planning on desktop viewports.
 * **AR Integration**: Building custom WebXR overlays to map visual Vastu purusha mandalas directly onto real room viewports.
+
+---
+
+## Related Documents
+* [Master Product Spec](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/01_Master_Product_Spec_v1.0.md)
+* [UI/UX Guidelines](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/02_UI_UX_Guidelines_v1.0.md)
+* [Component Library](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/03_Component_Library_v1.0.md)
+* [Asset Pipeline](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/04_Asset_Pipeline_v1.0.md)
+* [AI Prompt Library](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/05_AI_Prompt_Library_v1.0.md)
+* [Engineering Guidelines](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/06_Engineering_Guidelines_v1.0.md)
+* [Database & API](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/07_Database_API_v1.0.md)
+* [Analytics](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/08_Analytics_and_Events_v1.0.md)
+* [Error States](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/09_Error_States_v1.0.md)
+* [Deployment](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/10_Deployment_Performance_v1.0.md)

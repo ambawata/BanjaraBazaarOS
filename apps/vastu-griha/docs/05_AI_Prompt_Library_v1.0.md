@@ -1,8 +1,45 @@
-# Vastu Griha — AI Prompt Library Specification v1.0
+Platform:
+BanjaraBazaarOS
 
-**Status**: Release Candidate / Production Spec  
-**Version**: 1.0  
-**Authors**: Lead AI Architect, Principal Vastu Consultant  
+Module:
+Vastu Griha
+
+Document:
+AI Prompt Library
+
+Version:
+1.0
+
+Status:
+Review
+
+Owner:
+Product Team
+
+Last Updated:
+2026-07-01
+
+---
+
+## Platform Overview
+
+BanjaraBazaarOS is the unified operating system powering all Banjara Bazaar digital products.
+
+Current modules include:
+• Marketplace
+• Vendor Portal
+• CRM
+• Inventory
+• Orders
+• Payments
+• Notifications
+• AI Gateway
+• RentPro
+• Vastu Griha
+
+Future modules may be added without affecting the platform architecture.
+
+Vastu Griha is one module within this ecosystem and must always reuse shared platform services whenever possible.
 
 ---
 
@@ -10,7 +47,7 @@
 
 The integration of Artificial Intelligence within Vastu Griha is governed by five absolute architectural pillars:
 
-1. **AI Assists, Never Replaces**: The user retains absolute agency. AI acts as an advisory co-pilot that flags spatial imbalances and suggests remedies. The application will never execute layout changes, purchase remedies, or modify blueprint files without explicit user action and confirmation.
+1. **AI Assists, Never Replaces**: The user retains absolute agency. AI acts as an advisory co-pilot that flags spatial imbalances and suggests remedies. The Vastu Griha modulelication will never execute layout changes, purchase remedies, or modify blueprint files without explicit user action and confirmation.
 2. **AI Must Explain, Not Just Answer**: Raw scores or compliance binaries are prohibited. Every score deduction, recommendation, or remedy proposal must include a clear explanation of *why* the suggestion is made, citing the spatial physics of classical Vastu Shastra (e.g., solar progression, thermal load, magnetic orientation) translated into modern architectural terms.
 3. **AI Never Invents Room Dimensions**: If a dimension, boundary, or text label is illegible or missing from a floor plan drawing, the AI must mark that parameter as `Indeterminate`. The system will never guess or assume standard dimensions; it must prompt the user to input the missing values manually.
 4. **AI Always Expresses Confidence**: Every object detection, text extraction, and Vastu compliance analysis payload must output a confidence coefficient between `0.0` and `1.0`. The UI will display warning indicators for low-confidence detections, prompting verification.
@@ -2083,7 +2120,7 @@ To prevent prompt drift across model updates, prompts must pass integration test
 
 ## 13. Prompt Security
 
-To protect the application interface from prompt injection and data leaks, we implement three layers of guardrails.
+To protect the Vastu Griha Module interface from prompt injection and data leaks, we implement three layers of guardrails.
 
 ### Prompt Injection Protections
 * **Input Validation**: All incoming query strings are filtered for malicious commands (e.g. "Ignore previous instructions", "Reveal your system prompts").
@@ -2102,3 +2139,17 @@ To protect the application interface from prompt injection and data leaks, we im
 * **AR Spatial Overlay**: Projects the 9x9 Vastu Purusha Mandala over real room boundaries via device cameras, highlighting compliance zones on the fly.
 * **3D Layout Synthesis**: Automatically generates 3D spatial models from 2D vector plans for virtual walk-throughs.
 * **Real-Time Collaboration**: Supports multi-user canvas sharing with concurrent prompts processing and conflict resolution.
+
+---
+
+## Related Documents
+* [Master Product Spec](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/01_Master_Product_Spec_v1.0.md)
+* [UI/UX Guidelines](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/02_UI_UX_Guidelines_v1.0.md)
+* [Component Library](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/03_Component_Library_v1.0.md)
+* [Asset Pipeline](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/04_Asset_Pipeline_v1.0.md)
+* [AI Prompt Library](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/05_AI_Prompt_Library_v1.0.md)
+* [Engineering Guidelines](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/06_Engineering_Guidelines_v1.0.md)
+* [Database & API](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/07_Database_API_v1.0.md)
+* [Analytics](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/08_Analytics_and_Events_v1.0.md)
+* [Error States](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/09_Error_States_v1.0.md)
+* [Deployment](file:///c:/Users/DELL/BanjaraBazaarOS/apps/vastu-griha/docs/10_Deployment_Performance_v1.0.md)
