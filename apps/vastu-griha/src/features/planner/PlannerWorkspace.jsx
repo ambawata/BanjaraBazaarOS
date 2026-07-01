@@ -8,53 +8,180 @@ import ReportGenerator from '../../components/ReportGenerator'
 import AiChat from '../../components/AiChat'
 import PlotConfig from '../../components/PlotConfig'
 import { EXPANDED_ROOMS_CATALOG } from '../../assets/constants'
+import { useUiStore } from '../../stores/uiStore'
+import { useProjectStore } from '../../stores/projectStore'
+import { useCanvasStore } from '../../stores/canvasStore'
 
-export default function PlannerWorkspace({
-  screenState,
-  setScreenState,
-  activeTab,
-  setActiveTab,
-  showAcharyaModal,
-  setShowAcharyaModal,
-  isMobile,
-  theme,
-  toggleTheme,
-  boundaryPoints,
-  selectedIssueRoom,
-  setSelectedIssueRoom,
-  selectedRoomId,
-  setSelectedRoomId,
-  showVastuGrid,
-  setShowVastuGrid,
-  showNormalGrid,
-  setShowNormalGrid,
-  showAddPopup,
-  setShowAddPopup,
-  customRoomName,
-  setCustomRoomName,
-  searchQuery,
-  setSearchQuery,
-  isTracing,
-  traceStatus,
-  onboarding,
-  plot,
-  setPlot,
-  rooms,
-  setRooms,
-  imageSettings,
-  setImageSettings,
-  handlePointsChange,
-  handleAddRoom,
-  handleAddCustomRoom,
-  handleClearCanvas,
-  handleNudge,
-  handleResizeNudge,
-  handleDeleteSelected,
-  handleAutoTrace,
-  handleContinueProject,
-  handleBackdropFile
-}) {
-  
+export default function PlannerWorkspace() {
+  const {
+    screenState,
+    setScreenState,
+    activeTab,
+    setActiveTab,
+    showAcharyaModal,
+    setShowAcharyaModal,
+    isMobile,
+    theme,
+    toggleTheme,
+    selectedIssueRoom,
+    setSelectedIssueRoom,
+    selectedRoomId,
+    setSelectedRoomId,
+    showVastuGrid,
+    setShowVastuGrid,
+    showNormalGrid,
+    setShowNormalGrid,
+    showAddPopup,
+    setShowAddPopup,
+    customRoomName,
+    setCustomRoomName,
+    searchQuery,
+    setSearchQuery,
+    isTracing,
+    traceStatus
+  } = useUiStore()
+
+  const {
+    onboarding,
+    plot,
+    setPlot
+  } = useProjectStore()
+
+  const {
+    rooms,
+    setRooms,
+    boundaryPoints,
+    setBoundaryPoints,
+    imageSettings,
+    setImageSettings,
+    addRoom,
+    deleteRoom,
+    clearCanvas,
+    nudgeRoom,
+    resizeRoom,
+    undoLayout,
+    redoLayout
+  } = useCanvasStore()
+
+  // Preset vs Corner Taps shape handler
+  const selectShapePreset = (shape) => {
+    setBoundaryPoints([])
+    useProjectStore.getState().setOnboarding({ ...onboarding, plotShape: shape })
+  }
+
+  const handlePointsChange = (pts) => {
+    setBoundaryPoints(pts)
+    if (pts.length > 0) {
+      useProjectStore.getState().setOnboarding({ ...onboarding, plotShape: 'Custom Shape (Tapped corners)' })
+    }
+  }
+
+  // Add room helpers
+  const handleAddRoom = (template) => {
+    addRoom(template)
+    setShowAddPopup(false)
+    setActiveTab('designer')
+  }
+
+  // Submit custom element
+  const handleAddCustomRoom = (e) => {
+    e.preventDefault()
+    if (!customRoomName.trim()) return
+    addRoom({
+      type: 'custom',
+      label: customRoomName,
+      w: 22,
+      h: 22
+    })
+    setCustomRoomName('')
+    setShowAddPopup(false)
+    setActiveTab('designer')
+  }
+
+  // Clear visual canvas
+  const handleClearCanvas = () => {
+    if (window.confirm('Reset current layout design?')) {
+      clearCanvas()
+      setSelectedRoomId(null)
+    }
+  }
+
+  const handleDeleteSelected = () => {
+    if (!selectedRoomId) return
+    deleteRoom(selectedRoomId)
+    setSelectedRoomId(null)
+  }
+
+  const handleAutoTrace = () => {
+    if (!imageSettings.url) {
+      alert("Please upload a floor plan drawing (PDF/JPG/PNG) first using the uploader!")
+      return
+    }
+    
+    useUiStore.getState().setIsTracing(true)
+    useUiStore.getState().setTraceStatus('Scanning layout drawing structural contours...')
+    
+    setTimeout(() => {
+      useUiStore.getState().setTraceStatus('Detecting text tags (Bedroom, Kitchen, Pooja)...')
+    }, 1000)
+
+    setTimeout(() => {
+      useUiStore.getState().setTraceStatus('Mapping coordinate offsets to 3x3 Vastu mandala...')
+    }, 2000)
+
+    setTimeout(() => {
+      setRooms([
+        { id: 't1', type: 'bedroom', label: 'Master Bedroom', x: 2.8, y: 60.5, width: 29.2, height: 31.5 },
+        { id: 't2', type: 'bedroom', label: 'Kids Bedroom', x: 2.8, y: 2, width: 29.2, height: 32 },
+        { id: 't3', type: 'bedroom', label: 'Parents Bedroom', x: 61.2, y: 6, width: 29.5, height: 33.2 },
+        { id: 't4', type: 'living', label: 'Living Room Lounge', x: 35, y: 5, width: 26.2, height: 24.5 },
+        { id: 't5', type: 'kitchen', label: 'Kitchen Cooktop', x: 61.8, y: 59, width: 29.2, height: 33.2 },
+        { id: 't6', type: 'pooja', label: 'Pooja Mandir', x: 74.6, y: 39.2, width: 16.1, height: 19.8 },
+        { id: 't7', type: 'toilet', label: 'Left Toilet / Bath', x: 16.5, y: 34, width: 15.5, height: 22 },
+        { id: 't8', type: 'toilet', label: 'Right Toilet / Bath', x: 61.8, y: 39.2, width: 12.8, height: 19.8 },
+        { id: 't9', type: 'staircase', label: 'Staircase Block', x: 32, y: 55.5, width: 14.8, height: 36.5 },
+        { id: 't10', type: 'dining', label: 'Dining Area', x: 46.8, y: 59.8, width: 15, height: 32.2 },
+        { id: 't11', type: 'entrance', label: 'Main Entrance', x: 46.8, y: 92, width: 15, height: 8 }
+      ])
+      useUiStore.getState().setIsTracing(false)
+      useUiStore.getState().setTraceStatus('')
+      setActiveTab('designer')
+    }, 3000)
+  }
+
+  // Background sketch calibration file reader
+  const handleContinueProject = (project) => {
+    if (project === 'gupta') {
+      setPlot({ width: 30, length: 40, shape: 'Rectangular', facing: 'East', tilt: 0 })
+      setRooms([
+        { id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 80, y: 5, width: 15, height: 8 },
+        { id: 'r2', type: 'pooja', label: 'Pooja Mandir', x: 75, y: 15, width: 20, height: 15 },
+        { id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 75, y: 70, width: 20, height: 20 },
+        { id: 'r4', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 70, width: 35, height: 25 },
+        { id: 'r5', type: 'living', label: 'Living Room Lounge', x: 30, y: 25, width: 40, height: 35 }
+      ])
+      setScreenState('workspace')
+      setActiveTab('designer')
+    } else {
+      setPlot({ width: 60, length: 90, shape: 'Rectangular', facing: 'North', tilt: 0 })
+      setRooms([
+        { id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 45, y: 5, width: 15, height: 8 },
+        { id: 'r2', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 65, width: 30, height: 25 },
+        { id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 65, y: 65, width: 25, height: 25 },
+        { id: 'r4', type: 'pooja', label: 'Pooja Room', x: 75, y: 10, width: 20, height: 20 }
+      ])
+      setScreenState('workspace')
+      setActiveTab('designer')
+    }
+  }
+
+  const handleBackdropFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setImageSettings({ ...imageSettings, url })
+  }
+
   if (screenState === 'welcome') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden' }}>
@@ -344,7 +471,7 @@ export default function PlannerWorkspace({
               <i className="ti ti-layout-grid"></i>
               <span>Design</span>
             </div>
-            <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
+            <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifycontent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
               <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
             </button>
             <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }}>
@@ -576,6 +703,12 @@ export default function PlannerWorkspace({
                     </button>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn btn-sm" onClick={undoLayout} title="Undo last action">
+                      <i className="ti ti-arrow-back-up" style={{ fontSize: '14px', marginRight: '4px' }}></i> Undo
+                    </button>
+                    <button className="btn btn-sm" onClick={redoLayout} title="Redo action">
+                      <i className="ti ti-arrow-forward-up" style={{ fontSize: '14px', marginRight: '4px' }}></i> Redo
+                    </button>
                     <button className="btn btn-danger btn-sm" onClick={handleClearCanvas}>
                       <i className="ti ti-trash"></i> Clear
                     </button>
@@ -650,18 +783,18 @@ export default function PlannerWorkspace({
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
                       <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                         <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Move:</span>
-                        <button className="btn btn-sm" onClick={() => handleNudge('left')}><i className="ti ti-arrow-left"></i></button>
-                        <button className="btn btn-sm" onClick={() => handleNudge('up')}><i className="ti ti-arrow-up"></i></button>
-                        <button className="btn btn-sm" onClick={() => handleNudge('down')}><i className="ti ti-arrow-down"></i></button>
-                        <button className="btn btn-sm" onClick={() => handleNudge('right')}><i className="ti ti-arrow-right"></i></button>
+                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'left')}><i className="ti ti-arrow-left"></i></button>
+                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'up')}><i className="ti ti-arrow-up"></i></button>
+                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'down')}><i className="ti ti-arrow-down"></i></button>
+                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'right')}><i className="ti ti-arrow-right"></i></button>
                       </div>
 
                       <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                         <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Resize:</span>
-                        <button className="btn btn-sm" onClick={() => handleResizeNudge('w', 1)}>W +</button>
-                        <button className="btn btn-sm" onClick={() => handleResizeNudge('w', -1)}>W -</button>
-                        <button className="btn btn-sm" onClick={() => handleResizeNudge('h', 1)}>H +</button>
-                        <button className="btn btn-sm" onClick={() => handleResizeNudge('h', -1)}>H -</button>
+                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'w', 1)}>W +</button>
+                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'w', -1)}>W -</button>
+                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', 1)}>H +</button>
+                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', -1)}>H -</button>
                       </div>
                     </div>
                   </div>
@@ -695,7 +828,7 @@ export default function PlannerWorkspace({
                   <input 
                     type="range" min="0.1" max="1.0" step="0.05" style={{ width: '100%' }}
                     value={imageSettings.opacity} 
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, opacity: parseFloat(e.target.value) }))} 
+                    onChange={(e) => setImageSettings({ ...imageSettings, opacity: parseFloat(e.target.value) })} 
                   />
                 </div>
 
@@ -704,7 +837,7 @@ export default function PlannerWorkspace({
                   <input 
                     type="range" min="0.5" max="2.5" step="0.05" style={{ width: '100%' }}
                     value={imageSettings.scale} 
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, scale: parseFloat(e.target.value) }))} 
+                    onChange={(e) => setImageSettings({ ...imageSettings, scale: parseFloat(e.target.value) })} 
                   />
                 </div>
 
@@ -713,7 +846,7 @@ export default function PlannerWorkspace({
                   <input 
                     type="range" min="-180" max="180" step="5" style={{ width: '100%' }}
                     value={imageSettings.rotation} 
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, rotation: parseInt(e.target.value) }))} 
+                    onChange={(e) => setImageSettings({ ...imageSettings, rotation: parseInt(e.target.value) })} 
                   />
                 </div>
 

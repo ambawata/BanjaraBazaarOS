@@ -3,41 +3,156 @@ import Canvas from '../../components/Canvas'
 import Compass from '../../components/Compass'
 import PlotBoundaryDrawer from '../../components/PlotBoundaryDrawer'
 import { GOAL_SVGS, STYLE_SVGS } from '../../assets/constants'
+import { useUiStore } from '../../stores/uiStore'
+import { useProjectStore } from '../../stores/projectStore'
+import { useCanvasStore } from '../../stores/canvasStore'
 
-export default function OnboardingWizard({
-  screenState,
-  setScreenState,
-  onboarding,
-  setOnboarding,
-  boundaryPoints,
-  setBoundaryPoints,
-  rooms,
-  setRooms,
-  plot,
-  setPlot,
-  imageSettings,
-  setImageSettings,
-  selectedRoomId,
-  setSelectedRoomId,
-  designProgress,
-  setDesignProgress,
-  isMobile,
-  setShowAcharyaModal,
-  isTracing,
-  setIsTracing,
-  traceStatus,
-  setTraceStatus,
-  setActiveTab,
-  selectSizePreset,
-  typeCustomDimension,
-  selectShapePreset,
-  handlePointsChange,
-  handleAddRoom,
-  handleAutoTrace,
-  triggerAiDesignProcess,
-  getDeterminedRoomsList
-}) {
-  
+export default function OnboardingWizard() {
+  const {
+    screenState,
+    setScreenState,
+    isMobile,
+    setShowAcharyaModal,
+    isTracing,
+    traceStatus,
+    setActiveTab,
+    designProgress,
+    setDesignProgress
+  } = useUiStore()
+
+  const {
+    onboarding,
+    setOnboarding,
+    plot,
+    setPlot
+  } = useProjectStore()
+
+  const {
+    rooms,
+    setRooms,
+    boundaryPoints,
+    setBoundaryPoints,
+    imageSettings,
+    selectedRoomId,
+    setSelectedRoomId,
+    addRoom
+  } = useCanvasStore()
+
+  // Preset Selection vs. Custom inputs UX Rule (Screen 2 Plot Size)
+  const selectSizePreset = (preset) => {
+    setOnboarding({
+      ...onboarding,
+      sizePreset: preset,
+      customWidth: '',
+      customLength: ''
+    })
+  }
+
+  const typeCustomDimension = (field, val) => {
+    setOnboarding({
+      ...onboarding,
+      sizePreset: null, // Clear active preset
+      [field]: val
+    })
+  }
+
+  // Plot Boundary Preset vs. Corner Taps (Screen 3 Shape)
+  const selectShapePreset = (shape) => {
+    setBoundaryPoints([]) // Clear custom drawing
+    setOnboarding({ ...onboarding, plotShape: shape })
+  }
+
+  const handlePointsChange = (pts) => {
+    setBoundaryPoints(pts)
+    if (pts.length > 0) {
+      setOnboarding({ ...onboarding, plotShape: 'Custom Shape (Tapped corners)' })
+    }
+  }
+
+  // Determine rooms based on lifestyle checklist (AI Room Determination)
+  const getDeterminedRoomsList = () => {
+    const list = []
+    list.push('Living Room')
+    list.push('Kitchen Cooktop')
+    list.push('Dining Area')
+    list.push('Bathroom / Toilet')
+
+    if (onboarding.goal === 'Build New Home') {
+      list.push('Master Bedroom')
+      list.push('Parents Bedroom')
+      list.push('Kids Bedroom')
+    } else {
+      list.push('Master Bedroom')
+    }
+
+    if (onboarding.customRequirements.toLowerCase().includes('pooja')) {
+      list.push('Pooja Temple Mandir')
+    } else {
+      list.push('Pooja Temple Mandir (Recommended)')
+    }
+
+    if (onboarding.customRequirements.toLowerCase().includes('office') || onboarding.customRequirements.toLowerCase().includes('study')) {
+      list.push('Home Office')
+    }
+
+    return list
+  }
+
+  // Generate plan from configurations
+  const loadLifestyleLayout = () => {
+    let w = 30, l = 40
+    if (onboarding.sizePreset) {
+      const parts = onboarding.sizePreset.split(' ')
+      w = parseInt(parts[0]) || 30
+      l = parseInt(parts[2]) || 40
+    } else {
+      w = parseInt(onboarding.customWidth) || 30
+      l = parseInt(onboarding.customLength) || 40
+    }
+
+    let dir = 'East'
+    if (onboarding.facing.includes('North')) dir = 'North'
+    else if (onboarding.facing.includes('West')) dir = 'West'
+    else if (onboarding.facing.includes('South')) dir = 'South'
+
+    const tplPlot = {
+      width: w,
+      length: l,
+      shape: onboarding.plotShape.includes('Custom') ? 'Irregular' : 'Rectangular',
+      facing: dir,
+      tilt: 0
+    }
+
+    const tplRooms = []
+    tplRooms.push({ id: 'r1', type: 'entrance', label: 'Main Entrance Gate', x: 80, y: 5, width: 15, height: 8 })
+    tplRooms.push({ id: 'r2', type: 'pooja', label: 'Pooja Mandir', x: 75, y: 15, width: 20, height: 15 })
+    tplRooms.push({ id: 'r3', type: 'kitchen', label: 'Kitchen Cooktop', x: 75, y: 70, width: 20, height: 20 })
+    tplRooms.push({ id: 'r4', type: 'bedroom', label: 'Master Bedroom', x: 5, y: 70, width: 35, height: 25 })
+    tplRooms.push({ id: 'r5', type: 'living', label: 'Living Room Lounge', x: 30, y: 25, width: 40, height: 35 })
+    tplRooms.push({ id: 'r6', type: 'toilet', label: 'Bathroom Toilet', x: 5, y: 35, width: 20, height: 20 })
+
+    setPlot(tplPlot)
+    setRooms(tplRooms)
+    setScreenState('preview')
+  }
+
+  // Start designing animation
+  const triggerAiDesignProcess = () => {
+    setScreenState('designing')
+    setDesignProgress(0)
+    
+    const interval = setInterval(() => {
+      setDesignProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          loadLifestyleLayout()
+          return 100
+        }
+        return prev + 10
+      })
+    }, 150)
+  }
+
   // Wizard header matching mockup
   const renderWizardHeader = (activeStep, backState) => {
     return (
@@ -119,7 +234,7 @@ export default function OnboardingWizard({
               <div 
                 key={p}
                 className={`option-list-card ${onboarding.propertyType === p ? 'selected' : ''}`}
-                onClick={() => setOnboarding(prev => ({ ...prev, propertyType: p }))}
+                onClick={() => setOnboarding({ ...onboarding, propertyType: p })}
               >
                 <span style={{ fontSize: '14px', fontWeight: 600 }}>{p}</span>
                 <div className="option-circle">
@@ -190,7 +305,7 @@ export default function OnboardingWizard({
                 <div 
                   key={sd}
                   className={`option-button-card ${onboarding.facing === sd ? 'selected' : ''}`}
-                  onClick={() => setOnboarding(prev => ({ ...prev, facing: sd }))}
+                  onClick={() => setOnboarding({ ...onboarding, facing: sd })}
                 >
                   {sd}
                 </div>
@@ -280,7 +395,7 @@ export default function OnboardingWizard({
                   return (
                     <div 
                       key={g.id}
-                      onClick={() => setOnboarding(prev => ({ ...prev, goal: g.id }))}
+                      onClick={() => setOnboarding({ ...onboarding, goal: g.id })}
                       style={{
                         background: 'var(--bg2)',
                         border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
@@ -323,7 +438,7 @@ export default function OnboardingWizard({
                       <select 
                         className="chat-input" style={{ width: '100%', padding: '8px' }}
                         value={onboarding.membersCount}
-                        onChange={(e) => setOnboarding(prev => ({ ...prev, membersCount: e.target.value }))}
+                        onChange={(e) => setOnboarding({ ...onboarding, membersCount: e.target.value })}
                       >
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -338,7 +453,7 @@ export default function OnboardingWizard({
                       <select 
                         className="chat-input" style={{ width: '100%', padding: '8px' }}
                         value={onboarding.occupantType}
-                        onChange={(e) => setOnboarding(prev => ({ ...prev, occupantType: e.target.value }))}
+                        onChange={(e) => setOnboarding({ ...onboarding, occupantType: e.target.value })}
                       >
                         <option value="Self">Self</option>
                         <option value="Parents">Parents</option>
@@ -360,7 +475,7 @@ export default function OnboardingWizard({
                     return (
                       <div 
                         key={b}
-                        onClick={() => setOnboarding(prev => ({ ...prev, budget: b }))}
+                        onClick={() => setOnboarding({ ...onboarding, budget: b })}
                         className={`option-button-card ${isSelected ? 'selected' : ''}`}
                         style={{ padding: '8px 4px', fontSize: '11.5px', justifyContent: 'center' }}
                       >
@@ -383,7 +498,7 @@ export default function OnboardingWizard({
                     return (
                       <div 
                         key={s}
-                        onClick={() => setOnboarding(prev => ({ ...prev, preferredStyle: s }))}
+                        onClick={() => setOnboarding({ ...onboarding, preferredStyle: s })}
                         style={{
                           border: isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)',
                           borderRadius: '8px',
@@ -412,7 +527,7 @@ export default function OnboardingWizard({
                   style={{ flex: 1, width: '100%', minHeight: '120px', padding: '12px', borderRadius: '12px', fontSize: '12px', resize: 'none' }}
                   placeholder="e.g. Need a senior citizen room on ground floor, EV charging in garage, open pooja temple..."
                   value={onboarding.customRequirements}
-                  onChange={(e) => setOnboarding(prev => ({ ...prev, customRequirements: e.target.value }))}
+                  onChange={(e) => setOnboarding({ ...onboarding, customRequirements: e.target.value })}
                 />
               </div>
             </div>
