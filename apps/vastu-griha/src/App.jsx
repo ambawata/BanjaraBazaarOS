@@ -157,6 +157,7 @@ export default function App() {
   // Elements Popup & Custom input state
   const [showAddPopup, setShowAddPopup] = useState(false)
   const [customRoomName, setCustomRoomName] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [isTracing, setIsTracing] = useState(false)
   const [traceStatus, setTraceStatus] = useState('')
 
