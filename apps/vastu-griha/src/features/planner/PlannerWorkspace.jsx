@@ -38,7 +38,17 @@ export default function PlannerWorkspace() {
     searchQuery,
     setSearchQuery,
     isTracing,
-    traceStatus
+    traceStatus,
+    showShareModal,
+    setShowShareModal,
+    showNotificationCenter,
+    setShowNotificationCenter,
+    editMode,
+    setEditMode,
+    members,
+    comments,
+    tasks,
+    notifications
   } = useUiStore()
 
   const {
@@ -562,6 +572,12 @@ export default function PlannerWorkspace() {
           >
             <i className="ti ti-file-text-filled"></i> Print Audit
           </div>
+          <div 
+            className={`nav-item ${activeTab === 'collaborate' ? 'active' : ''}`}
+            onClick={() => setActiveTab('collaborate')}
+          >
+            <i className="ti ti-users"></i> Collaborate
+          </div>
         </div>
 
         <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border)' }}>
@@ -586,6 +602,7 @@ export default function PlannerWorkspace() {
               {activeTab === 'analysis' && 'Vastu Compliance Audit'}
               {activeTab === 'shop' && 'Vastu Remedies Shop'}
               {activeTab === 'reports' && 'Vastu Health Report'}
+              {activeTab === 'collaborate' && 'Project Collaboration'}
             </span>
             <span className="page-subtitle">
               {activeTab === 'home' && 'Summary of home blueprint, energy health scores, and quick actions'}
@@ -595,16 +612,71 @@ export default function PlannerWorkspace() {
               {activeTab === 'analysis' && 'Detailed sector evaluations and graded remedies'}
               {activeTab === 'shop' && 'Procure Vedic remedies to align home energy fields'}
               {activeTab === 'reports' && 'Check and print family Vastu layout checklist reports'}
+              {activeTab === 'collaborate' && 'Share layout coordinates and trace tasks checklists'}
             </span>
           </div>
 
-          <div className="topbar-right">
+          <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <select 
+              className="btn" 
+              style={{ padding: '6px 12px', fontSize: '12px', cursor: 'pointer' }}
+              value={editMode}
+              onChange={(e) => setEditMode(e.target.value)}
+            >
+              <option value="edit">✏️ Edit Mode</option>
+              <option value="view">👁️ View Only</option>
+            </select>
+
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setShowNotificationCenter(!showNotificationCenter)}>
+              <i className="ti ti-bell" style={{ fontSize: '20px' }}></i>
+              {notifications.length > 0 && (
+                <div style={{ position: 'absolute', top: '2px', right: '2px', width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent)' }}></div>
+              )}
+            </div>
+
             <button className="btn btn-icon theme-toggle" onClick={toggleTheme}>
               <i className={`ti ti-${theme === 'light' ? 'moon-filled' : 'sun-filled'}`}></i>
             </button>
+
+            <button className="btn" onClick={() => setShowShareModal(true)}>
+              <i className="ti ti-share"></i> Share
+            </button>
+
             <button className="btn btn-primary" onClick={() => setActiveTab('reports')}>
               <i className="ti ti-printer"></i> Print Report
             </button>
+
+            {showNotificationCenter && (
+              <div 
+                style={{ 
+                  position: 'absolute', 
+                  top: '50px', 
+                  right: '180px', 
+                  width: '280px', 
+                  background: 'var(--bg2)', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '12px', 
+                  boxShadow: 'var(--shadow)', 
+                  zIndex: 500, 
+                  padding: '16px',
+                  textAlign: 'left'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid var(--border)', paddingBottom: '6px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '13px' }}>Local Alerts</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text3)', cursor: 'pointer' }} onClick={() => setShowNotificationCenter(false)}>Close</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                  {notifications.map(n => (
+                    <div key={n.id} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '12px' }}>{n.text}</span>
+                      <span style={{ fontSize: '9px', color: 'var(--text3)' }}>{n.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
@@ -1036,7 +1108,241 @@ export default function PlannerWorkspace() {
             />
           )}
 
+          {/* Collaborate Tab */}
+          {activeTab === 'collaborate' && (
+            <div style={{ flex: 1, display: 'flex', gap: '20px', padding: '24px', overflowY: 'auto', textAlign: 'left', flexWrap: 'wrap' }}>
+              
+              {/* Left Column: Members & Task Checklist */}
+              <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                
+                {/* Member List */}
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Project Members ({members.length})</span>
+                    <button className="btn btn-sm btn-primary" onClick={() => setShowShareModal(true)}>
+                      <i className="ti ti-user-plus"></i> Invite
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {members.map(m => (
+                      <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg3)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border2)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-dim)', border: '1px solid var(--accent)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                            {m.avatar}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ fontSize: '13px', fontWeight: 600 }}>{m.name}</span>
+                            <span style={{ fontSize: '10px', color: 'var(--text2)' }}>{m.email}</span>
+                          </div>
+                        </div>
+
+                        <select 
+                          className="btn btn-sm" 
+                          style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 600, border: '1px solid var(--border2)' }}
+                          value={m.role}
+                          onChange={(e) => useUiStore.getState().updateMemberRole(m.id, e.target.value)}
+                        >
+                          <option value="Owner">👑 Owner</option>
+                          <option value="Editor">✏️ Editor</option>
+                          <option value="Viewer">👁️ Viewer</option>
+                          <option value="Family">👪 Family</option>
+                          <option value="Consultant">🧭 Consultant</option>
+                          <option value="Staff">🛠️ Staff</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Task Checklist */}
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Verification Checklist</span>
+                    <button 
+                      className="btn btn-sm" 
+                      onClick={() => {
+                        const txt = prompt('Enter new task detail:')
+                        if (txt) {
+                          useUiStore.getState().addTask({ id: Date.now().toString(), text: txt, completed: false })
+                        }
+                      }}
+                    >
+                      + Add Task
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {tasks.map(t => (
+                      <label 
+                        key={t.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          background: 'var(--bg3)',
+                          padding: '10px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border2)',
+                          cursor: 'pointer',
+                          textDecoration: t.completed ? 'line-through' : 'none',
+                          opacity: t.completed ? 0.6 : 1
+                        }}
+                      >
+                        <input 
+                          type="checkbox"
+                          checked={t.completed}
+                          onChange={() => toggleTask(t.id)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span style={{ fontSize: '12.5px' }}>{t.text}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Local Comments Panel & Version Placeholder */}
+              <div style={{ flex: 1.2, minWidth: '320px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                
+                {/* Local Comments Panel */}
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Local Comments Panel</span>
+
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      const txt = e.target.elements['cmt-text'].value
+                      const tgt = e.target.elements['cmt-target'].value
+                      if (!txt.trim()) return
+
+                      useUiStore.getState().addComment({
+                        id: Date.now().toString(),
+                        target: tgt,
+                        author: 'Amit Gupta',
+                        text: txt,
+                        time: 'Just now'
+                      })
+                      e.target.elements['cmt-text'].value = ''
+                    }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                  >
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <select name="cmt-target" className="btn btn-sm" style={{ flex: 1, padding: '6px' }}>
+                        <option value="General Project">General Project</option>
+                        {rooms.map(r => (
+                          <option key={r.id} value={r.label}>{r.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <textarea 
+                      name="cmt-text"
+                      className="chat-input"
+                      style={{ width: '100%', minHeight: '60px', padding: '8px', fontSize: '12px', resize: 'none' }}
+                      placeholder="Type a comment or query..."
+                      required
+                    />
+                    <button type="submit" className="btn btn-sm btn-primary" style={{ alignSelf: 'flex-end', padding: '6px 16px' }}>Post Comment</button>
+                  </form>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+                    {comments.map(c => (
+                      <div key={c.id} style={{ background: 'var(--bg3)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border2)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: 'bold' }}>{c.author}</span>
+                          <span style={{ fontSize: '9px', color: 'var(--text3)' }}>{c.time}</span>
+                        </div>
+                        <span style={{ fontSize: '10px', background: 'var(--bg4)', padding: '2px 6px', borderRadius: '4px', alignSelf: 'flex-start', color: 'var(--gold)', fontWeight: 600 }}>@ {c.target}</span>
+                        <p style={{ fontSize: '12px', color: 'var(--text2)', marginTop: '4px', lineHeight: 1.3 }}>{c.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cloud Sync & Versioning info panel */}
+                <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Cloud Sync Status</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <i className="ti ti-cloud-off" style={{ fontSize: '24px', color: 'var(--gold)' }}></i>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Local Sandbox Mode</span>
+                      <span style={{ fontSize: '10.5px', color: 'var(--text2)' }}>Layout auto-saving locally. Future cloud versioning pending.</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text3)', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
+                    <span>Revision: v1.0.3-local</span>
+                    <span>Last Saved: Just now</span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
         </div>
+
+        {/* Share Project Dialog Overlay */}
+        {showShareModal && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 990, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} onClick={() => setShowShareModal(false)}>
+            <div style={{ width: '100%', maxWidth: '420px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
+                <h3 style={{ fontFamily: 'var(--fd)', fontWeight: 'bold', margin: 0 }}>Share Project</h3>
+                <i className="ti ti-x" style={{ fontSize: '20px', cursor: 'pointer', color: 'var(--text3)' }} onClick={() => setShowShareModal(false)}></i>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Invite by Email or Phone number</span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input type="text" className="chat-input" placeholder="e.g. neha@gupta.com" style={{ flex: 1, padding: '8px' }} id="invite-input" />
+                  <button className="btn btn-primary" onClick={() => {
+                    const el = document.getElementById('invite-input')
+                    if (el && el.value.trim()) {
+                      useUiStore.getState().addMember({
+                        id: Date.now().toString(),
+                        name: el.value.split('@')[0],
+                        email: el.value,
+                        role: 'Editor',
+                        avatar: el.value[0].toUpperCase()
+                      })
+                      useUiStore.getState().addNotification({
+                        id: Date.now().toString(),
+                        text: `Invited ${el.value} to project`,
+                        time: 'Just now',
+                        type: 'share'
+                      })
+                      el.value = ''
+                      alert('Invite sent successfully! Member added to local registry.')
+                    }
+                  }}>Invite</button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Shareable layout link</span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input type="text" className="chat-input" value="https://vastugriha.banjarabazaaros.com/share/prj-gupta-392a" readOnly style={{ flex: 1, padding: '8px', fontSize: '11.5px', background: 'var(--bg3)', color: 'var(--text2)' }} />
+                  <button className="btn btn-sm" onClick={() => { navigator.clipboard.writeText('https://vastugriha.banjarabazaaros.com/share/prj-gupta-392a'); alert('Copied share link to clipboard!'); }}>Copy</button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Scan QR to view layout on mobile</span>
+                <div style={{ width: '100px', height: '100px', background: '#fff', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 10 10" style={{ width: '100%', height: '100%' }}>
+                    <rect x="0" y="0" width="3" height="3" fill="#000" />
+                    <rect x="7" y="0" width="3" height="3" fill="#000" />
+                    <rect x="0" y="7" width="3" height="3" fill="#000" />
+                    <rect x="4" y="4" width="2" height="2" fill="#000" />
+                    <rect x="2" y="4" width="1" height="2" fill="#000" />
+                    <rect x="7" y="5" width="2" height="1" fill="#000" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 8. Add Room Popup */}
         {showAddPopup && (

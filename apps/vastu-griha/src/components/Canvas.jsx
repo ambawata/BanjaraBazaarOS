@@ -21,6 +21,7 @@ export default function Canvas() {
   const { snapToGrid, gridSize } = useSettingsStore()
   const showVastuGrid = useUiStore((state) => state.showVastuGrid)
   const showNormalGrid = useUiStore((state) => state.showNormalGrid)
+  const editMode = useUiStore((state) => state.editMode)
 
   const containerRef = useRef(null)
   const plotRef = useRef(null)
@@ -60,6 +61,7 @@ export default function Canvas() {
 
   // Dragging and Resizing Logic
   const handleMouseDown = (e, roomId, type) => {
+    if (editMode === 'view') return
     e.stopPropagation()
     const room = rooms.find(r => r.id === roomId)
     if (!room) return
@@ -79,6 +81,7 @@ export default function Canvas() {
   }
 
   const handleTouchStart = (e, roomId, type) => {
+    if (editMode === 'view') return
     e.stopPropagation()
     const touch = e.touches?.[0]
     if (!touch) return
@@ -100,7 +103,7 @@ export default function Canvas() {
   }
 
   const handleMouseMove = (e) => {
-    if (!dragState || !plotRef.current) return
+    if (editMode === 'view' || !dragState || !plotRef.current) return
     e.preventDefault()
     
     const deltaX = e.clientX - dragState.startX
@@ -151,7 +154,7 @@ export default function Canvas() {
   }
 
   const handleTouchMove = (e) => {
-    if (!dragState || !plotRef.current) return
+    if (editMode === 'view' || !dragState || !plotRef.current) return
     e.preventDefault()
     
     const touch = e.touches?.[0]
@@ -346,7 +349,7 @@ export default function Canvas() {
               onTouchStart={(e) => handleTouchStart(e, room.id, 'move')}
             >
               {/* Context Sensitive Floating Canva-style Toolbar */}
-              {isSelected && (
+              {isSelected && editMode !== 'view' && (
                 <div className="floating-context-toolbar" onMouseDown={(e) => e.stopPropagation()}>
                   <button 
                     className="floating-context-btn" 
@@ -399,11 +402,13 @@ export default function Canvas() {
 
               <div className="placed-room-header">
                 <span className="placed-room-title">{room.label}</span>
-                <i 
-                  className="ti ti-x placed-room-close"
-                  onClick={(e) => handleRemoveRoom(room.id, e)}
-                  title="Remove room"
-                ></i>
+                {editMode !== 'view' && (
+                  <i 
+                    className="ti ti-x placed-room-close"
+                    onClick={(e) => handleRemoveRoom(room.id, e)}
+                    title="Remove room"
+                  ></i>
+                )}
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: 'auto' }}>
@@ -421,15 +426,17 @@ export default function Canvas() {
               </div>
               
               {/* Touch Handles */}
-              {isSelected && (
+              {isSelected && editMode !== 'view' && (
                 <div className="touch-handle-rotate" title="Rotate room segment orientation" />
               )}
               
-              <div 
-                className="placed-room-resize-handle"
-                onMouseDown={(e) => handleMouseDown(e, room.id, 'resize')}
-                onTouchStart={(e) => handleTouchStart(e, room.id, 'resize')}
-              />
+              {editMode !== 'view' && (
+                <div 
+                  className="placed-room-resize-handle"
+                  onMouseDown={(e) => handleMouseDown(e, room.id, 'resize')}
+                  onTouchStart={(e) => handleTouchStart(e, room.id, 'resize')}
+                />
+              )}
             </div>
           )
         })}
