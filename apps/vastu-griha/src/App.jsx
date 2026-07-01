@@ -321,6 +321,12 @@ export default function App() {
     setRooms(updated)
   }
 
+  const handleDeleteSelected = () => {
+    if (!selectedRoomId) return
+    setRooms(prev => prev.filter(r => r.id !== selectedRoomId))
+    setSelectedRoomId(null)
+  }
+
   const handleAutoTrace = () => {
     if (!imageSettings.url) {
       alert("Please upload a floor plan drawing (PDF/JPG/PNG) first using the uploader!")

@@ -74,7 +74,8 @@ export default function Canvas({
 
   const handleTouchStart = (e, roomId, type) => {
     e.stopPropagation()
-    const touch = e.touches[0]
+    const touch = e.touches?.[0]
+    if (!touch) return
     const room = rooms.find(r => r.id === roomId)
     if (!room) return
     
@@ -140,7 +141,8 @@ export default function Canvas({
     if (!dragState || !plotRef.current) return
     e.preventDefault()
     
-    const touch = e.touches[0]
+    const touch = e.touches?.[0]
+    if (!touch) return
     const deltaX = touch.clientX - dragState.startX
     const deltaY = touch.clientY - dragState.startY
     
