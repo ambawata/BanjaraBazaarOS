@@ -1,0 +1,1259 @@
+[
+  {
+    "id": "avatars-expert",
+    "name": "Vastu Expert Consultant",
+    "category": "avatars",
+    "tags": [
+      "avatar",
+      "expert",
+      "consultant",
+      "profile"
+    ],
+    "defaultWidthFt": 2,
+    "defaultDepthFt": 2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Profile avatar template representing certified Vastu consultants and Acharyas.",
+    "recommendedRooms": [
+      "Expert Consultation Panel"
+    ],
+    "recommendedDirections": [
+      "Center"
+    ],
+    "material": "Digital Graphic",
+    "color": "Gold & White Aura",
+    "filename": "expert"
+  },
+  {
+    "id": "backgrounds-grid-pattern",
+    "name": "Modular Alignment Grid",
+    "category": "backgrounds",
+    "tags": [
+      "grid",
+      "background",
+      "pattern",
+      "blueprint"
+    ],
+    "defaultWidthFt": 30,
+    "defaultDepthFt": 40,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Aligning diagnostic layout grid corresponding to Vastu's 9x9 Pada division. Serves as coordinates backdrop for planning.",
+    "recommendedRooms": [
+      "Canvas Background"
+    ],
+    "recommendedDirections": [
+      "Center",
+      "North",
+      "South",
+      "East",
+      "West"
+    ],
+    "material": "Digital Layer",
+    "color": "Grid White & Blue",
+    "filename": "grid-pattern"
+  },
+  {
+    "id": "decor-mirror",
+    "name": "Sacred Circular Mirror",
+    "category": "decor",
+    "tags": [
+      "mirror",
+      "decor",
+      "glass",
+      "reflection"
+    ],
+    "defaultWidthFt": 2,
+    "defaultDepthFt": 0.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Sacred round wall mirror framed in copper. Mirrors reflect energy; placement on North or East walls attracts wealth and abundance.",
+    "recommendedRooms": [
+      "Living Room",
+      "Dressing Room",
+      "Foyer"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "North-East"
+    ],
+    "material": "Copper Frame & Glass",
+    "color": "Copper & Mirror",
+    "filename": "mirror"
+  },
+  {
+    "id": "furniture-armchair",
+    "name": "Linen Cushion Armchair",
+    "category": "furniture",
+    "tags": [
+      "armchair",
+      "chair",
+      "seating",
+      "bedroom",
+      "living room"
+    ],
+    "defaultWidthFt": 3,
+    "defaultDepthFt": 3,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Cozy upholstered armchair with oak wood trims and sage green velvet back support cushion. Perfect accent seating for living rooms or bedroom reading corners.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Study"
+    ],
+    "recommendedDirections": [
+      "South",
+      "West",
+      "North-West"
+    ],
+    "material": "Oak Wood & Linen Fabric",
+    "color": "Sage Green & Cream",
+    "filename": "armchair"
+  },
+  {
+    "id": "furniture-bed",
+    "name": "Premium Double Bed",
+    "category": "furniture",
+    "tags": [
+      "bed",
+      "double",
+      "sleeping",
+      "bedroom",
+      "headboard"
+    ],
+    "defaultWidthFt": 6.6,
+    "defaultDepthFt": 7,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Luxury double bed with robust walnut headboard and terracotta throw covers. The bed head must face South to ensure sound sleep.",
+    "recommendedRooms": [
+      "Bedroom"
+    ],
+    "recommendedDirections": [
+      "South",
+      "West",
+      "South-West"
+    ],
+    "material": "Walnut Wood & Fabrics",
+    "color": "Natural Walnut & Terracotta",
+    "filename": "bed"
+  },
+  {
+    "id": "furniture-bench",
+    "name": "Upholstered Entryway Bench",
+    "category": "furniture",
+    "tags": [
+      "bench",
+      "seating",
+      "entryway",
+      "cushion"
+    ],
+    "defaultWidthFt": 4.5,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Elegant tufted cushion entryway bench with supporting wooden frame legs. Provides simple visitor rest and hallway comfort.",
+    "recommendedRooms": [
+      "Entryway",
+      "Foyer",
+      "Living Room"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "West"
+    ],
+    "material": "Walnut Wood & Velvet Fabric",
+    "color": "Terracotta Red",
+    "filename": "bench"
+  },
+  {
+    "id": "furniture-bookshelf",
+    "name": "Ladder Bookcase Shelf",
+    "category": "furniture",
+    "tags": [
+      "bookshelf",
+      "bookcase",
+      "shelf",
+      "library",
+      "storage"
+    ],
+    "defaultWidthFt": 3.5,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Ladder-style storage shelf in warm teak wood finish. Holds spiritual and academic texts to optimize wisdom energy when situated in the North-East.",
+    "recommendedRooms": [
+      "Study",
+      "Living Room",
+      "Home Office"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "North",
+      "West"
+    ],
+    "material": "Teak Wood & Ceramic",
+    "color": "Natural Teak & Terracotta",
+    "filename": "bookshelf"
+  },
+  {
+    "id": "furniture-bunk-bed",
+    "name": "Dual Tier Bunk Bed",
+    "category": "furniture",
+    "tags": [
+      "bed",
+      "bunk",
+      "kids",
+      "bedroom",
+      "frame"
+    ],
+    "defaultWidthFt": 3.5,
+    "defaultDepthFt": 6.6,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Compact dual-tier bunk bed in solid timber wood. Smart safety railings and built-in ladder makes it optimal for children's bedrooms.",
+    "recommendedRooms": [
+      "Kids Bedroom",
+      "Bedroom"
+    ],
+    "recommendedDirections": [
+      "North-West",
+      "West",
+      "East"
+    ],
+    "material": "Timber Wood & Cushions",
+    "color": "Linen Cream & Sage",
+    "filename": "bunk-bed"
+  },
+  {
+    "id": "furniture-carpet",
+    "name": "Woven Textured Carpet",
+    "category": "furniture",
+    "tags": [
+      "carpet",
+      "rug",
+      "woven",
+      "floor",
+      "living room"
+    ],
+    "defaultWidthFt": 8,
+    "defaultDepthFt": 5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Premium woven area rug with geometric motifs and corner tassels. Anchors furniture layouts and introduces warm organic earth energy.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Dining Room"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "East",
+      "West"
+    ],
+    "material": "Woven Natural Wool",
+    "color": "Tan & Terracotta Accent",
+    "filename": "carpet"
+  },
+  {
+    "id": "furniture-ceiling-fan",
+    "name": "Modern Wood Ceiling Fan",
+    "category": "furniture",
+    "tags": [
+      "fan",
+      "ceiling",
+      "cooling",
+      "ventilation"
+    ],
+    "defaultWidthFt": 4,
+    "defaultDepthFt": 4,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Premium wood ceiling fan with 3 blades and central casing cap. Establishes healthy air circulation in bedrooms or lounges.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Family Lounge"
+    ],
+    "recommendedDirections": [
+      "North-West",
+      "East",
+      "West"
+    ],
+    "material": "Maple Wood & Steel",
+    "color": "Maple Wood Gold",
+    "filename": "ceiling-fan"
+  },
+  {
+    "id": "furniture-coffee-table",
+    "name": "Organic Wood Coffee Table",
+    "category": "furniture",
+    "tags": [
+      "table",
+      "coffee",
+      "wood",
+      "living room",
+      "centerpiece"
+    ],
+    "defaultWidthFt": 4.2,
+    "defaultDepthFt": 2.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Low-profile solid oak table featuring organic grain lines and curved edges. Balances space energy when placed in the North-East center of the living area.",
+    "recommendedRooms": [
+      "Living Room",
+      "Family Lounge"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "East",
+      "North"
+    ],
+    "material": "Oak Wood",
+    "color": "Natural Wood Honey",
+    "filename": "coffee-table"
+  },
+  {
+    "id": "furniture-console-table",
+    "name": "Entryway Console Table",
+    "category": "furniture",
+    "tags": [
+      "table",
+      "console",
+      "entryway",
+      "hallway"
+    ],
+    "defaultWidthFt": 4,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Slender, low-depth entryway console table with lower display shelf. Holds sacred objects or plants to greet positive energy at the home's main threshold.",
+    "recommendedRooms": [
+      "Entryway",
+      "Foyer",
+      "Hallway"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "East",
+      "North"
+    ],
+    "material": "Oak Wood & Clay Base",
+    "color": "Oak Honey & Clay",
+    "filename": "console-table"
+  },
+  {
+    "id": "furniture-curtains",
+    "name": "Linen Window Curtains",
+    "category": "furniture",
+    "tags": [
+      "curtains",
+      "drape",
+      "window",
+      "fabric",
+      "decor"
+    ],
+    "defaultWidthFt": 5,
+    "defaultDepthFt": 0.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Hanging linen curtain panel pair, creating soft light filtration and energy buffering for large windows.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Dining Room"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "West"
+    ],
+    "material": "Linen Fabric & Brass Rod",
+    "color": "Ivory White",
+    "filename": "curtains"
+  },
+  {
+    "id": "furniture-dining-chair",
+    "name": "Oak Wood Dining Chair",
+    "category": "furniture",
+    "tags": [
+      "chair",
+      "dining",
+      "seating",
+      "wooden",
+      "dining room"
+    ],
+    "defaultWidthFt": 1.8,
+    "defaultDepthFt": 1.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Sleek dining chair made from solid natural oak with comfortable cushioned seat. Follows clean Scandinavian design principles.",
+    "recommendedRooms": [
+      "Dining Room",
+      "Kitchen"
+    ],
+    "recommendedDirections": [
+      "East",
+      "North",
+      "West"
+    ],
+    "material": "Oak Wood & Cushion",
+    "color": "Natural Wood & Ivory",
+    "filename": "dining-chair"
+  },
+  {
+    "id": "furniture-dining-table",
+    "name": "Oak Wood Dining Table",
+    "category": "furniture",
+    "tags": [
+      "table",
+      "dining",
+      "wood",
+      "dining room"
+    ],
+    "defaultWidthFt": 6,
+    "defaultDepthFt": 3.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Solid oak dining table designed for family gatherings. Provides stable grounding when oriented in the West dining zone.",
+    "recommendedRooms": [
+      "Dining Room"
+    ],
+    "recommendedDirections": [
+      "West",
+      "South",
+      "North-West"
+    ],
+    "material": "Oak Wood",
+    "color": "Oak Honey",
+    "filename": "dining-table"
+  },
+  {
+    "id": "furniture-floor-lamp",
+    "name": "Arched Brass Floor Lamp",
+    "category": "furniture",
+    "tags": [
+      "lamp",
+      "floor",
+      "lighting",
+      "brass",
+      "living room"
+    ],
+    "defaultWidthFt": 2.5,
+    "defaultDepthFt": 2.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Stunning arched brass floor lamp with fabric shade and marble weight base. Soft warm light source recommended for study and lounge environments.",
+    "recommendedRooms": [
+      "Living Room",
+      "Study",
+      "Library"
+    ],
+    "recommendedDirections": [
+      "South-East",
+      "North-West",
+      "North-East"
+    ],
+    "material": "Brass & Marble & Linen",
+    "color": "Gold & Ivory",
+    "filename": "floor-lamp"
+  },
+  {
+    "id": "furniture-mirror",
+    "name": "Full-Length Floor Mirror",
+    "category": "furniture",
+    "tags": [
+      "mirror",
+      "floor",
+      "dressing",
+      "decor"
+    ],
+    "defaultWidthFt": 2.2,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Elegant arched wood floor-standing dressing mirror. Encourages clean reflective energy flows inside bedrooms or dressing chambers.",
+    "recommendedRooms": [
+      "Dressing Room",
+      "Bedroom",
+      "Entryway"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "North-East"
+    ],
+    "material": "Teak Wood & Silver Mirror",
+    "color": "Oak Wood & Mirror Glass",
+    "filename": "mirror"
+  },
+  {
+    "id": "furniture-office-chair",
+    "name": "Ergonomic Office Task Chair",
+    "category": "furniture",
+    "tags": [
+      "chair",
+      "office",
+      "desk",
+      "task",
+      "work",
+      "seating"
+    ],
+    "defaultWidthFt": 2.2,
+    "defaultDepthFt": 2.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "High-back office task chair featuring lumbar support adjustments and double-wheel casters. Perfect for maximizing focus and productivity in study sectors.",
+    "recommendedRooms": [
+      "Study",
+      "Home Office"
+    ],
+    "recommendedDirections": [
+      "West",
+      "North",
+      "East"
+    ],
+    "material": "Nylon Frame & Mesh Fabric",
+    "color": "Slate Blue & Black",
+    "filename": "office-chair"
+  },
+  {
+    "id": "furniture-office-desk",
+    "name": "Premium Office Desk",
+    "category": "furniture",
+    "tags": [
+      "desk",
+      "office",
+      "table",
+      "work",
+      "executive"
+    ],
+    "defaultWidthFt": 5.5,
+    "defaultDepthFt": 3,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Premium study and work desk featuring thick oak top panel and built-in filing drawers. Recommended to orient facing North or East inside the study sector.",
+    "recommendedRooms": [
+      "Study",
+      "Home Office"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "West"
+    ],
+    "material": "Oak Wood & Walnut Veneer",
+    "color": "Oak Honey & Dark Walnut",
+    "filename": "office-desk"
+  },
+  {
+    "id": "furniture-ottoman",
+    "name": "Round Velvet Ottoman Pouf",
+    "category": "furniture",
+    "tags": [
+      "ottoman",
+      "pouf",
+      "stool",
+      "seating",
+      "living room"
+    ],
+    "defaultWidthFt": 2,
+    "defaultDepthFt": 2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Compact round tufted footrest pouf with wooden trim base. Fits easily near coffee tables to augment casual seating layouts.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Family Lounge"
+    ],
+    "recommendedDirections": [
+      "North-West",
+      "East",
+      "West"
+    ],
+    "material": "Timber Wood & Suede Cushion",
+    "color": "Sage Green & Beech",
+    "filename": "ottoman"
+  },
+  {
+    "id": "furniture-plant-stand",
+    "name": "Tiers Metal Plant Stand",
+    "category": "furniture",
+    "tags": [
+      "stand",
+      "plant",
+      "metal",
+      "foliage",
+      "pot"
+    ],
+    "defaultWidthFt": 2.2,
+    "defaultDepthFt": 2.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Three-tiered metal framing plant display stand. Highly recommended remedy for boosting North-East air quality and vitality.",
+    "recommendedRooms": [
+      "Living Room",
+      "Balcony",
+      "Study"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "North-East"
+    ],
+    "material": "Wrought Iron & Pine Wood",
+    "color": "Black & Pine Gold",
+    "filename": "plant-stand"
+  },
+  {
+    "id": "furniture-recliner",
+    "name": "Ergonomic Lounge Recliner",
+    "category": "furniture",
+    "tags": [
+      "recliner",
+      "lounge",
+      "chair",
+      "seating",
+      "comfort"
+    ],
+    "defaultWidthFt": 3.2,
+    "defaultDepthFt": 3.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Premium ergonomic recliner with terracotta cushioning and high lumbar support. Perfect remedy chair for grounding and stress relief.",
+    "recommendedRooms": [
+      "Living Room",
+      "Study"
+    ],
+    "recommendedDirections": [
+      "South",
+      "West",
+      "South-West"
+    ],
+    "material": "Walnut Wood & Suede Fabric",
+    "color": "Terracotta Red",
+    "filename": "recliner"
+  },
+  {
+    "id": "furniture-side-table",
+    "name": "Oak Nightstand Side Table",
+    "category": "furniture",
+    "tags": [
+      "table",
+      "side",
+      "nightstand",
+      "bedroom"
+    ],
+    "defaultWidthFt": 2,
+    "defaultDepthFt": 2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Compact single drawer bedroom nightstand table made from honey oak wood. Excellent bedside convenience companion.",
+    "recommendedRooms": [
+      "Bedroom",
+      "Living Room"
+    ],
+    "recommendedDirections": [
+      "South",
+      "West",
+      "North-West"
+    ],
+    "material": "Oak Wood & Brass",
+    "color": "Oak Honey",
+    "filename": "side-table"
+  },
+  {
+    "id": "furniture-sofa",
+    "name": "Premium Three-Seater Sofa",
+    "category": "furniture",
+    "tags": [
+      "sofa",
+      "couch",
+      "seating",
+      "living room",
+      "modern"
+    ],
+    "defaultWidthFt": 7,
+    "defaultDepthFt": 3.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Premium three-seater upholstered fabric sofa with natural oak details and soft cushions. Placed in the South or West for grounding stability.",
+    "recommendedRooms": [
+      "Living Room",
+      "Family Lounge"
+    ],
+    "recommendedDirections": [
+      "South",
+      "West",
+      "South-West"
+    ],
+    "material": "Oak Wood & Linen Fabric",
+    "color": "Warm Cream",
+    "filename": "sofa"
+  },
+  {
+    "id": "furniture-study-table",
+    "name": "Home Study Desk",
+    "category": "furniture",
+    "tags": [
+      "table",
+      "desk",
+      "study",
+      "work",
+      "drawers"
+    ],
+    "defaultWidthFt": 4.5,
+    "defaultDepthFt": 2.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Compact study desk with integrated drawer storage cabinet. Recommended placement in the North or West directions to stimulate concentration and academic success.",
+    "recommendedRooms": [
+      "Study",
+      "Bedroom",
+      "Home Office"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "West"
+    ],
+    "material": "Teak Wood",
+    "color": "Natural Teak Brown",
+    "filename": "study-table"
+  },
+  {
+    "id": "furniture-table-lamp",
+    "name": "Ceramic Shade Table Lamp",
+    "category": "furniture",
+    "tags": [
+      "lamp",
+      "table",
+      "lighting",
+      "shade",
+      "nightstand"
+    ],
+    "defaultWidthFt": 1.5,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Compact ceramic-body table lamp with textured linen pleated shade. Emits soothing, warm ambient glow perfect for nightstands.",
+    "recommendedRooms": [
+      "Bedroom",
+      "Study",
+      "Living Room"
+    ],
+    "recommendedDirections": [
+      "South-East",
+      "North-West",
+      "East"
+    ],
+    "material": "Ceramic & Pleated Linen",
+    "color": "Celadon Green & Cream",
+    "filename": "table-lamp"
+  },
+  {
+    "id": "furniture-tv-unit",
+    "name": "Minimalist Media TV Unit",
+    "category": "furniture",
+    "tags": [
+      "tv",
+      "unit",
+      "media",
+      "living room",
+      "cabinet"
+    ],
+    "defaultWidthFt": 5.5,
+    "defaultDepthFt": 1.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Low-profile media unit with storage drawers and oak finishes. Helps clean and organize electronic energies in living spaces.",
+    "recommendedRooms": [
+      "Living Room",
+      "Bedroom",
+      "Family Lounge"
+    ],
+    "recommendedDirections": [
+      "South-East",
+      "North-West",
+      "East"
+    ],
+    "material": "Teak Wood & Acrylic panels",
+    "color": "Natural Teak & Warm White",
+    "filename": "tv-unit"
+  },
+  {
+    "id": "furniture-wall-shelf",
+    "name": "Floating Wall Shelf",
+    "category": "furniture",
+    "tags": [
+      "shelf",
+      "wall",
+      "floating",
+      "decor",
+      "storage"
+    ],
+    "defaultWidthFt": 3.5,
+    "defaultDepthFt": 0.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Floating timber shelf pane with bracket mount support. Holds decorative books and items cleanly off floor surfaces.",
+    "recommendedRooms": [
+      "Living Room",
+      "Study",
+      "Bedroom"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "West"
+    ],
+    "material": "Oak Wood & Steel Brackets",
+    "color": "Oak Light & Charcoal",
+    "filename": "wall-shelf"
+  },
+  {
+    "id": "furniture-wardrobe",
+    "name": "Double Door Wooden Wardrobe",
+    "category": "furniture",
+    "tags": [
+      "wardrobe",
+      "closet",
+      "cabinet",
+      "bedroom",
+      "storage"
+    ],
+    "defaultWidthFt": 4,
+    "defaultDepthFt": 2.2,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Tall wooden wardrobe cabinet with custom copper fittings. Excellent storage organizer for bedrooms, providing solid mass structure in heavier zones.",
+    "recommendedRooms": [
+      "Bedroom",
+      "Dressing Room"
+    ],
+    "recommendedDirections": [
+      "South-West",
+      "South",
+      "West"
+    ],
+    "material": "Walnut Wood & Brass details",
+    "color": "Natural Walnut Wood",
+    "filename": "wardrobe"
+  },
+  {
+    "id": "plants-tulsi",
+    "name": "Potted Tulsi Plant",
+    "category": "plants",
+    "tags": [
+      "tulsi",
+      "plant",
+      "sacred",
+      "natural"
+    ],
+    "defaultWidthFt": 1.5,
+    "defaultDepthFt": 1.5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Sacred potted Holy Basil (Tulsi) plant. Emits high sattvic vibrations; must be kept in the North-East or Center (Brahmasthan) of the house.",
+    "recommendedRooms": [
+      "Courtyard",
+      "Balcony",
+      "Pooja Room"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "East",
+      "North",
+      "Center"
+    ],
+    "material": "Clay Pot & Plant",
+    "color": "Terracotta & Green",
+    "filename": "tulsi"
+  },
+  {
+    "id": "room-bedroom",
+    "name": "Master Bedroom Layout",
+    "category": "rooms",
+    "tags": [
+      "bedroom",
+      "master",
+      "room",
+      "floorplan"
+    ],
+    "defaultWidthFt": 14,
+    "defaultDepthFt": 16,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Standard layout blueprint for a Master Bedroom. Vastu recommends South-West placement for the house owner to secure stability and authority.",
+    "recommendedRooms": [
+      "Master Bedroom"
+    ],
+    "recommendedDirections": [
+      "South-West"
+    ],
+    "material": "Multi-Material",
+    "color": "Neutral Warm",
+    "filename": "room-bedroom"
+  },
+  {
+    "id": "structure-main-door",
+    "name": "Main Entrance Door",
+    "category": "structure",
+    "tags": [
+      "door",
+      "entrance",
+      "main",
+      "structure"
+    ],
+    "defaultWidthFt": 4,
+    "defaultDepthFt": 0.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Main entryway door opening inwards clockwise. Must be placed in auspicious grid coordinates (Pada) on the North or East wall to invite prosperity.",
+    "recommendedRooms": [
+      "Entrance Lobby",
+      "Foyer"
+    ],
+    "recommendedDirections": [
+      "North",
+      "East",
+      "North-East"
+    ],
+    "material": "Teak Wood & Brass Fittings",
+    "color": "Natural Teak & Gold",
+    "filename": "main-door"
+  },
+  {
+    "id": "symbols-swastika",
+    "name": "Auspicious Swastika",
+    "category": "symbols",
+    "tags": [
+      "swastika",
+      "symbol",
+      "sacred",
+      "auspicious"
+    ],
+    "defaultWidthFt": 0.8,
+    "defaultDepthFt": 0.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Sacred geometric Swastika symbol. Invites Ganesha's energy and removes spatial obstacles; placed above main doors or inside pooja altars.",
+    "recommendedRooms": [
+      "Pooja Room",
+      "Entrance"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "East",
+      "North"
+    ],
+    "material": "Brass Plate",
+    "color": "Gold Brass",
+    "filename": "swastika"
+  },
+  {
+    "id": "utilities-water-tank",
+    "name": "Overhead Water Tank",
+    "category": "utilities",
+    "tags": [
+      "water",
+      "tank",
+      "utility",
+      "overhead"
+    ],
+    "defaultWidthFt": 5,
+    "defaultDepthFt": 5,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Heavy overhead storage water tank. Water represents elements; should be located in the West or North-West to prevent financial leakage.",
+    "recommendedRooms": [
+      "Roof",
+      "Utility Area"
+    ],
+    "recommendedDirections": [
+      "West",
+      "North-West"
+    ],
+    "material": "Polyethylene",
+    "color": "Dark Blue",
+    "filename": "water-tank"
+  },
+  {
+    "id": "vastu-pyramid",
+    "name": "Vastu Copper Pyramid",
+    "category": "vastu",
+    "tags": [
+      "pyramid",
+      "copper",
+      "vastu",
+      "remedy"
+    ],
+    "defaultWidthFt": 0.8,
+    "defaultDepthFt": 0.8,
+    "rotation": 0,
+    "anchor": "center",
+    "preview": "preview.svg",
+    "thumbnail": "thumbnail.svg",
+    "plannerTop": "planner-top.svg",
+    "plannerOutline": "planner-outline.svg",
+    "license": "MIT",
+    "source": "BanjaraBazaarOS Internal",
+    "version": "1.0.0",
+    "description": "Sacred 9x9 grid copper pyramid. Emits neutralizing scalar energy; placed in sub-optimal zones (like a toilet in the North-East) to absorb defects.",
+    "recommendedRooms": [
+      "Living Room",
+      "Toilet",
+      "Entrance"
+    ],
+    "recommendedDirections": [
+      "North-East",
+      "South-West",
+      "Center"
+    ],
+    "material": "Solid Pure Copper",
+    "color": "Shiny Copper Rose",
+    "filename": "pyramid"
+  }
+]

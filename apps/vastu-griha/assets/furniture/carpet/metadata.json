@@ -1,0 +1,36 @@
+{
+  "id": "furniture-carpet",
+  "name": "Woven Textured Carpet",
+  "category": "furniture",
+  "tags": [
+    "carpet",
+    "rug",
+    "woven",
+    "floor",
+    "living room"
+  ],
+  "defaultWidthFt": 8,
+  "defaultDepthFt": 5,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Premium woven area rug with geometric motifs and corner tassels. Anchors furniture layouts and introduces warm organic earth energy.",
+  "recommendedRooms": [
+    "Living Room",
+    "Bedroom",
+    "Dining Room"
+  ],
+  "recommendedDirections": [
+    "North-East",
+    "East",
+    "West"
+  ],
+  "material": "Woven Natural Wool",
+  "color": "Tan & Terracotta Accent"
+}

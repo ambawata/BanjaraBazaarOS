@@ -1,0 +1,31 @@
+{
+  "id": "room-bedroom",
+  "name": "Master Bedroom Layout",
+  "category": "rooms",
+  "tags": [
+    "bedroom",
+    "master",
+    "room",
+    "floorplan"
+  ],
+  "defaultWidthFt": 14,
+  "defaultDepthFt": 16,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Standard layout blueprint for a Master Bedroom. Vastu recommends South-West placement for the house owner to secure stability and authority.",
+  "recommendedRooms": [
+    "Master Bedroom"
+  ],
+  "recommendedDirections": [
+    "South-West"
+  ],
+  "material": "Multi-Material",
+  "color": "Neutral Warm"
+}

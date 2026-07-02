@@ -1,0 +1,35 @@
+{
+  "id": "furniture-console-table",
+  "name": "Entryway Console Table",
+  "category": "furniture",
+  "tags": [
+    "table",
+    "console",
+    "entryway",
+    "hallway"
+  ],
+  "defaultWidthFt": 4,
+  "defaultDepthFt": 1.5,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Slender, low-depth entryway console table with lower display shelf. Holds sacred objects or plants to greet positive energy at the home's main threshold.",
+  "recommendedRooms": [
+    "Entryway",
+    "Foyer",
+    "Hallway"
+  ],
+  "recommendedDirections": [
+    "North-East",
+    "East",
+    "North"
+  ],
+  "material": "Oak Wood & Clay Base",
+  "color": "Oak Honey & Clay"
+}

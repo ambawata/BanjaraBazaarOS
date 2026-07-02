@@ -43,18 +43,18 @@
 }
 
 body.light {
-  --bg: #f4f3f8;
+  --bg: #fdfbf7;
   --bg2: #ffffff;
-  --bg3: #f0eefa;
-  --bg4: #e8e5f5;
-  --border: #dddaf0;
-  --border2: #ccc8e8;
-  --text: #1a1727;
-  --text2: #4a4465;
-  --text3: #9490b0;
-  --accent: #7c6ff7;
-  --accent2: #6558e2;
-  --accent-dim: rgba(124, 111, 247, 0.12);
+  --bg3: #f7f5ef;
+  --bg4: #efebe2;
+  --border: #eae5d8;
+  --border2: #ddd7c9;
+  --text: #2b2723;
+  --text2: #6c665e;
+  --text3: #9b958c;
+  --accent: #5f55e5;
+  --accent2: #4a3fd1;
+  --accent-dim: rgba(95, 85, 229, 0.08);
   
   /* Vastu Elements Colors (Light) Mapped to the design tokens */
   --emerald: #22c55e;
@@ -73,7 +73,7 @@ body.light {
   --green: #22c55e;
   --green-dim: rgba(34, 197, 94, 0.10);
   
-  --shadow: 0 4px 15px rgba(124, 92, 191, 0.08);
+  --shadow: 0 10px 40px rgba(45, 41, 37, 0.04);
 }
 
 * {
@@ -1982,5 +1982,16 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 

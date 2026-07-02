@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5178",
-    "build": "vite build",
+    "compile-manifest": "node scripts/compile-manifest.js",
+    "dev": "node scripts/compile-manifest.js && vite --port 5178",
+    "build": "node scripts/compile-manifest.js && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

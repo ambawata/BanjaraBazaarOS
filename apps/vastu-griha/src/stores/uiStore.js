@@ -5,7 +5,7 @@ export const useUiStore = create((set) => ({
   activeTab: 'home',
   showAcharyaModal: false,
   isMobile: typeof window !== 'undefined' ? window.innerWidth <= 768 : false,
-  theme: typeof window !== 'undefined' ? (localStorage.getItem('vg-theme') || 'dark') : 'dark',
+  theme: typeof window !== 'undefined' ? (localStorage.getItem('vg-theme') || 'light') : 'light',
   showVastuGrid: true,
   showNormalGrid: true,
   showAddPopup: false,
