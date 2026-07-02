@@ -1,0 +1,35 @@
+{
+  "id": "furniture-office-desk",
+  "name": "Premium Office Desk",
+  "category": "furniture",
+  "tags": [
+    "desk",
+    "office",
+    "table",
+    "work",
+    "executive"
+  ],
+  "defaultWidthFt": 5.5,
+  "defaultDepthFt": 3,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Premium study and work desk featuring thick oak top panel and built-in filing drawers. Recommended to orient facing North or East inside the study sector.",
+  "recommendedRooms": [
+    "Study",
+    "Home Office"
+  ],
+  "recommendedDirections": [
+    "North",
+    "East",
+    "West"
+  ],
+  "material": "Oak Wood & Walnut Veneer",
+  "color": "Oak Honey & Dark Walnut"
+}

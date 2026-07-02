@@ -1,0 +1,22 @@
+{
+  "name": "vastu-griha",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "compile-manifest": "node scripts/compile-manifest.js",
+    "dev": "node scripts/compile-manifest.js && vite --port 5178",
+    "build": "node scripts/compile-manifest.js && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.14.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.2"
+  }
+}

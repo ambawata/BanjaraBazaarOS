@@ -1,0 +1,35 @@
+{
+  "id": "furniture-bunk-bed",
+  "name": "Dual Tier Bunk Bed",
+  "category": "furniture",
+  "tags": [
+    "bed",
+    "bunk",
+    "kids",
+    "bedroom",
+    "frame"
+  ],
+  "defaultWidthFt": 3.5,
+  "defaultDepthFt": 6.6,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Compact dual-tier bunk bed in solid timber wood. Smart safety railings and built-in ladder makes it optimal for children's bedrooms.",
+  "recommendedRooms": [
+    "Kids Bedroom",
+    "Bedroom"
+  ],
+  "recommendedDirections": [
+    "North-West",
+    "West",
+    "East"
+  ],
+  "material": "Timber Wood & Cushions",
+  "color": "Linen Cream & Sage"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "backgrounds-grid-pattern",
+  "name": "Modular Alignment Grid",
+  "category": "backgrounds",
+  "tags": [
+    "grid",
+    "background",
+    "pattern",
+    "blueprint"
+  ],
+  "defaultWidthFt": 30,
+  "defaultDepthFt": 40,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Aligning diagnostic layout grid corresponding to Vastu's 9x9 Pada division. Serves as coordinates backdrop for planning.",
+  "recommendedRooms": [
+    "Canvas Background"
+  ],
+  "recommendedDirections": [
+    "Center",
+    "North",
+    "South",
+    "East",
+    "West"
+  ],
+  "material": "Digital Layer",
+  "color": "Grid White & Blue"
+}

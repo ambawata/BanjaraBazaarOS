@@ -1,0 +1,4 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="20" y1="100" x2="180" y2="100" stroke="#3d2616" stroke-width="6" stroke-linecap="round" />
+      <path d="M 22 100 Q 35 105 50 100 Q 65 95 80 100 Q 95 105 110 100 Q 125 95 140 100 Q 155 105 178 100" stroke="#fdfaf6" stroke-width="4.5" fill="none" />
+    </svg>

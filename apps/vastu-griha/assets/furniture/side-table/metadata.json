@@ -1,0 +1,34 @@
+{
+  "id": "furniture-side-table",
+  "name": "Oak Nightstand Side Table",
+  "category": "furniture",
+  "tags": [
+    "table",
+    "side",
+    "nightstand",
+    "bedroom"
+  ],
+  "defaultWidthFt": 2,
+  "defaultDepthFt": 2,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Compact single drawer bedroom nightstand table made from honey oak wood. Excellent bedside convenience companion.",
+  "recommendedRooms": [
+    "Bedroom",
+    "Living Room"
+  ],
+  "recommendedDirections": [
+    "South",
+    "West",
+    "North-West"
+  ],
+  "material": "Oak Wood & Brass",
+  "color": "Oak Honey"
+}
