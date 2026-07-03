@@ -279,24 +279,6 @@ export default function PlannerWorkspace() {
     }
   }
 
-            <button className="bottom-nav-fab-btn" onClick={() => { setScreenState('workspace'); setShowAddPopup(true); }} style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifycontent: 'center', border: 'none', boxShadow: '0 4px 10px rgba(124, 111, 247, 0.4)', marginTop: '-16px', cursor: 'pointer', zIndex: 110, padding: 0 }}>
-              <i className="ti ti-plus" style={{ fontSize: '20px' }}></i>
-            </button>
-            <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }}>
-              <i className="ti ti-file-text"></i>
-              <span>Reports</span>
-            </div>
-            <div className="bottom-nav-item" onClick={() => { setScreenState('workspace'); setActiveTab('shop'); }}>
-              <i className="ti ti-shopping-cart"></i>
-              <span>Remedies</span>
-            </div>
-          </div>
-        )}
-
-      </div>
-    )
-  }
-
   // Workspace View
   return (
     <div id="app-container">
