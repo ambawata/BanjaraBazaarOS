@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export const useUiStore = create((set) => ({
-  screenState: 'welcome',
+  screenState: 'step_prop',
   activeTab: 'home',
   showAcharyaModal: false,
   isMobile: typeof window !== 'undefined' ? window.innerWidth <= 768 : false,

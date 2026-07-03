@@ -210,37 +210,6 @@ export default function ProjectDashboard() {
           <i className="ti ti-search" style={{ position: 'absolute', left: '32px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text3)', fontSize: '16px' }}></i>
         </div>
 
-        {/* Dashboard quick routes */}
-        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          
-          <div 
-            onClick={() => { setScreenState('workspace'); setActiveTab('upload'); }}
-            style={{ background: 'rgba(124, 111, 247, 0.05)', border: '1px solid rgba(124, 111, 247, 0.15)', borderRadius: '18px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
-          >
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <i className="ti ti-upload" style={{ fontSize: '20px' }}></i>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
-              <strong style={{ fontSize: '14px', color: 'var(--text)' }}>Upload Floor Plan</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text2)' }}>Upload drawings for AI room detection</span>
-            </div>
-          </div>
-
-          <div 
-            onClick={() => setScreenState('step_shape')}
-            style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.15)', borderRadius: '18px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
-          >
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <i className="ti ti-edit" style={{ fontSize: '20px' }}></i>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
-              <strong style={{ fontSize: '14px', color: 'var(--text)' }}>Draw New Plot Layout</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text2)' }}>Calibrate dimensions and place shapes</span>
-            </div>
-          </div>
-
-        </div>
-
         {/* Projects List title */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px 6px 20px', borderBottom: '1px solid var(--border)', margin: '0 20px' }}>
           <strong style={{ fontSize: '14px' }}>My Layouts ({processedList.length})</strong>
@@ -331,26 +300,6 @@ export default function ProjectDashboard() {
         >
           <i className="ti ti-plus"></i>
         </button>
-
-        {/* Mobile persistent navigation bar */}
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '64px', background: 'var(--bg2)', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', zIndex: 200 }}>
-          <button onClick={() => { setScreenState('workspace'); setActiveTab('home') }} style={{ background: 'none', border: 'none', color: 'var(--accent)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
-            <i className="ti ti-smart-home" style={{ fontSize: '20px' }}></i>
-            <span style={{ fontSize: '9px', fontWeight: 'bold' }}>Home</span>
-          </button>
-          <button onClick={() => { setScreenState('workspace'); setActiveTab('designer'); }} style={{ background: 'none', border: 'none', color: 'var(--text3)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
-            <i className="ti ti-layout-dashboard" style={{ fontSize: '20px' }}></i>
-            <span style={{ fontSize: '9px' }}>Design</span>
-          </button>
-          <button onClick={() => { setScreenState('workspace'); setActiveTab('shop'); }} style={{ background: 'none', border: 'none', color: 'var(--text3)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
-            <i className="ti ti-shopping-cart" style={{ fontSize: '20px' }}></i>
-            <span style={{ fontSize: '9px' }}>Shop</span>
-          </button>
-          <button onClick={() => { setScreenState('workspace'); setActiveTab('reports'); }} style={{ background: 'none', border: 'none', color: 'var(--text3)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
-            <i className="ti ti-file-text" style={{ fontSize: '20px' }}></i>
-            <span style={{ fontSize: '9px' }}>Reports</span>
-          </button>
-        </div>
 
       </div>
     )

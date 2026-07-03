@@ -34,7 +34,7 @@ export default function App() {
 
   const wizardStates = ['step_prop', 'step_size', 'step_shape', 'step_preferences', 'step_summary', 'designing', 'preview']
   
-  if (screenState === 'dashboard' || screenState === 'welcome') {
+  if (screenState === 'dashboard') {
     return <ProjectDashboard />
   }
 
