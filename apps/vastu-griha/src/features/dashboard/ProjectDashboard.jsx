@@ -334,7 +334,7 @@ export default function ProjectDashboard() {
 
         {/* Mobile persistent navigation bar */}
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '64px', background: 'var(--bg2)', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', zIndex: 200 }}>
-          <button style={{ background: 'none', border: 'none', color: 'var(--accent)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
+          <button onClick={() => { setScreenState('workspace'); setActiveTab('home') }} style={{ background: 'none', border: 'none', color: 'var(--accent)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer' }}>
             <i className="ti ti-smart-home" style={{ fontSize: '20px' }}></i>
             <span style={{ fontSize: '9px', fontWeight: 'bold' }}>Home</span>
           </button>
