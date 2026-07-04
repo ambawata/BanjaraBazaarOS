@@ -12,6 +12,11 @@ import { EXPANDED_ROOMS_CATALOG } from '../../assets/constants'
 import { useUiStore } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { useCanvasStore } from '../../stores/canvasStore'
+import { Hero } from './widgets/home/Hero';
+import { ActionCards } from './widgets/home/ActionCards';
+import { RecentActivity } from './widgets/home/RecentActivity';
+import { VastuScoreGauge } from './widgets/home/VastuScoreGauge';
+import { ItemPlacementWidget } from './widgets/home/ItemPlacementWidget';
 
 export default function PlannerWorkspace() {
   const {
@@ -202,6 +207,16 @@ export default function PlannerWorkspace() {
     setActiveTab('designer')
   }
 
+  const handleHomeAddToCart = () => {
+    useUiStore.getState().addNotification({
+        id: Date.now().toString(),
+        text: 'Added Wall Mirror (Round) to Banjara Bazaar cart',
+        time: 'Just now',
+        type: 'shop'
+    });
+    alert('Added mirror item to Banjara Bazaar cart!');
+  };
+
   // Clear visual canvas
   const handleClearCanvas = () => {
     if (window.confirm('Reset current layout design?')) {
@@ -277,6 +292,19 @@ export default function PlannerWorkspace() {
       setScreenState('workspace')
       setActiveTab('designer')
     }
+  }
+
+  const handleBackdropFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      setImageSettings({
+        ...imageSettings,
+        url: ev.target?.result
+      })
+    }
+    reader.readAsDataURL(file)
   }
 
   // Workspace View
@@ -403,8 +431,8 @@ export default function PlannerWorkspace() {
                 value={editMode}
                 onChange={(e) => setEditMode(e.target.value)}
               >
-                <option value="edit">âœï¸ Edit Mode</option>
-                <option value="view">ðŸ‘ï¸ View Only</option>
+                <option value="edit">✍️ Edit Mode</option>
+                <option value="view">👓️ View Only</option>
               </select>
 
               <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setShowNotificationCenter(!showNotificationCenter)}>
@@ -466,7 +494,6 @@ export default function PlannerWorkspace() {
           
           {/* 1. Dedicated Workspace Landing Screen */}
           {activeTab === 'home' && (() => {
-            const isCorrectDirection = ['North', 'East'].includes(placementDirection)
             return (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#faf9f6', overflowY: 'auto', paddingBottom: '80px' }}>
                 
@@ -516,366 +543,19 @@ export default function PlannerWorkspace() {
                 {/* Home Inner Content Panel */}
                 <div style={{ width: '100%', maxWidth: '480px', margin: '0 auto', padding: 'clamp(16px, 4vw, 20px)', display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 5vw, 22px)', boxSizing: 'border-box' }}>
                   
-                  {/* HERO SECTION */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', background: 'transparent', marginBottom: '-16px' }}>
-                    <div style={{ flex: 1.1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text2)', opacity: 0.9 }}>ðŸ‘‹ Namaste, Amit</span>
-                      <h2 style={{ fontFamily: 'var(--fd)', fontSize: '24px', fontWeight: 800, color: 'var(--text)', marginTop: '6px', lineHeight: 1.2, letterSpacing: '-0.3px' }}>
-                        Let's make your home<br />more <span style={{ color: 'var(--accent)' }}>Vastu</span> friendly
-                      </h2>
-                      <p style={{ fontSize: '12px', color: 'var(--text2)', marginTop: '8px', lineHeight: 1.4 }}>
-                        Get personalized guidance and shop the right products for your home.
-                      </p>
-                    </div>
-                    <div style={{ flex: 0.9, display: 'flex', justifyContent: 'center' }}>
-                      {/* Cozy Armchair Illustration (Enlarged) */}
-                      <svg viewBox="0 0 200 200" style={{ width: '100%', height: 'auto', maxWidth: '220px' }}>
-                        <defs>
-                          <radialGradient id="hero-grad" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#fffcf5" />
-                            <stop offset="70%" stopColor="#fdf6e2" />
-                            <stop offset="100%" stopColor="#f7eecf" stopOpacity="0" />
-                          </radialGradient>
-                        </defs>
-                        <circle cx="110" cy="100" r="80" fill="url(#hero-grad)" />
-                        
-                        {/* Minimalist Floor Lamp */}
-                        <path d="M150,160 L150,70" stroke="#d7ccc8" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M140,160 L160,160" stroke="#d7ccc8" strokeWidth="3" strokeLinecap="round" />
-                        <path d="M138,70 L162,70 L154,54 L146,54 Z" fill="#efebe9" stroke="#d7ccc8" strokeWidth="1" />
-                        <path d="M150,70 L150,85" stroke="#ffe082" strokeWidth="1.5" />
-                        
-                        {/* Table with Plant */}
-                        <ellipse cx="60" cy="140" rx="20" ry="4" fill="#d7ccc8" />
-                        <line x1="50" y1="140" x2="45" y2="165" stroke="#8d6e63" strokeWidth="2" />
-                        <line x1="70" y1="140" x2="75" y2="165" stroke="#8d6e63" strokeWidth="2" />
-                        <line x1="60" y1="140" x2="60" y2="165" stroke="#8d6e63" strokeWidth="2" />
-                        {/* Plant Pot */}
-                        <rect x="54" y="124" width="12" height="12" fill="#ffab91" rx="2" />
-                        {/* Green Plant Leaves (Monstera style) */}
-                        <path d="M60,124 Q45,100 38,105 Q35,115 54,124" fill="#4caf50" />
-                        <path d="M60,124 Q75,100 82,105 Q85,115 66,124" fill="#4caf50" />
-                        <path d="M60,124 Q60,95 55,95 Q50,105 60,124" fill="#388e3c" />
-                        <path d="M60,124 Q68,105 72,112" stroke="#2e7d32" strokeWidth="2" />
-                        
-                        {/* Armchair */}
-                        {/* Backrest */}
-                        <rect x="90" y="90" width="50" height="45" rx="10" fill="#f5f5f0" stroke="#e0e0d1" strokeWidth="1.5" />
-                        {/* Seat cushion */}
-                        <rect x="84" y="125" width="62" height="20" rx="6" fill="#f5f5f0" stroke="#e0e0d1" strokeWidth="1.5" />
-                        {/* Left Armrest */}
-                        <rect x="78" y="110" width="12" height="32" rx="4" fill="#e0e0d1" stroke="#d5d5c3" strokeWidth="1.5" />
-                        {/* Right Armrest */}
-                        <rect x="140" y="110" width="12" height="32" rx="4" fill="#e0e0d1" stroke="#d5d5c3" strokeWidth="1.5" />
-                        {/* Chair legs */}
-                        <line x1="94" y1="145" x2="90" y2="165" stroke="#8d6e63" strokeWidth="2.5" strokeLinecap="round" />
-                        <line x1="136" y1="145" x2="140" y2="165" stroke="#8d6e63" strokeWidth="2.5" strokeLinecap="round" />
-                        
-                        {/* Pillow */}
-                        <path d="M102,125 Q115,115 128,125 Q128,132 115,130 Q102,132 102,125 Z" fill="#ffe082" stroke="#ffd54f" strokeWidth="1" />
-                      </svg>
-                    </div>
-                  </div>
+                  <Hero />
+                  <ActionCards setActiveTab={setActiveTab} setScreenState={setScreenState} />
 
-                  {/* FOUR PRIMARY ACTION CARDS */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left' }}>
-                    <span style={{ fontSize: '13.5px', fontWeight: 'bold', color: 'var(--text)' }}>What would you like to do today?</span>
-                    
-                    <div style={{ display: 'flex', gap: '14px', overflowX: 'auto', paddingBottom: '10px' }} className="no-scrollbar">
-                      
-                      {/* Card 1: Already have floor plan */}
-                      <div 
-                        onClick={() => setActiveTab('upload')}
-                        style={{ flexShrink: 0, width: '150px', background: '#f3f0ff', border: '1px solid #e7e2ff', borderRadius: '24px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '210px', cursor: 'pointer', transition: 'transform 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        <svg viewBox="0 0 100 100" width="50" height="50" style={{ margin: '0 auto 8px 0' }}>
-                          <rect x="10" y="10" width="80" height="80" rx="10" fill="#fff" stroke="#dcd6ff" strokeWidth="1.5" />
-                          <rect x="22" y="22" width="25" height="25" fill="none" stroke="#7c6ff7" strokeWidth="1.5" strokeDasharray="2 2" />
-                          <rect x="52" y="22" width="26" height="35" fill="none" stroke="#7c6ff7" strokeWidth="1.5" />
-                          <rect x="22" y="52" width="25" height="26" fill="none" stroke="#7c6ff7" strokeWidth="1.5" />
-                          <line x1="34" y1="22" x2="34" y2="47" stroke="#7c6ff7" strokeWidth="1" />
-                          <line x1="22" y1="34" x2="47" y2="34" stroke="#7c6ff7" strokeWidth="1" />
-                        </svg>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#312e81', lineHeight: 1.2 }}>I already have a Floor Plan</span>
-                          <span style={{ fontSize: '10px', color: '#6366f1' }}>Upload your plan and get Vastu analysis</span>
-                        </div>
-                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#7c6ff7', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
-                          <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
-                        </div>
-                      </div>
-
-                      {/* Card 2: Don't have floor plan */}
-                      <div 
-                        onClick={() => setScreenState('step_prop')}
-                        style={{ flexShrink: 0, width: '150px', background: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: '24px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '210px', cursor: 'pointer', transition: 'transform 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        <svg viewBox="0 0 100 100" width="50" height="50" style={{ margin: '0 auto 8px 0' }}>
-                          <rect x="10" y="10" width="80" height="80" rx="10" fill="#fff" stroke="#d1fae5" strokeWidth="1.5" />
-                          <polygon points="25,25 75,25 65,75 35,75" fill="none" stroke="#22c55e" strokeWidth="2" />
-                          <circle cx="25" cy="25" r="3" fill="#22c55e" />
-                          <circle cx="75" cy="25" r="3" fill="#22c55e" />
-                          <circle cx="65" cy="75" r="3" fill="#22c55e" />
-                          <circle cx="35" cy="75" r="3" fill="#22c55e" />
-                        </svg>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#064e3b', lineHeight: 1.2 }}>I don't have a Floor Plan</span>
-                          <span style={{ fontSize: '10px', color: '#16a34a' }}>Draw your plot and create the plan</span>
-                        </div>
-                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#22c55e', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
-                          <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
-                        </div>
-                      </div>
-
-                      {/* Card 3: Place Item */}
-                      <div 
-                        onClick={() => {
-                          const el = document.getElementById('item-placement-widget')
-                          if (el) el.scrollIntoView({ behavior: 'smooth' })
-                        }}
-                        style={{ flexShrink: 0, width: '150px', background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: '24px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '210px', cursor: 'pointer', transition: 'transform 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        <svg viewBox="0 0 100 100" width="50" height="50" style={{ margin: '0 auto 8px 0' }}>
-                          <rect x="10" y="10" width="80" height="80" rx="10" fill="#fff" stroke="#fef3c7" strokeWidth="1.5" />
-                          <ellipse cx="50" cy="45" rx="16" ry="24" fill="none" stroke="#d97706" strokeWidth="2.5" />
-                          <ellipse cx="50" cy="45" rx="13" ry="21" fill="#fff" stroke="#fbbf24" strokeWidth="1" />
-                          <line x1="38" y1="80" x2="62" y2="80" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                          <line x1="41" y1="80" x2="46" y2="68" stroke="#d97706" strokeWidth="2" />
-                          <line x1="59" y1="80" x2="54" y2="68" stroke="#d97706" strokeWidth="2" />
-                        </svg>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#78350f', lineHeight: 1.2 }}>Place My New Item</span>
-                          <span style={{ fontSize: '10px', color: '#d97706' }}>Find the perfect Vastu placement for any item</span>
-                        </div>
-                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#d97706', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
-                          <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
-                        </div>
-                      </div>
-
-                      {/* Card 4: Quick Vastu check */}
-                      <div 
-                        onClick={() => setActiveTab('analysis')}
-                        style={{ flexShrink: 0, width: '150px', background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '24px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '210px', cursor: 'pointer', transition: 'transform 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        <svg viewBox="0 0 100 100" width="50" height="50" style={{ margin: '0 auto 8px 0' }}>
-                          <rect x="10" y="10" width="80" height="80" rx="10" fill="#fff" stroke="#dbeafe" strokeWidth="1.5" />
-                          <path d="M50,22 L75,30 L75,55 Q75,72 50,80 Q25,72 25,55 L25,30 Z" fill="none" stroke="#2563eb" strokeWidth="2" />
-                          <path d="M42,51 L48,57 L58,44" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e3a8a', lineHeight: 1.2 }}>Quick Vastu Check</span>
-                          <span style={{ fontSize: '10px', color: '#2563eb' }}>Get instant score and top remedies</span>
-                        </div>
-                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
-                          <i className="ti ti-arrow-right" style={{ fontSize: '12px' }}></i>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* RECENT ACTIVITY & VASTU SCORE ROW */}
                   <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', textAlign: 'left', width: '100%' }}>
-                    
-                    {/* Left Box: Recent Activity */}
-                    <div style={{ flex: '1 1 min(100%, 240px)', background: '#ffffff', borderRadius: '24px', border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13.5px', fontWeight: 'bold', color: 'var(--text)' }}>Recent Activity</span>
-                        <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }} onClick={() => setActiveTab('collaborate')}>View All</span>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {[
-                          { text: 'Dining table placement improved', time: 'Today, 10:30 AM', score: '+18 Score' },
-                          { text: 'Mirror moved to North wall', time: 'Yesterday, 6:45 PM', score: '+12 Score' },
-                          { text: 'Water fountain added in NE', time: '29 May, 9:15 PM', score: '+15 Score' }
-                        ].map((act, idx) => (
-                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg3)', padding: '8px 12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                              <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--emerald-dim)', color: 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <i className="ti ti-arrow-up" style={{ fontSize: '12px' }}></i>
-                              </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', textAlign: 'left' }}>
-                                <span style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text)' }}>{act.text}</span>
-                                <span style={{ fontSize: '9px', color: 'var(--text3)' }}>{act.time}</span>
-                              </div>
-                            </div>
-                            <span style={{ fontSize: '10px', color: 'var(--emerald)', fontWeight: 'bold', flexShrink: 0 }}>{act.score}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right Box: Vastu Score Gauge */}
-                    <div style={{ flex: '1 1 min(100%, 160px)', background: '#ffffff', borderRadius: '24px', border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', boxSizing: 'border-box' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text2)' }}>Your Vastu Score</span>
-                        <i className="ti ti-info-circle" style={{ fontSize: '12px', color: 'var(--text3)' }}></i>
-                      </div>
-
-                      <div style={{ position: 'relative', width: '110px', height: '70px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-                        <svg viewBox="0 0 100 60" style={{ width: '100px', height: '60px' }}>
-                          <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#eee" strokeWidth="8" strokeLinecap="round" />
-                          <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--emerald)" strokeWidth="8" strokeLinecap="round" strokeDasharray="125.6" strokeDashoffset="22.6" />
-                        </svg>
-                        <div style={{ position: 'absolute', bottom: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text)' }}>82<span style={{ fontSize: '11px', color: 'var(--text3)' }}>/100</span></span>
-                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--emerald)' }}>Good</span>
-                          <span style={{ fontSize: '9px', color: 'var(--text3)' }}>Keep going!</span>
-                        </div>
-                      </div>
-                    </div>
-
+                    <RecentActivity setActiveTab={setActiveTab} />
+                    <VastuScoreGauge />
                   </div>
 
-                  {/* WHERE DO YOU WANT TO PLACE SECTION */}
-                  <div id="item-placement-widget" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%' }}>
-                    <div>
-                      <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--text)' }}>Where do you want to place?</h3>
-                      <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                        Item: <span style={{ fontWeight: 600 }}>Wall Mirror</span>
-                      </div>
-                      <div style={{ fontSize: '12px', marginTop: '2px' }}>
-                        Best Directions: <span style={{ color: 'var(--emerald)', fontWeight: 'bold' }}>North, East</span>
-                      </div>
-                    </div>
-
-                    {/* Direction Chips */}
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      {['North', 'East', 'West', 'South'].map(dir => {
-                        const isActive = placementDirection === dir
-                        return (
-                          <button 
-                            key={dir}
-                            onClick={() => setPlacementDirection(dir)}
-                            style={{
-                              padding: '6px 14px',
-                              borderRadius: '16px',
-                              border: isActive ? '1px solid var(--accent)' : '1px solid var(--border2)',
-                              background: isActive ? 'var(--accent)' : 'transparent',
-                              color: isActive ? '#ffffff' : 'var(--text2)',
-                              fontSize: '11px',
-                              fontWeight: 'bold',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease'
-                            }}
-                          >
-                            {dir}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {/* Split Box */}
-                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginTop: '4px' }}>
-                      
-                      {/* Left side: Wall vector preview */}
-                      <div style={{ flex: 1.2, minWidth: '180px', position: 'relative' }}>
-                        <svg viewBox="0 0 320 180" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '16px', background: '#faf9f5', border: '1px solid var(--border)' }}>
-                          <rect width="320" height="180" fill="#faf9f5" />
-                          {/* Baseboard/Skirting */}
-                          <rect y="136" width="320" height="44" fill="#f3efe6" />
-                          <line x1="0" y1="136" x2="320" y2="136" stroke="#eae4d6" strokeWidth="2" />
-                          
-                          {/* Door/Window on the left */}
-                          <rect x="15" y="20" width="40" height="116" fill="none" stroke="#ddd7c9" strokeWidth="1.5" />
-                          <line x1="35" y1="20" x2="35" y2="136" stroke="#ddd7c9" strokeWidth="1.5" />
-                          <rect x="22" y="30" width="26" height="25" fill="none" stroke="#ddd7c9" strokeWidth="1" />
-                          <rect x="22" y="65" width="26" height="25" fill="none" stroke="#ddd7c9" strokeWidth="1" />
-                          <rect x="22" y="100" width="26" height="25" fill="none" stroke="#ddd7c9" strokeWidth="1" />
-
-                          {/* Plant on the right */}
-                          <path d="M260,136 Q254,100 258,95 Q262,100 260,136" fill="#a5d6a7" />
-                          <circle cx="260" cy="136" r="10" fill="#e0d7c6" stroke="#d5cbb6" strokeWidth="1.5" />
-                          {/* Plant leaves */}
-                          <path d="M260,126 Q250,90 240,90 Q235,95 255,122" fill="#2e7d32" />
-                          <path d="M260,126 Q270,90 280,90 Q285,95 265,122" fill="#2e7d32" />
-                          <path d="M260,116 Q250,75 252,70 Q258,75 260,116" fill="#388e3c" />
-                          <path d="M260,120 Q242,105 248,110" stroke="#1b5e20" strokeWidth="1" />
-                          
-                          {/* Sofa Couch */}
-                          <rect x="75" y="102" width="150" height="34" rx="6" fill="#d7ccc8" stroke="#bcaaa4" strokeWidth="1.5" />
-                          <rect x="85" y="82" width="130" height="20" rx="6" fill="#d7ccc8" stroke="#bcaaa4" strokeWidth="1.5" />
-                          <rect x="68" y="94" width="12" height="36" rx="4" fill="#bcaaa4" stroke="#8d6e63" strokeWidth="1.5" />
-                          <rect x="220" y="94" width="12" height="36" rx="4" fill="#bcaaa4" stroke="#8d6e63" strokeWidth="1.5" />
-                          <line x1="84" y1="136" x2="80" y2="152" stroke="#8d6e63" strokeWidth="3" strokeLinecap="round" />
-                          <line x1="216" y1="136" x2="220" y2="152" stroke="#8d6e63" strokeWidth="3" strokeLinecap="round" />
-
-                          {/* Mirror placement preview on North / East */}
-                          {isCorrectDirection ? (
-                            <>
-                              <rect x="110" y="24" width="80" height="50" fill="rgba(95, 85, 229, 0.05)" stroke="var(--accent)" strokeWidth="2" strokeDasharray="4 4" rx="6" />
-                              {/* Hanging string */}
-                              <line x1="150" y1="24" x2="135" y2="38" stroke="var(--accent)" strokeWidth="1.5" />
-                              <line x1="150" y1="24" x2="165" y2="38" stroke="var(--accent)" strokeWidth="1.5" />
-                              {/* Oval mirror */}
-                              <ellipse cx="150" cy="48" rx="14" ry="18" fill="#e0f2f1" stroke="#8d6e63" strokeWidth="2" />
-                              <ellipse cx="150" cy="48" rx="12" ry="16" fill="#e0f7fa" />
-                              <circle cx="150" cy="24" r="2" fill="var(--accent)" />
-                              
-                              {/* Target points */}
-                              <circle cx="110" cy="24" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                              <circle cx="190" cy="24" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                              <circle cx="110" cy="74" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                              <circle cx="190" cy="74" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                            </>
-                          ) : (
-                            <>
-                              <rect x="110" y="24" width="80" height="50" fill="rgba(239, 68, 68, 0.05)" stroke="var(--red)" strokeWidth="2" strokeDasharray="4 4" rx="6" />
-                              <text x="150" y="52" fill="var(--red)" fontSize="9" fontWeight="bold" textAnchor="middle">Conflict Zone</text>
-                            </>
-                          )}
-                        </svg>
-                      </div>
-
-                      {/* Right side: Product recommend card */}
-                      <div style={{ flex: '1 1 130px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#faf9f6', padding: '12px', borderRadius: '16px', border: '1px solid var(--border)', justifyContent: 'space-between', boxSizing: 'border-box' }}>
-                        <span style={{ fontSize: '9px', fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase' }}>Perfect on this wall!</span>
-                        
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                          <svg viewBox="0 0 100 100" width="40" height="40">
-                            <ellipse cx="50" cy="50" rx="20" ry="28" fill="#eae5db" stroke="#8d6e63" strokeWidth="2" />
-                            <ellipse cx="50" cy="50" rx="16" ry="24" fill="#ffffff" />
-                          </svg>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text)' }}>Wall Mirror (Round)</span>
-                          <span style={{ fontSize: '9px', color: 'var(--text3)' }}>Size: 24 inch</span>
-                          <span style={{ fontSize: '12.5px', fontWeight: 'bold', color: 'var(--accent)', marginTop: '2px' }}>â‚¹2,499</span>
-                        </div>
-
-                        <div style={{ fontSize: '10px', color: 'var(--text2)' }}>
-                          4.6 â­ <span style={{ color: 'var(--text3)' }}>(128)</span>
-                        </div>
-
-                        <button 
-                          className="btn btn-primary btn-sm"
-                          style={{ width: '100%', padding: '8px', borderRadius: '10px', fontSize: '10px', justifyContent: 'center' }}
-                          onClick={() => {
-                            useUiStore.getState().addNotification({
-                              id: Date.now().toString(),
-                              text: 'Added Wall Mirror (Round) to Banjara Bazaar cart',
-                              time: 'Just now',
-                              type: 'shop'
-                            })
-                            alert('Added mirror item to Banjara Bazaar cart!')
-                          }}
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-
-                    </div>
-                  </div>
+                  <ItemPlacementWidget
+                    placementDirection={placementDirection}
+                    setPlacementDirection={setPlacementDirection}
+                    onAddToCart={handleHomeAddToCart}
+                  />
 
                   {/* TALK TO ACHARYA AI BOTTOM CARD */}
                   <div 
