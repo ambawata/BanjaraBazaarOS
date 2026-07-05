@@ -968,8 +968,9 @@ export default function PlannerWorkspace() {
                   height: '100%',
                   overflow: 'hidden'
                 }}>
-                  {/* Full-screen canvas */}
-                  <div style={{ flex: 1, position: 'relative' }}>
+                  {/* Full-screen canvas — top padding reserves space so the
+                      floating toolbar below never overlaps the plot content */}
+                  <div style={{ flex: 1, position: 'relative', paddingTop: 60, boxSizing: 'border-box' }}>
                     <GestureCanvas />
                   </div>
 

@@ -332,8 +332,9 @@ export default function Canvas() {
           borderRadius: shape === 'Irregular' ? '0px' : '16px'
         }}
       >
-        {/* Custom Wall Outline & Length Labels overlay */}
-        {shape === 'Irregular' && (
+        {/* Custom Wall Outline & Length Labels overlay — only while the plot is
+            still empty; once rooms are placed these labels just clutter the canvas */}
+        {shape === 'Irregular' && rooms.length === 0 && (
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 8 }}>
             {/* Filled background with low opacity for visual reference */}
             <polygon
