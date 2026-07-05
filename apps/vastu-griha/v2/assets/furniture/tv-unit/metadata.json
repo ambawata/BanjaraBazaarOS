@@ -1,0 +1,36 @@
+{
+  "id": "furniture-tv-unit",
+  "name": "Minimalist Media TV Unit",
+  "category": "furniture",
+  "tags": [
+    "tv",
+    "unit",
+    "media",
+    "living room",
+    "cabinet"
+  ],
+  "defaultWidthFt": 5.5,
+  "defaultDepthFt": 1.8,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Low-profile media unit with storage drawers and oak finishes. Helps clean and organize electronic energies in living spaces.",
+  "recommendedRooms": [
+    "Living Room",
+    "Bedroom",
+    "Family Lounge"
+  ],
+  "recommendedDirections": [
+    "South-East",
+    "North-West",
+    "East"
+  ],
+  "material": "Teak Wood & Acrylic panels",
+  "color": "Natural Teak & Warm White"
+}
