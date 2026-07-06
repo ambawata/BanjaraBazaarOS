@@ -25,7 +25,8 @@ export default function Canvas() {
     imageSettings,
     selectedRoomId,
     setSelectedRoomId,
-    deleteRoom
+    deleteRoom,
+    nudgeRoom
   } = useCanvasStore()
 
   const { plot } = useProjectStore()
@@ -502,40 +503,43 @@ export default function Canvas() {
               onTouchStart={(e) => handleTouchStart(e, room.id, 'move')}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Context Sensitive Floating Canva-style Toolbar */}
+              {/* Canva-style floating toolbar — icon-only (no text labels) so
+                  it's compact enough to sit above a small room without
+                  spilling into neighboring rooms on a phone screen. */}
               {isSelected && editMode !== 'view' && (
                 <div className="floating-context-toolbar" onMouseDown={(e) => e.stopPropagation()}>
-                  <button 
-                    className="floating-context-btn" 
+                  <button
+                    className="floating-context-btn"
+                    title="Duplicate"
                     onClick={(e) => {
                       e.stopPropagation()
                       const clone = { ...room, id: Date.now().toString(), x: Math.min(80, room.x + 10), y: Math.min(80, room.y + 10) }
                       setRooms([...rooms, clone])
                     }}
                   >
-                    <i className="ti ti-copy"></i> Duplicate
+                    <i className="ti ti-copy"></i>
                   </button>
-                  <div className="floating-context-divider"></div>
-                  <button 
-                    className="floating-context-btn" 
+                  <button
+                    className="floating-context-btn"
+                    title="Rotate 90°"
                     onClick={(e) => {
                       e.stopPropagation()
                       const nextRotation = ((room.rotation || 0) + 90) % 360
-                      const rotated = { 
-                         ...room, 
-                         width: room.height, 
-                         height: room.width, 
-                         rotation: nextRotation 
+                      const rotated = {
+                         ...room,
+                         width: room.height,
+                         height: room.width,
+                         rotation: nextRotation
                       }
                       const next = rooms.map(r => r.id === room.id ? rotated : r)
                       setRooms(next)
                     }}
                   >
-                    <i className="ti ti-rotate-clockwise"></i> Rotate
+                    <i className="ti ti-rotate-clockwise"></i>
                   </button>
-                  <div className="floating-context-divider"></div>
-                  <button 
-                    className="floating-context-btn" 
+                  <button
+                    className="floating-context-btn"
+                    title="Delete"
                     style={{ color: 'var(--red)' }}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -543,7 +547,7 @@ export default function Canvas() {
                       setSelectedRoomId(null)
                     }}
                   >
-                    <i className="ti ti-trash"></i> Delete
+                    <i className="ti ti-trash"></i>
                   </button>
                 </div>
               )}
@@ -779,6 +783,26 @@ export default function Canvas() {
           )
         })}
       </div>
+
+      {/* Canva-style nudge bar — docked to the bottom of the screen (not
+          buried in a panel you have to scroll to) so precise 1-step moves
+          are always one tap away once a room is selected. */}
+      {selectedRoomId && editMode !== 'view' && (
+        <div className="canvas-nudge-bar" onClick={(e) => e.stopPropagation()}>
+          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'left')} title="Nudge left">
+            <i className="ti ti-arrow-left"></i>
+          </button>
+          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'up')} title="Nudge up">
+            <i className="ti ti-arrow-up"></i>
+          </button>
+          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'down')} title="Nudge down">
+            <i className="ti ti-arrow-down"></i>
+          </button>
+          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'right')} title="Nudge right">
+            <i className="ti ti-arrow-right"></i>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -463,14 +463,16 @@ body {
   transform-origin: center center;
 }
 
-/* Floating zoom controls for the canvas — pinned to the corner with
-   position: sticky so they stay reachable even after scrolling/panning
-   into a zoomed-in view. */
+/* Floating zoom controls for the canvas. This is `position: fixed` to the
+   viewport (not sticky inside the flex-centered canvas-container) so it
+   always stays in the same screen corner and never drifts into the middle
+   of the plan — sticky inside a centering flex row was the bug that put it
+   on top of the rooms. Bottom-left keeps it clear of the add-room FAB
+   (bottom-right) and the bottom nav bar. */
 .canvas-zoom-controls {
-  position: sticky;
-  top: 8px;
-  left: 100%;
-  transform: translateX(calc(-100% - 8px));
+  position: fixed;
+  bottom: 96px;
+  left: 12px;
   width: fit-content;
   display: flex;
   align-items: center;
@@ -479,8 +481,27 @@ body {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  z-index: 20;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  z-index: 200;
+}
+
+/* Docked nudge bar, fixed to the bottom-center of the screen whenever a
+   room is selected — same fixed-to-viewport approach as the zoom controls
+   so it's always reachable regardless of scroll/zoom state. */
+.canvas-nudge-bar {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  z-index: 200;
 }
 
 .canvas-zoom-level {
@@ -1928,15 +1949,14 @@ body {
   background: none;
   border: none;
   color: var(--text);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 12px;
+  font-size: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   cursor: pointer;
-  white-space: nowrap;
   transition: all 0.15s ease;
 }
 
