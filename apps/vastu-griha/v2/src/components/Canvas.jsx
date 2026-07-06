@@ -18,6 +18,44 @@ function complianceClassFor(status) {
   return 'poor'
 }
 
+// How close (in % of plot) a door/window has to get to a wall line before
+// it snaps onto it. Candidate walls are the plot boundary plus every other
+// room's 4 edges — there's no separate "wall" object in this data model,
+// a room's own rectangle edge IS the wall.
+const WALL_SNAP_PCT = 3
+
+function findWallSnap(door, x, y, allRooms) {
+  const centerX = x + door.width / 2
+  const centerY = y + door.height / 2
+
+  const candidates = [
+    { orientation: 'horizontal', pos: 0, spanMin: 0, spanMax: 100 },
+    { orientation: 'horizontal', pos: 100, spanMin: 0, spanMax: 100 },
+    { orientation: 'vertical', pos: 0, spanMin: 0, spanMax: 100 },
+    { orientation: 'vertical', pos: 100, spanMin: 0, spanMax: 100 }
+  ]
+
+  allRooms.forEach(r => {
+    if (r.id === door.id || r.category === 'opening' || r.category === 'remedy') return
+    candidates.push({ orientation: 'horizontal', pos: r.y, spanMin: r.x, spanMax: r.x + r.width })
+    candidates.push({ orientation: 'horizontal', pos: r.y + r.height, spanMin: r.x, spanMax: r.x + r.width })
+    candidates.push({ orientation: 'vertical', pos: r.x, spanMin: r.y, spanMax: r.y + r.height })
+    candidates.push({ orientation: 'vertical', pos: r.x + r.width, spanMin: r.y, spanMax: r.y + r.height })
+  })
+
+  let best = null
+  candidates.forEach(c => {
+    const dist = c.orientation === 'horizontal' ? Math.abs(centerY - c.pos) : Math.abs(centerX - c.pos)
+    const lateral = c.orientation === 'horizontal' ? centerX : centerY
+    const withinSpan = lateral >= c.spanMin - 8 && lateral <= c.spanMax + 8
+    if (withinSpan && dist <= WALL_SNAP_PCT && (!best || dist < best.dist)) {
+      best = { ...c, dist }
+    }
+  })
+
+  return best
+}
+
 export default function Canvas() {
   const {
     rooms,
@@ -172,6 +210,32 @@ export default function Canvas() {
 
       newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
       newY = Math.max(0, Math.min(100 - targetRoom.height, newY))
+
+      // Doors/windows snap onto the nearest wall (plot boundary or another
+      // room's edge) and orient themselves to lie flush along it, instead
+      // of being placed free-floating by eye.
+      if (targetRoom.category === 'opening') {
+        const wallSnap = findWallSnap(targetRoom, newX, newY, rooms)
+        if (wallSnap) {
+          if (wallSnap.orientation === 'horizontal') {
+            if (targetRoom.width < targetRoom.height) {
+              const w = targetRoom.height, h = targetRoom.width
+              targetRoom.width = w
+              targetRoom.height = h
+            }
+            newY = wallSnap.pos - targetRoom.height / 2
+          } else {
+            if (targetRoom.height < targetRoom.width) {
+              const w = targetRoom.height, h = targetRoom.width
+              targetRoom.width = w
+              targetRoom.height = h
+            }
+            newX = wallSnap.pos - targetRoom.width / 2
+          }
+          newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
+          newY = Math.max(0, Math.min(100 - targetRoom.height, newY))
+        }
+      }
 
       targetRoom.x = Math.round(newX * 10) / 10
       targetRoom.y = Math.round(newY * 10) / 10
@@ -567,7 +631,7 @@ export default function Canvas() {
                       pointed to). Solid ink-black lines, not a colored or
                       dashed decoration. */}
                   {room.type === 'door' && (
-                    <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                       <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="2" />
                       <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="2" />
                       <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.2" />
