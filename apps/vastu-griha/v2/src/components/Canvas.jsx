@@ -38,6 +38,38 @@ export default function Canvas() {
   const plotRef = useRef(null)
   const [dragState, setDragState] = useState(null)
   const [plotDims, setPlotDims] = useState({ w: 400, h: 400 })
+  const [zoom, setZoom] = useState(1)
+  const pinchRef = useRef(null)
+
+  // The zoomed pixel size of the plot — dragging/resizing math and the
+  // rendered plot-wrapper both use this instead of the base plotDims, so
+  // zooming in gives you bigger, easier-to-tap rooms without changing any
+  // of the underlying percentage-based room coordinates.
+  const zoomedDims = { w: plotDims.w * zoom, h: plotDims.h * zoom }
+
+  const clampZoom = (z) => Math.max(1, Math.min(3, z))
+
+  // Two-finger pinch to zoom — the same gesture Vinod already knows from
+  // Canva. Only engages when a room isn't being dragged.
+  const handlePinchStart = (e) => {
+    if (e.touches.length === 2 && !dragState) {
+      const [t1, t2] = e.touches
+      const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+      pinchRef.current = { startDist: dist, startZoom: zoom }
+    }
+  }
+  const handlePinchMove = (e) => {
+    if (e.touches.length === 2 && pinchRef.current) {
+      e.preventDefault()
+      const [t1, t2] = e.touches
+      const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+      const ratio = dist / pinchRef.current.startDist
+      setZoom(clampZoom(pinchRef.current.startZoom * ratio))
+    }
+  }
+  const handlePinchEnd = (e) => {
+    if (e.touches.length < 2) pinchRef.current = null
+  }
 
   useEffect(() => {
     function updateDimensions() {
@@ -120,8 +152,8 @@ export default function Canvas() {
     const deltaX = e.clientX - dragState.startX
     const deltaY = e.clientY - dragState.startY
 
-    const deltaXPercent = (deltaX / plotDims.w) * 100
-    const deltaYPercent = (deltaY / plotDims.h) * 100
+    const deltaXPercent = (deltaX / zoomedDims.w) * 100
+    const deltaYPercent = (deltaY / zoomedDims.h) * 100
 
     const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
     if (roomIndex === -1) return
@@ -172,9 +204,9 @@ export default function Canvas() {
     if (!touch) return
     const deltaX = touch.clientX - dragState.startX
     const deltaY = touch.clientY - dragState.startY
-    
-    const deltaXPercent = (deltaX / plotDims.w) * 100
-    const deltaYPercent = (deltaY / plotDims.h) * 100
+
+    const deltaXPercent = (deltaX / zoomedDims.w) * 100
+    const deltaYPercent = (deltaY / zoomedDims.h) * 100
     
     const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
     if (roomIndex === -1) return
@@ -326,21 +358,44 @@ export default function Canvas() {
     : 'none'
 
   return (
-    <div 
-      className="canvas-container" 
+    <div
+      className="canvas-container"
       ref={containerRef}
       onClick={() => setSelectedRoomId(null)}
+      onTouchStart={handlePinchStart}
+      onTouchMove={handlePinchMove}
+      onTouchEnd={handlePinchEnd}
+      style={{ overflow: 'auto' }}
     >
-      <div 
-        className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`} 
+      {/* Zoom controls — pinch with two fingers works too, but these give
+          a reliable tap-based way to get room enough to edit precisely,
+          which is the main thing that made a crowded layout hard to use
+          on a small phone screen. */}
+      <div className="canvas-zoom-controls" onClick={(e) => e.stopPropagation()}>
+        <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z - 0.25))} title="Zoom out">
+          <i className="ti ti-minus"></i>
+        </button>
+        <span className="canvas-zoom-level">{Math.round(zoom * 100)}%</span>
+        <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z + 0.25))} title="Zoom in">
+          <i className="ti ti-plus"></i>
+        </button>
+        {zoom !== 1 && (
+          <button className="btn-icon" onClick={() => setZoom(1)} title="Reset zoom">
+            <i className="ti ti-focus-2"></i>
+          </button>
+        )}
+      </div>
+      <div
+        className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
         ref={plotRef}
         style={{
-          width: `${plotDims.w}px`,
-          height: `${plotDims.h}px`,
+          width: `${zoomedDims.w}px`,
+          height: `${zoomedDims.h}px`,
           position: 'relative',
           clipPath: clipPathVal,
           border: shape === 'Irregular' ? 'none' : '1.5px solid var(--text)',
-          borderRadius: '0px'
+          borderRadius: '0px',
+          flexShrink: 0
         }}
       >
         {/* Custom Wall Outline & Length Labels overlay — only while the plot is
@@ -349,7 +404,7 @@ export default function Canvas() {
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 8 }}>
             {/* Filled background with low opacity for visual reference */}
             <polygon
-              points={`0,0 ${(pctTR_X / 100) * plotDims.w},0 ${(pctBR_X / 100) * plotDims.w},${(pctBR_Y / 100) * plotDims.h} 0,${(pctBL_Y / 100) * plotDims.h}`}
+              points={`0,0 ${(pctTR_X / 100) * zoomedDims.w},0 ${(pctBR_X / 100) * zoomedDims.w},${(pctBR_Y / 100) * zoomedDims.h} 0,${(pctBL_Y / 100) * zoomedDims.h}`}
               fill="rgba(245, 158, 11, 0.02)"
               stroke="var(--gold)"
               strokeWidth="4"
@@ -418,8 +473,8 @@ export default function Canvas() {
           const wFeet = coordinateSystem.pctToFeet(room.width, plot.width)
           const hFeet = coordinateSystem.pctToFeet(room.height, plot.length)
           const areaFeet = wFeet * hFeet
-          const roomPxW = (room.width / 100) * plotDims.w
-          const roomPxH = (room.height / 100) * plotDims.h
+          const roomPxW = (room.width / 100) * zoomedDims.w
+          const roomPxH = (room.height / 100) * zoomedDims.h
 
           return (
             <div

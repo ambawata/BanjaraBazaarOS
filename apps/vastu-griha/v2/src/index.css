@@ -463,6 +463,35 @@ body {
   transform-origin: center center;
 }
 
+/* Floating zoom controls for the canvas — pinned to the corner with
+   position: sticky so they stay reachable even after scrolling/panning
+   into a zoomed-in view. */
+.canvas-zoom-controls {
+  position: sticky;
+  top: 8px;
+  left: 100%;
+  transform: translateX(calc(-100% - 8px));
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+.canvas-zoom-level {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--fm);
+  color: var(--text2);
+  min-width: 34px;
+  text-align: center;
+}
+
 /* Placed Room — drawn as a real floor-plan room (flat paper fill, thin
    wall lines) instead of a floating UI card, per Vinod's direction that
    the live editor should read as a floor plan, not boxes. */
