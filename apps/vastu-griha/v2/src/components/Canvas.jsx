@@ -65,9 +65,9 @@ export default function Canvas() {
     e.stopPropagation()
     const room = rooms.find(r => r.id === roomId)
     if (!room) return
-    
+
     setSelectedRoomId(roomId)
-    
+
     setDragState({
       type,
       roomId,
@@ -105,16 +105,16 @@ export default function Canvas() {
   const handleMouseMove = (e) => {
     if (editMode === 'view' || !dragState || !plotRef.current) return
     e.preventDefault()
-    
+
     const deltaX = e.clientX - dragState.startX
     const deltaY = e.clientY - dragState.startY
-    
+
     const deltaXPercent = (deltaX / plotDims.w) * 100
     const deltaYPercent = (deltaY / plotDims.h) * 100
-    
+
     const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
     if (roomIndex === -1) return
-    
+
     const newRooms = [...rooms]
     const targetRoom = { ...newRooms[roomIndex] }
     
