@@ -26,7 +26,8 @@ export default function Canvas() {
     selectedRoomId,
     setSelectedRoomId,
     deleteRoom,
-    nudgeRoom
+    nudgeRoom,
+    resizeRoom
   } = useCanvasStore()
 
   const { plot } = useProjectStore()
@@ -41,6 +42,14 @@ export default function Canvas() {
   const [plotDims, setPlotDims] = useState({ w: 400, h: 400 })
   const [zoom, setZoom] = useState(1)
   const pinchRef = useRef(null)
+  // Which contextual control strip is open above the bottom action bar —
+  // mirrors Canva's Transparency/Layers/Position/Nudge/More tab row, but
+  // scoped to what's actually useful for a floor plan room.
+  const [activePanel, setActivePanel] = useState(null)
+
+  useEffect(() => {
+    setActivePanel(null)
+  }, [selectedRoomId])
 
   // The zoomed pixel size of the plot — dragging/resizing math and the
   // rendered plot-wrapper both use this instead of the base plotDims, so
@@ -146,108 +155,78 @@ export default function Canvas() {
     })
   }
 
-  const handleMouseMove = (e) => {
-    if (editMode === 'view' || !dragState || !plotRef.current) return
-    e.preventDefault()
-
-    const deltaX = e.clientX - dragState.startX
-    const deltaY = e.clientY - dragState.startY
-
-    const deltaXPercent = (deltaX / zoomedDims.w) * 100
-    const deltaYPercent = (deltaY / zoomedDims.h) * 100
-
+  // Shared by mouse and touch — handles a plain move, and resizing from
+  // any of the 4 corners (Canva lets you resize from any corner, not just
+  // bottom-right, so the opposite corner needs to stay anchored in place).
+  const applyDrag = (deltaXPercent, deltaYPercent) => {
     const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
     if (roomIndex === -1) return
 
     const newRooms = [...rooms]
     const targetRoom = { ...newRooms[roomIndex] }
-    
+    const snap = (v) => snapToGrid ? snapEngine.snapToGrid(v, gridSize) : v
+
     if (dragState.type === 'move') {
-      let newX = dragState.startXCoord + deltaXPercent
-      let newY = dragState.startYCoord + deltaYPercent
-      
-      if (snapToGrid) {
-        newX = snapEngine.snapToGrid(newX, gridSize)
-        newY = snapEngine.snapToGrid(newY, gridSize)
-      }
-      
+      let newX = snap(dragState.startXCoord + deltaXPercent)
+      let newY = snap(dragState.startYCoord + deltaYPercent)
+
       newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
-      let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
-      
+      newY = Math.max(0, Math.min(100 - targetRoom.height, newY))
+
       targetRoom.x = Math.round(newX * 10) / 10
-      targetRoom.y = Math.round(newYClamped * 10) / 10
-    } 
-    else if (dragState.type === 'resize') {
-      let newW = dragState.startW + deltaXPercent
-      let newH = dragState.startH + deltaYPercent
-      
-      if (snapToGrid) {
-        newW = snapEngine.snapToGrid(newW, gridSize)
-        newH = snapEngine.snapToGrid(newH, gridSize)
+      targetRoom.y = Math.round(newY * 10) / 10
+    } else if (dragState.type?.startsWith('resize-')) {
+      const corner = dragState.type
+      const growsRight = corner === 'resize-br' || corner === 'resize-tr'
+      const growsDown = corner === 'resize-br' || corner === 'resize-bl'
+      const farX = dragState.startXCoord + dragState.startW
+      const farY = dragState.startYCoord + dragState.startH
+
+      let newX = dragState.startXCoord
+      let newY = dragState.startYCoord
+      let newW
+      let newH
+
+      if (growsRight) {
+        newW = Math.max(10, Math.min(100 - newX, snap(dragState.startW + deltaXPercent)))
+      } else {
+        newX = Math.max(0, Math.min(farX - 10, snap(dragState.startXCoord + deltaXPercent)))
+        newW = farX - newX
       }
-      
-      newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
-      newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
-      
+
+      if (growsDown) {
+        newH = Math.max(10, Math.min(100 - newY, snap(dragState.startH + deltaYPercent)))
+      } else {
+        newY = Math.max(0, Math.min(farY - 10, snap(dragState.startYCoord + deltaYPercent)))
+        newH = farY - newY
+      }
+
+      targetRoom.x = Math.round(newX * 10) / 10
+      targetRoom.y = Math.round(newY * 10) / 10
       targetRoom.width = Math.round(newW * 10) / 10
       targetRoom.height = Math.round(newH * 10) / 10
     }
-    
+
     newRooms[roomIndex] = targetRoom
     setRooms(newRooms)
+  }
+
+  const handleMouseMove = (e) => {
+    if (editMode === 'view' || !dragState || !plotRef.current) return
+    e.preventDefault()
+    const deltaXPercent = ((e.clientX - dragState.startX) / zoomedDims.w) * 100
+    const deltaYPercent = ((e.clientY - dragState.startY) / zoomedDims.h) * 100
+    applyDrag(deltaXPercent, deltaYPercent)
   }
 
   const handleTouchMove = (e) => {
     if (editMode === 'view' || !dragState || !plotRef.current) return
     e.preventDefault()
-    
     const touch = e.touches?.[0]
     if (!touch) return
-    const deltaX = touch.clientX - dragState.startX
-    const deltaY = touch.clientY - dragState.startY
-
-    const deltaXPercent = (deltaX / zoomedDims.w) * 100
-    const deltaYPercent = (deltaY / zoomedDims.h) * 100
-    
-    const roomIndex = rooms.findIndex(r => r.id === dragState.roomId)
-    if (roomIndex === -1) return
-    
-    const newRooms = [...rooms]
-    const targetRoom = { ...newRooms[roomIndex] }
-    
-    if (dragState.type === 'move') {
-      let newX = dragState.startXCoord + deltaXPercent
-      let newY = dragState.startYCoord + deltaYPercent
-      
-      if (snapToGrid) {
-        newX = snapEngine.snapToGrid(newX, gridSize)
-        newY = snapEngine.snapToGrid(newY, gridSize)
-      }
-      
-      newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
-      let newYClamped = Math.max(0, Math.min(100 - targetRoom.height, newY))
-      
-      targetRoom.x = Math.round(newX * 10) / 10
-      targetRoom.y = Math.round(newYClamped * 10) / 10
-    } 
-    else if (dragState.type === 'resize') {
-      let newW = dragState.startW + deltaXPercent
-      let newH = dragState.startH + deltaYPercent
-      
-      if (snapToGrid) {
-        newW = snapEngine.snapToGrid(newW, gridSize)
-        newH = snapEngine.snapToGrid(newH, gridSize)
-      }
-      
-      newW = Math.max(10, Math.min(100 - targetRoom.x, newW))
-      newH = Math.max(10, Math.min(100 - targetRoom.y, newH))
-      
-      targetRoom.width = Math.round(newW * 10) / 10
-      targetRoom.height = Math.round(newH * 10) / 10
-    }
-    
-    newRooms[roomIndex] = targetRoom
-    setRooms(newRooms)
+    const deltaXPercent = ((touch.clientX - dragState.startX) / zoomedDims.w) * 100
+    const deltaYPercent = ((touch.clientY - dragState.startY) / zoomedDims.h) * 100
+    applyDrag(deltaXPercent, deltaYPercent)
   }
 
   const handleMouseUp = () => {
@@ -371,21 +350,24 @@ export default function Canvas() {
       {/* Zoom controls — pinch with two fingers works too, but these give
           a reliable tap-based way to get room enough to edit precisely,
           which is the main thing that made a crowded layout hard to use
-          on a small phone screen. */}
-      <div className="canvas-zoom-controls" onClick={(e) => e.stopPropagation()}>
-        <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z - 0.25))} title="Zoom out">
-          <i className="ti ti-minus"></i>
-        </button>
-        <span className="canvas-zoom-level">{Math.round(zoom * 100)}%</span>
-        <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z + 0.25))} title="Zoom in">
-          <i className="ti ti-plus"></i>
-        </button>
-        {zoom !== 1 && (
-          <button className="btn-icon" onClick={() => setZoom(1)} title="Reset zoom">
-            <i className="ti ti-focus-2"></i>
+          on a small phone screen. Hidden while a room is selected so it
+          doesn't compete with the room action bar for the same corner. */}
+      {!selectedRoomId && (
+        <div className="canvas-zoom-controls" onClick={(e) => e.stopPropagation()}>
+          <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z - 0.25))} title="Zoom out">
+            <i className="ti ti-minus"></i>
           </button>
-        )}
-      </div>
+          <span className="canvas-zoom-level">{Math.round(zoom * 100)}%</span>
+          <button className="btn-icon" onClick={() => setZoom(z => clampZoom(z + 0.25))} title="Zoom in">
+            <i className="ti ti-plus"></i>
+          </button>
+          {zoom !== 1 && (
+            <button className="btn-icon" onClick={() => setZoom(1)} title="Reset zoom">
+              <i className="ti ti-focus-2"></i>
+            </button>
+          )}
+        </div>
+      )}
       <div
         className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
         ref={plotRef}
@@ -767,42 +749,110 @@ export default function Canvas() {
                 </>
               )}
 
-              {/* Touch Handles */}
-              {isSelected && editMode !== 'view' && (
-                <div className="touch-handle-rotate" title="Rotate room segment orientation" />
-              )}
-              
-              {editMode !== 'view' && (
-                <div 
-                  className="placed-room-resize-handle"
-                  onMouseDown={(e) => handleMouseDown(e, room.id, 'resize')}
-                  onTouchStart={(e) => handleTouchStart(e, room.id, 'resize')}
+              {/* Corner resize handles — Canva lets you grab any of the 4
+                  corners, not just bottom-right, so a room can be resized
+                  from whichever corner is easiest to reach on screen. */}
+              {editMode !== 'view' && ['tl', 'tr', 'bl', 'br'].map(corner => (
+                <div
+                  key={corner}
+                  className={`placed-room-resize-handle handle-${corner}`}
+                  onMouseDown={(e) => handleMouseDown(e, room.id, `resize-${corner}`)}
+                  onTouchStart={(e) => handleTouchStart(e, room.id, `resize-${corner}`)}
                 />
-              )}
+              ))}
             </div>
           )
         })}
       </div>
 
-      {/* Canva-style nudge bar — docked to the bottom of the screen (not
-          buried in a panel you have to scroll to) so precise 1-step moves
-          are always one tap away once a room is selected. */}
-      {selectedRoomId && editMode !== 'view' && (
-        <div className="canvas-nudge-bar" onClick={(e) => e.stopPropagation()}>
-          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'left')} title="Nudge left">
-            <i className="ti ti-arrow-left"></i>
-          </button>
-          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'up')} title="Nudge up">
-            <i className="ti ti-arrow-up"></i>
-          </button>
-          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'down')} title="Nudge down">
-            <i className="ti ti-arrow-down"></i>
-          </button>
-          <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'right')} title="Nudge right">
-            <i className="ti ti-arrow-right"></i>
-          </button>
-        </div>
-      )}
+      {/* Canva-style bottom action bar — a row of tabs docked to the
+          screen bottom; tapping one opens just that control strip above
+          the tab row, instead of scattering separate floating buttons
+          all over the canvas. */}
+      {selectedRoomId && editMode !== 'view' && (() => {
+        const selectedRoom = rooms.find(r => r.id === selectedRoomId)
+        if (!selectedRoom) return null
+        const info = evaluateRoom(selectedRoom, plot)
+
+        return (
+          <div className="room-action-dock" onClick={(e) => e.stopPropagation()}>
+            {activePanel === 'move' && (
+              <div className="room-action-panel">
+                <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'left')} title="Nudge left"><i className="ti ti-arrow-left"></i></button>
+                <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'up')} title="Nudge up"><i className="ti ti-arrow-up"></i></button>
+                <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'down')} title="Nudge down"><i className="ti ti-arrow-down"></i></button>
+                <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'right')} title="Nudge right"><i className="ti ti-arrow-right"></i></button>
+              </div>
+            )}
+            {activePanel === 'resize' && (
+              <div className="room-action-panel">
+                <span className="room-action-panel-label">Width</span>
+                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', -1)} title="Narrower"><i className="ti ti-minus"></i></button>
+                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', 1)} title="Wider"><i className="ti ti-plus"></i></button>
+                <span className="room-action-panel-label">Length</span>
+                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', -1)} title="Shorter"><i className="ti ti-minus"></i></button>
+                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', 1)} title="Longer"><i className="ti ti-plus"></i></button>
+              </div>
+            )}
+            {activePanel === 'info' && (
+              <div className="room-action-panel room-action-panel-text">
+                <span className={`compliance-dot-${complianceClassFor(info.status)} room-info-dot`}></span>
+                <div>
+                  <strong>{info.status}</strong> in the {info.zone}
+                  <p>{info.desc}</p>
+                </div>
+              </div>
+            )}
+            {activePanel === 'more' && (
+              <div className="room-action-panel">
+                <button
+                  className="btn-icon"
+                  title="Duplicate"
+                  onClick={() => {
+                    const clone = { ...selectedRoom, id: Date.now().toString(), x: Math.min(80, selectedRoom.x + 10), y: Math.min(80, selectedRoom.y + 10) }
+                    setRooms([...rooms, clone])
+                  }}
+                >
+                  <i className="ti ti-copy"></i>
+                </button>
+                <button
+                  className="btn-icon"
+                  title="Rotate 90°"
+                  onClick={() => {
+                    const nextRotation = ((selectedRoom.rotation || 0) + 90) % 360
+                    const rotated = { ...selectedRoom, width: selectedRoom.height, height: selectedRoom.width, rotation: nextRotation }
+                    setRooms(rooms.map(r => r.id === selectedRoom.id ? rotated : r))
+                  }}
+                >
+                  <i className="ti ti-rotate-clockwise"></i>
+                </button>
+                <button
+                  className="btn-icon btn-danger"
+                  title="Delete"
+                  onClick={() => { deleteRoom(selectedRoomId); setSelectedRoomId(null) }}
+                >
+                  <i className="ti ti-trash"></i>
+                </button>
+              </div>
+            )}
+
+            <div className="room-action-tabs">
+              <button className={activePanel === 'move' ? 'active' : ''} onClick={() => setActivePanel(p => p === 'move' ? null : 'move')}>
+                <i className="ti ti-arrows-move"></i><span>Move</span>
+              </button>
+              <button className={activePanel === 'resize' ? 'active' : ''} onClick={() => setActivePanel(p => p === 'resize' ? null : 'resize')}>
+                <i className="ti ti-resize"></i><span>Resize</span>
+              </button>
+              <button className={activePanel === 'info' ? 'active' : ''} onClick={() => setActivePanel(p => p === 'info' ? null : 'info')}>
+                <i className="ti ti-compass"></i><span>Vastu</span>
+              </button>
+              <button className={activePanel === 'more' ? 'active' : ''} onClick={() => setActivePanel(p => p === 'more' ? null : 'more')}>
+                <i className="ti ti-dots"></i><span>More</span>
+              </button>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

@@ -485,23 +485,102 @@ body {
   z-index: 200;
 }
 
-/* Docked nudge bar, fixed to the bottom-center of the screen whenever a
-   room is selected — same fixed-to-viewport approach as the zoom controls
-   so it's always reachable regardless of scroll/zoom state. */
-.canvas-nudge-bar {
+/* Canva-style bottom action dock — a tab row fixed above the app's own
+   bottom nav (60px + safe-area), with an optional control strip that pops
+   up directly above the tabs when one is active. Only one tab's controls
+   show at a time, so the screen stays uncluttered by default. */
+.room-action-dock {
   position: fixed;
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: calc(60px + env(safe-area-inset-bottom));
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+}
+
+.room-action-panel {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 4px;
+  padding: 6px 10px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  z-index: 200;
+  animation: slideUpFade 0.15s ease-out;
+}
+
+.room-action-panel-label {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+  margin: 0 2px;
+}
+
+.room-action-panel-text {
+  border-radius: 16px;
+  max-width: 320px;
+  align-items: flex-start;
+  text-align: left;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.room-action-panel-text strong {
+  color: var(--text);
+  font-size: 13px;
+}
+.room-action-panel-text p {
+  margin: 2px 0 0 0;
+}
+.room-info-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.room-action-tabs {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  justify-content: space-around;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.room-action-tabs button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.room-action-tabs button i {
+  font-size: 17px;
+}
+
+.room-action-tabs button.active {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .canvas-zoom-level {
@@ -1972,45 +2051,18 @@ body {
   margin: 0 2px;
 }
 
-/* Touch Handles */
-.touch-handle-rotate {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--gold);
-  border: 2px solid #fff;
-  cursor: grab;
-  z-index: 110;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-.touch-handle-rotate::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 10px;
-  background: var(--gold);
-}
-
+/* Corner resize handles — one at each corner (Canva-style), 36px touch
+   target, only visible on the room currently selected so other rooms stay
+   clean rectangles. Cursor hints match the direction you'd drag. */
 .placed-room-resize-handle {
-  /* Touch target stays ~36px for a reliable finger grab, but only the
-     room actively being edited shows it — every other room stays a
-     clean, unhandled floor-plan rectangle. */
-  width: 36px !important;
-  height: 36px !important;
-  right: -4px !important;
-  bottom: -4px !important;
+  position: absolute;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: transparent;
   border: none;
   display: none;
+  z-index: 15;
 }
 
 .placed-room.selected .placed-room-resize-handle {
@@ -2019,16 +2071,25 @@ body {
   border: 2px solid var(--text);
 }
 
-.placed-room.selected .placed-room-resize-handle::after {
+.handle-tl { top: -18px; left: -18px; cursor: nwse-resize; }
+.handle-tr { top: -18px; right: -18px; cursor: nesw-resize; }
+.handle-bl { bottom: -18px; left: -18px; cursor: nesw-resize; }
+.handle-br { bottom: -18px; right: -18px; cursor: nwse-resize; }
+
+.placed-room.selected .handle-tl::after,
+.placed-room.selected .handle-tr::after,
+.placed-room.selected .handle-bl::after,
+.placed-room.selected .handle-br::after {
   content: '';
   position: absolute;
-  right: 11px;
-  bottom: 11px;
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
+  width: 8px;
+  height: 8px;
+  border-color: var(--accent);
 }
+.placed-room.selected .handle-tl::after { top: 13px; left: 13px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.placed-room.selected .handle-tr::after { top: 13px; right: 13px; border-top: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+.placed-room.selected .handle-bl::after { bottom: 13px; left: 13px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.placed-room.selected .handle-br::after { bottom: 13px; right: 13px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); }
 
 /* Alignment Smart Guides */
 .smart-guide-x, .smart-guide-y {
