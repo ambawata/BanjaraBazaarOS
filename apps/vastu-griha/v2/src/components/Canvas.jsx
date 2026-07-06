@@ -339,8 +339,8 @@ export default function Canvas() {
           height: `${plotDims.h}px`,
           position: 'relative',
           clipPath: clipPathVal,
-          border: shape === 'Irregular' ? 'none' : '1.5px solid var(--gold)',
-          borderRadius: shape === 'Irregular' ? '0px' : '16px'
+          border: shape === 'Irregular' ? 'none' : '1.5px solid var(--text)',
+          borderRadius: '0px'
         }}
       >
         {/* Custom Wall Outline & Length Labels overlay — only while the plot is
@@ -445,6 +445,7 @@ export default function Canvas() {
               }}
               onMouseDown={(e) => handleMouseDown(e, room.id, 'move')}
               onTouchStart={(e) => handleTouchStart(e, room.id, 'move')}
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Context Sensitive Floating Canva-style Toolbar */}
               {isSelected && editMode !== 'view' && (
@@ -669,12 +670,23 @@ export default function Canvas() {
                   {/* Detailed 2D architectural symbols inside rooms — drawn clearly
                       (not faded watermarks) so the plan reads like a real drawing.
                       Shared with the printable professional floor plan export. */}
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.62, pointerEvents: 'none' }}>
-                    <RoomSymbol type={room.type} label={room.label} />
-                  </div>
+                  {roomPxW > 60 && roomPxH > 60 && (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.55, pointerEvents: 'none' }}>
+                      <RoomSymbol type={room.type} label={room.label} />
+                    </div>
+                  )}
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 'auto', textAlign: 'center' }}>
-                    <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.01em', textTransform: 'uppercase', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 'auto', textAlign: 'center', lineHeight: 1.1 }}>
+                    <span style={{
+                      fontSize: roomPxW < 70 || roomPxH < 70 ? '8.5px' : '10.5px',
+                      fontWeight: 700,
+                      letterSpacing: '0.01em',
+                      textTransform: 'uppercase',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      maxWidth: '100%',
+                      color: 'var(--text)'
+                    }}>
                       {room.label}
                     </span>
                     {roomPxW > 55 && roomPxH > 55 && (

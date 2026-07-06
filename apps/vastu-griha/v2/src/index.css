@@ -396,9 +396,9 @@ body {
 .plot-wrapper {
   position: relative;
   background: var(--bg2);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12), 0 2px 10px rgba(0, 0, 0, 0.05);
-  border: 2px solid var(--gold);
-  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1.5px solid var(--text);
+  border-radius: 0px;
   transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
   overflow: hidden;
 }
@@ -463,31 +463,33 @@ body {
   transform-origin: center center;
 }
 
-/* Placed Room Card Component */
+/* Placed Room — drawn as a real floor-plan room (flat paper fill, thin
+   wall lines) instead of a floating UI card, per Vinod's direction that
+   the live editor should read as a floor plan, not boxes. */
 .placed-room {
   position: absolute;
-  border-radius: 12px;
-  border: 1.5px solid var(--border);
+  border-radius: 2px;
+  border: 1.5px solid var(--text);
   background: var(--bg2);
-  backdrop-filter: blur(8px);
   padding: 10px;
   cursor: move;
   z-index: 2;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  transition: outline-color 0.2s;
 }
 
 .placed-room:hover {
-  border-color: var(--accent);
+  outline: 1.5px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .placed-room.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .placed-room-header {
@@ -549,42 +551,10 @@ body {
   border-top-left-radius: 4px;
 }
 
-/* Room Compliance glow classes */
-.compliance-excellent {
-  border-color: #10b981 !important;
-  background: rgba(16, 185, 129, 0.04) !important;
-}
-.compliance-excellent .placed-room-status {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-}
-
-.compliance-good {
-  border-color: #f59e0b !important;
-  background: rgba(245, 158, 11, 0.04) !important;
-}
-.compliance-good .placed-room-status {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-}
-
-.compliance-warning {
-  border-color: #f97316 !important;
-  background: rgba(249, 115, 22, 0.04) !important;
-}
-.compliance-warning .placed-room-status {
-  background: rgba(249, 115, 22, 0.1);
-  color: #ea580c;
-}
-
-.compliance-poor {
-  border-color: #ef4444 !important;
-  background: rgba(239, 68, 68, 0.04) !important;
-}
-.compliance-poor .placed-room-status {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
+/* Vastu compliance is now signalled only by the small corner dot
+   (.placed-room-vastu-dot below) — the room body itself stays a plain
+   floor-plan fill with no colored wash or colored wall, so the canvas
+   reads as a floor plan rather than a set of status cards. */
 
 /* Small Vastu-status dot — replaces the old full-width status pill so a
    room reads as "a room" (label + drawing) instead of "a dashboard card" */
@@ -1981,21 +1951,34 @@ body {
 }
 
 .placed-room-resize-handle {
-  /* Bigger than the original 24px so it's easier to grab with a finger,
-     closer to the ~40px minimum recommended touch target */
+  /* Touch target stays ~36px for a reliable finger grab, but only the
+     room actively being edited shows it — every other room stays a
+     clean, unhandled floor-plan rectangle. */
   width: 36px !important;
   height: 36px !important;
   right: -4px !important;
   bottom: -4px !important;
   border-radius: 50%;
-  background: var(--accent);
-  border: 4px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  transition: transform 0.2s;
+  background: transparent;
+  border: none;
+  display: none;
 }
 
-.placed-room-resize-handle:hover {
-  transform: scale(1.25);
+.placed-room.selected .placed-room-resize-handle {
+  display: block;
+  background: var(--bg2);
+  border: 2px solid var(--text);
+}
+
+.placed-room.selected .placed-room-resize-handle::after {
+  content: '';
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
 }
 
 /* Alignment Smart Guides */
