@@ -543,7 +543,7 @@ export default function Canvas() {
                     <div style={{ position: 'absolute', left: 0, top: '-3px', width: '1px', height: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <div style={{ position: 'absolute', right: 0, top: '-3px', width: '1px', height: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <span style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', fontSize: '8.5px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', whiteSpace: 'nowrap', background: 'var(--bg2)', padding: '0 3px' }}>
-                      {Math.round(wFeet)}'-0"
+                      {Math.round(wFeet)} ft
                     </span>
                   </div>
                   {/* Vertical dimension line */}
@@ -551,7 +551,7 @@ export default function Canvas() {
                     <div style={{ position: 'absolute', top: 0, left: '-3px', height: '1px', width: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <div style={{ position: 'absolute', bottom: 0, left: '-3px', height: '1px', width: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <span style={{ position: 'absolute', left: '4px', top: '50%', transform: 'translateY(-50%) rotate(90deg)', transformOrigin: 'center', fontSize: '8.5px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', whiteSpace: 'nowrap', background: 'var(--bg2)', padding: '0 3px' }}>
-                      {Math.round(hFeet)}'-0"
+                      {Math.round(hFeet)} ft
                     </span>
                   </div>
                 </>
@@ -784,16 +784,46 @@ export default function Canvas() {
                 <button className="btn-icon" onClick={() => nudgeRoom(selectedRoomId, 'right')} title="Nudge right"><i className="ti ti-arrow-right"></i></button>
               </div>
             )}
-            {activePanel === 'resize' && (
-              <div className="room-action-panel">
-                <span className="room-action-panel-label">Width</span>
-                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', -1)} title="Narrower"><i className="ti ti-minus"></i></button>
-                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', 1)} title="Wider"><i className="ti ti-plus"></i></button>
-                <span className="room-action-panel-label">Length</span>
-                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', -1)} title="Shorter"><i className="ti ti-minus"></i></button>
-                <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', 1)} title="Longer"><i className="ti ti-plus"></i></button>
-              </div>
-            )}
+            {activePanel === 'resize' && (() => {
+              const setFeet = (dimension, feetValue) => {
+                const feet = parseFloat(feetValue)
+                if (!feet || feet <= 0) return
+                if (dimension === 'w') {
+                  const pct = Math.min(100 - selectedRoom.x, Math.max(3, feet) / plot.width * 100)
+                  setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, width: Math.round(pct * 10) / 10 } : r))
+                } else {
+                  const pct = Math.min(100 - selectedRoom.y, Math.max(3, feet) / plot.length * 100)
+                  setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, height: Math.round(pct * 10) / 10 } : r))
+                }
+              }
+              const wFt = Math.round((selectedRoom.width / 100) * plot.width)
+              const hFt = Math.round((selectedRoom.height / 100) * plot.length)
+
+              return (
+                <div className="room-action-panel">
+                  <span className="room-action-panel-label">Width</span>
+                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', -1)} title="1 ft narrower"><i className="ti ti-minus"></i></button>
+                  <input
+                    type="number"
+                    className="room-size-input"
+                    value={wFt}
+                    onChange={(e) => setFeet('w', e.target.value)}
+                    title="Type exact width in feet"
+                  />
+                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', 1)} title="1 ft wider"><i className="ti ti-plus"></i></button>
+                  <span className="room-action-panel-label">Length</span>
+                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', -1)} title="1 ft shorter"><i className="ti ti-minus"></i></button>
+                  <input
+                    type="number"
+                    className="room-size-input"
+                    value={hFt}
+                    onChange={(e) => setFeet('h', e.target.value)}
+                    title="Type exact length in feet"
+                  />
+                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', 1)} title="1 ft longer"><i className="ti ti-plus"></i></button>
+                </div>
+              )
+            })()}
             {activePanel === 'info' && (
               <div className="room-action-panel room-action-panel-text">
                 <span className={`compliance-dot-${complianceClassFor(info.status)} room-info-dot`}></span>

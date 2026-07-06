@@ -86,6 +86,11 @@ export const EXPANDED_ROOMS_CATALOG = {
     { type: 'custom', label: 'Home Theatre', icon: 'ti ti-movie', w: 30, h: 25 },
     { type: 'custom', label: 'Gym Room', icon: 'ti ti-barbell', w: 24, h: 20 }
   ],
+  doors_windows: [
+    { type: 'door', label: 'Door', icon: 'ti ti-door-enter', w: 4, h: 2, category: 'opening' },
+    { type: 'window', label: 'Window', icon: 'ti ti-window', w: 6, h: 2, category: 'opening' },
+    { type: 'ventilator', label: 'Ventilator', icon: 'ti ti-air-conditioning', w: 5, h: 2, category: 'opening' }
+  ],
   utility: [
     { type: 'kitchen', label: 'Kitchen Cooktop', icon: 'ti ti-soup', w: 22, h: 22 },
     { type: 'custom', label: 'Utility Room', icon: 'ti ti-wash', w: 15, h: 15 },

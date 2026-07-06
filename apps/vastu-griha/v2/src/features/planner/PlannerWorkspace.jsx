@@ -1634,6 +1634,18 @@ export default function PlannerWorkspace() {
                 ))}
               </div>
 
+              {/* Doors & Windows — structural openings, placed as thin strips
+                  you drag onto a wall edge and rotate as needed. */}
+              <div style={{ textTransform: 'uppercase', fontSize: '10px', fontWeight: 600, color: 'var(--text3)', marginBottom: '8px', textAlign: 'left', fontFamily: 'var(--fm)' }}>Doors & Windows</div>
+              <div className="element-grid-container">
+                {EXPANDED_ROOMS_CATALOG.doors_windows.filter(e => e.label.toLowerCase().includes(searchQuery.toLowerCase())).map(r => (
+                  <div key={r.label} className="element-tile-card" onClick={() => handleAddRoom(r)}>
+                    <div className="element-tile-icon-box tile-outdoor"><i className={r.icon}></i></div>
+                    <span className="element-tile-label">{r.label}</span>
+                  </div>
+                ))}
+              </div>
+
               {/* Utility Rooms */}
               <div style={{ textTransform: 'uppercase', fontSize: '10px', fontWeight: 600, color: 'var(--text3)', marginBottom: '8px', textAlign: 'left', fontFamily: 'var(--fm)' }}>Utility & Kitchen</div>
               <div className="element-grid-container">

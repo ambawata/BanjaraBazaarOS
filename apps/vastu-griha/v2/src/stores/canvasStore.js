@@ -129,12 +129,17 @@ export const useCanvasStore = create((set, get) => ({
 
     const updated = [...rooms]
     const r = { ...updated[index] }
-    const step = 2.5 // grid nudge increment
-    
-    if (direction === 'left') r.x = Math.max(0, r.x - step)
-    else if (direction === 'right') r.x = Math.min(100 - r.width, r.x + step)
-    else if (direction === 'up') r.y = Math.max(0, r.y - step)
-    else if (direction === 'down') r.y = Math.min(100 - r.height, r.y + step)
+    // A fixed percentage step moved a different number of real feet
+    // depending on the plot's size — 1 tap could nudge a room 2ft on one
+    // wall and 3ft on another. Converting 1 real foot into the matching
+    // percentage for each axis keeps every tap the same, predictable step.
+    const stepX = (1 / plot.width) * 100
+    const stepY = (1 / plot.length) * 100
+
+    if (direction === 'left') r.x = Math.max(0, r.x - stepX)
+    else if (direction === 'right') r.x = Math.min(100 - r.width, r.x + stepX)
+    else if (direction === 'up') r.y = Math.max(0, r.y - stepY)
+    else if (direction === 'down') r.y = Math.min(100 - r.height, r.y + stepY)
 
     updated[index] = r
     set({ rooms: updated })
@@ -151,14 +156,20 @@ export const useCanvasStore = create((set, get) => ({
 
     const updated = [...rooms]
     const r = { ...updated[index] }
-    const step = 5
 
+    // Same fix as nudge — step by exactly 1 real foot on whichever axis,
+    // instead of a flat 5% that translated to a different foot count
+    // depending on the plot's width vs length.
     if (dimension === 'w') {
+      const step = (1 / plot.width) * 100
+      const minWidth = (3 / plot.width) * 100
       if (factor > 0) r.width = Math.min(100 - r.x, r.width + step)
-      else r.width = Math.max(10, r.width - step)
+      else r.width = Math.max(minWidth, r.width - step)
     } else if (dimension === 'h') {
+      const step = (1 / plot.length) * 100
+      const minHeight = (3 / plot.length) * 100
       if (factor > 0) r.height = Math.min(100 - r.y, r.height + step)
-      else r.height = Math.max(10, r.height - step)
+      else r.height = Math.max(minHeight, r.height - step)
     }
 
     updated[index] = r
