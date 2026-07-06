@@ -1,5 +1,6 @@
 import React from 'react'
 import { evaluateRoom } from './AnalysisPanel'
+import FloorPlanDrawing from './FloorPlanDrawing'
 
 export default function ReportGenerator({ rooms, plot }) {
   const evaluatedRooms = rooms.map(room => ({
@@ -45,8 +46,14 @@ export default function ReportGenerator({ rooms, plot }) {
           </button>
         </div>
 
+        {/* Professional Floor Plan Drawing — the presentation-ready sheet */}
+        <div className="report-section">
+          <h3 className="report-section-title">Floor Plan Drawing</h3>
+          <FloorPlanDrawing rooms={rooms} plot={plot} />
+        </div>
+
         {/* Audit Details */}
-        <div className="report-details-grid">
+        <div className="report-details-grid" style={{ pageBreakBefore: 'always' }}>
           <div>
             <strong style={{ fontSize: '11px', color: 'var(--text3)', fontFamily: 'var(--fm)', display: 'block', textTransform: 'uppercase' }}>Plot Size</strong>
             <span style={{ fontSize: '14px', fontWeight: 600 }}>{plot.width} ft × {plot.length} ft</span>

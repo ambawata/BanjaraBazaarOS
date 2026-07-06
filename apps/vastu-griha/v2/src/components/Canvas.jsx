@@ -6,6 +6,7 @@ import { useSettingsStore } from '../stores/settingsStore'
 import { useUiStore } from '../stores/uiStore'
 import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
+import RoomSymbol from './RoomSymbol'
 
 export default function Canvas() {
   const {
@@ -647,101 +648,10 @@ export default function Canvas() {
                   </div>
                   
                   {/* Detailed 2D architectural symbols inside rooms — drawn clearly
-                      (not faded watermarks) so the plan reads like a real drawing */}
+                      (not faded watermarks) so the plan reads like a real drawing.
+                      Shared with the printable professional floor plan export. */}
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.62, pointerEvents: 'none' }}>
-                    {room.type === 'kitchen' && (
-                      <svg viewBox="0 0 100 100" style={{ width: '50px', height: '50px' }}>
-                        {/* L-shaped counter */}
-                        <path d="M 8 8 L 92 8 L 92 30 L 30 30 L 30 92 L 8 92 Z" fill="none" stroke="var(--text)" strokeWidth="2.2" />
-                        {/* Sink */}
-                        <rect x="16" y="14" width="16" height="12" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        {/* Stove burners */}
-                        <circle cx="58" cy="18" r="6" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <circle cx="78" cy="18" r="6" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        {/* Fridge block */}
-                        <rect x="14" y="55" width="16" height="30" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                      </svg>
-                    )}
-                    {room.type === 'bedroom' && (
-                      <svg viewBox="0 0 100 100" style={{ width: '52px', height: '52px' }}>
-                        {/* Bed frame */}
-                        <rect x="10" y="8" width="80" height="60" rx="3" fill="none" stroke="var(--text)" strokeWidth="2.2" />
-                        {/* Pillows */}
-                        <rect x="16" y="14" width="30" height="16" rx="4" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="54" y="14" width="30" height="16" rx="4" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        {/* Blanket fold line */}
-                        <line x1="10" y1="46" x2="90" y2="46" stroke="var(--text)" strokeWidth="1.4" />
-                        {/* Nightstands */}
-                        <rect x="2" y="8" width="8" height="14" fill="none" stroke="var(--text)" strokeWidth="1.2" />
-                        <rect x="90" y="8" width="8" height="14" fill="none" stroke="var(--text)" strokeWidth="1.2" />
-                        {/* Wardrobe along bottom wall */}
-                        <rect x="10" y="80" width="80" height="14" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                      </svg>
-                    )}
-                    {room.type === 'living' && !room.label.toLowerCase().includes('dining') && (
-                      <svg viewBox="0 0 100 100" style={{ width: '52px', height: '52px' }}>
-                        {/* L-shaped sofa */}
-                        <rect x="8" y="55" width="60" height="20" rx="3" fill="none" stroke="var(--text)" strokeWidth="2" />
-                        <rect x="8" y="20" width="20" height="55" rx="3" fill="none" stroke="var(--text)" strokeWidth="2" />
-                        <line x1="8" y1="55" x2="28" y2="55" stroke="var(--text)" strokeWidth="1.2" />
-                        {/* Coffee table */}
-                        <rect x="45" y="30" width="35" height="20" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        {/* TV console */}
-                        <rect x="45" y="82" width="45" height="8" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                      </svg>
-                    )}
-                    {room.type === 'living' && room.label.toLowerCase().includes('dining') && (
-                      <svg viewBox="0 0 100 100" style={{ width: '50px', height: '50px' }}>
-                        <rect x="24" y="18" width="52" height="64" rx="4" fill="none" stroke="var(--text)" strokeWidth="2" />
-                        <rect x="6" y="26" width="14" height="18" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="6" y="56" width="14" height="18" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="80" y="26" width="14" height="18" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="80" y="56" width="14" height="18" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="38" y="4" width="24" height="12" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                        <rect x="38" y="84" width="24" height="12" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.4" />
-                      </svg>
-                    )}
-                    {room.type === 'pooja' && (
-                      <svg viewBox="0 0 100 100" style={{ width: '48px', height: '48px' }}>
-                        {/* Temple altar */}
-                        <rect x="20" y="55" width="60" height="30" fill="none" stroke="var(--gold)" strokeWidth="2" />
-                        <path d="M 30 55 L 30 30 L 50 12 L 70 30 L 70 55 Z" fill="none" stroke="var(--gold)" strokeWidth="2" />
-                        <circle cx="50" cy="40" r="7" fill="none" stroke="var(--gold)" strokeWidth="1.4" />
-                        <line x1="20" y1="70" x2="80" y2="70" stroke="var(--gold)" strokeWidth="1.2" />
-                      </svg>
-                    )}
-                    {room.type === 'toilet' && (
-                      <svg viewBox="0 0 100 100" style={{ width: '44px', height: '44px' }}>
-                        {/* WC */}
-                        <rect x="12" y="10" width="34" height="16" rx="2" fill="none" stroke="var(--text)" strokeWidth="1.8" />
-                        <ellipse cx="29" cy="46" rx="17" ry="20" fill="none" stroke="var(--text)" strokeWidth="1.8" />
-                        <ellipse cx="29" cy="42" rx="11" ry="14" fill="none" stroke="var(--text)" strokeWidth="1.2" />
-                        {/* Wash basin */}
-                        <rect x="58" y="8" width="30" height="14" rx="6" fill="none" stroke="var(--text)" strokeWidth="1.6" />
-                        <circle cx="73" cy="15" r="2" fill="var(--text)" />
-                        {/* Shower area */}
-                        <rect x="58" y="55" width="34" height="34" fill="none" stroke="var(--text)" strokeWidth="1.6" strokeDasharray="3 3" />
-                      </svg>
-                    )}
-                    {room.type === 'staircase' && (
-                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '48px' }}>
-                        <rect x="5" y="5" width="90" height="90" fill="none" stroke="var(--text)" strokeWidth="2" />
-                        <line x1="5" y1="20" x2="95" y2="20" stroke="var(--text)" strokeWidth="1.5" />
-                        <line x1="5" y1="35" x2="95" y2="35" stroke="var(--text)" strokeWidth="1.5" />
-                        <line x1="5" y1="50" x2="95" y2="50" stroke="var(--text)" strokeWidth="1.5" />
-                        <line x1="5" y1="65" x2="95" y2="65" stroke="var(--text)" strokeWidth="1.5" />
-                        <line x1="5" y1="80" x2="95" y2="80" stroke="var(--text)" strokeWidth="1.5" />
-                        <line x1="50" y1="90" x2="50" y2="10" stroke="var(--text)" strokeWidth="2" />
-                        <path d="M 50 85 L 58 78 L 50 71" fill="none" stroke="var(--text)" strokeWidth="2" />
-                      </svg>
-                    )}
-                    {room.type === 'lift' && (
-                      <svg viewBox="0 0 100 100" style={{ width: '44px', height: '44px' }}>
-                        <rect x="10" y="10" width="80" height="80" fill="none" stroke="var(--text)" strokeWidth="2" />
-                        <line x1="50" y1="10" x2="50" y2="90" stroke="var(--text)" strokeWidth="1.6" />
-                        <path d="M 40 40 L 50 30 L 60 40 M 40 60 L 50 70 L 60 60" fill="none" stroke="var(--text)" strokeWidth="1.6" />
-                      </svg>
-                    )}
+                    <RoomSymbol type={room.type} label={room.label} />
                   </div>
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.02)', paddingTop: '4px' }}>
