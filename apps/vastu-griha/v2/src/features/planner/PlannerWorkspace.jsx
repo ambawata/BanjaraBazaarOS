@@ -187,7 +187,14 @@ export default function PlannerWorkspace() {
 
   // Add room helpers
   const handleAddRoom = (template) => {
-    addRoom(template)
+    // A newly added door/window is a thin, easy-to-miss strip — select it
+    // immediately so its outline and the room action bar show up right
+    // away, instead of it silently landing somewhere on the canvas with
+    // no visible sign it was added at all. Canvas.jsx reads selection
+    // state from canvasStore, not the uiStore selectedRoomId destructured
+    // above, so it has to be set there directly.
+    const newId = addRoom(template)
+    useCanvasStore.getState().setSelectedRoomId(newId)
     setShowAddPopup(false)
     setActiveTab('designer')
   }

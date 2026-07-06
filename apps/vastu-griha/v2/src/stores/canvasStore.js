@@ -77,7 +77,14 @@ export const useCanvasStore = create((set, get) => ({
 
     const w = template.w || 15
     const h = template.h || 15
-    const { x, y } = findOpenSpot(rooms, w, h)
+    // Doors/windows landed wherever findOpenSpot found free space — often
+    // the middle of nowhere, tiny and easy to lose track of. They read as
+    // "openings" only when they actually sit on a wall, so default them to
+    // the plot's top boundary instead; wall-snapping while dragging takes
+    // over from there.
+    const { x, y } = template.category === 'opening'
+      ? { x: Math.max(2, 50 - w / 2), y: 0 }
+      : findOpenSpot(rooms, w, h)
 
     const newRoom = {
       id: Date.now().toString(),

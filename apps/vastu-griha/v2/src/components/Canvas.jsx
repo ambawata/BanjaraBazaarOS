@@ -871,27 +871,31 @@ export default function Canvas() {
               const hFt = Math.round((selectedRoom.height / 100) * plot.length)
 
               return (
-                <div className="room-action-panel">
-                  <span className="room-action-panel-label">Width</span>
-                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', -1)} title="1 ft narrower"><i className="ti ti-minus"></i></button>
-                  <input
-                    type="number"
-                    className="room-size-input"
-                    value={wFt}
-                    onChange={(e) => setFeet('w', e.target.value)}
-                    title="Type exact width in feet"
-                  />
-                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', 1)} title="1 ft wider"><i className="ti ti-plus"></i></button>
-                  <span className="room-action-panel-label">Length</span>
-                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', -1)} title="1 ft shorter"><i className="ti ti-minus"></i></button>
-                  <input
-                    type="number"
-                    className="room-size-input"
-                    value={hFt}
-                    onChange={(e) => setFeet('h', e.target.value)}
-                    title="Type exact length in feet"
-                  />
-                  <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', 1)} title="1 ft longer"><i className="ti ti-plus"></i></button>
+                <div className="room-action-panel room-action-panel-stack">
+                  <div className="room-action-panel-row">
+                    <span className="room-action-panel-label">Width</span>
+                    <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', -1)} title="1 ft narrower"><i className="ti ti-minus"></i></button>
+                    <input
+                      type="number"
+                      className="room-size-input"
+                      value={wFt}
+                      onChange={(e) => setFeet('w', e.target.value)}
+                      title="Type exact width in feet"
+                    />
+                    <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'w', 1)} title="1 ft wider"><i className="ti ti-plus"></i></button>
+                  </div>
+                  <div className="room-action-panel-row">
+                    <span className="room-action-panel-label">Length</span>
+                    <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', -1)} title="1 ft shorter"><i className="ti ti-minus"></i></button>
+                    <input
+                      type="number"
+                      className="room-size-input"
+                      value={hFt}
+                      onChange={(e) => setFeet('h', e.target.value)}
+                      title="Type exact length in feet"
+                    />
+                    <button className="btn-icon" onClick={() => resizeRoom(selectedRoomId, 'h', 1)} title="1 ft longer"><i className="ti ti-plus"></i></button>
+                  </div>
                 </div>
               )
             })()}
