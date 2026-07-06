@@ -5,6 +5,33 @@ import { useProjectStore } from './projectStore'
 let autosaveTimeout = null
 const DEBOUNCE_INTERVAL = 1500
 
+// New rooms used to always land at the same spot (35, 35) and stack directly
+// on top of whatever was already there — on a small phone screen that made
+// it impossible to tell rooms apart or tap the one you wanted. This scans a
+// grid of candidate spots and picks the first one that doesn't overlap an
+// existing room, so each new room lands somewhere you can actually see and
+// grab it.
+function findOpenSpot(rooms, w, h) {
+  const overlaps = (x, y) => rooms.some(r => {
+    if (r.category === 'opening' || r.category === 'remedy') return false
+    return x < r.x + r.width && x + w > r.x && y < r.y + r.height && y + h > r.y
+  })
+
+  const step = 8
+  for (let y = 2; y + h <= 100; y += step) {
+    for (let x = 2; x + w <= 100; x += step) {
+      if (!overlaps(x, y)) return { x, y }
+    }
+  }
+  // Plot is full — cascade diagonally from center so the new room is at
+  // least offset enough to see and drag it off the pile.
+  const offset = (rooms.length * 4) % 40
+  return {
+    x: Math.min(100 - w, 10 + offset),
+    y: Math.min(100 - h, 10 + offset)
+  }
+}
+
 const triggerAutosave = (rooms, plot) => {
   if (typeof window === 'undefined') return
   if (autosaveTimeout) clearTimeout(autosaveTimeout)
@@ -44,18 +71,22 @@ export const useCanvasStore = create((set, get) => ({
   addRoom: (template) => {
     const { rooms } = get()
     const { plot } = useProjectStore.getState()
-    
+
     // Save state to undo history before change
     useHistoryStore.getState().pushState(rooms, plot)
+
+    const w = template.w || 15
+    const h = template.h || 15
+    const { x, y } = findOpenSpot(rooms, w, h)
 
     const newRoom = {
       id: Date.now().toString(),
       type: template.type,
       label: template.label,
-      x: 35,
-      y: 35,
-      width: template.w || 15,
-      height: template.h || 15,
+      x,
+      y,
+      width: w,
+      height: h,
       category: template.category || 'room',
       rotation: template.rotation || 0,
       icon: template.icon

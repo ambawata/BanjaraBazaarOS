@@ -433,7 +433,7 @@ export default function Canvas() {
                 background: room.category === 'opening' || room.category === 'remedy' ? 'transparent' : undefined,
                 border: room.category === 'opening'
                   ? (isSelected ? '1.5px dashed var(--accent)' : 'none')
-                  : (room.category === 'remedy' ? 'none' : '5px double var(--text)'),
+                  : (room.category === 'remedy' ? 'none' : '4px solid var(--text)'),
                 boxShadow: 'none',
                 transform: room.rotation ? `rotate(${room.rotation}deg)` : undefined,
                 borderRadius: room.category === 'remedy' ? '50%' : '2px',
@@ -670,30 +670,40 @@ export default function Canvas() {
                   {/* Detailed 2D architectural symbols inside rooms — drawn clearly
                       (not faded watermarks) so the plan reads like a real drawing.
                       Shared with the printable professional floor plan export. */}
-                  {roomPxW > 60 && roomPxH > 60 && (
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.55, pointerEvents: 'none' }}>
-                      <RoomSymbol type={room.type} label={room.label} />
+                  {roomPxW > 78 && roomPxH > 78 && (
+                    <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', overflow: 'hidden' }}>
+                      <RoomSymbol type={room.type} label={room.label} size={Math.max(28, Math.min(50, Math.min(roomPxW, roomPxH) * 0.55))} />
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 'auto', textAlign: 'center', lineHeight: 1.1 }}>
-                    <span style={{
-                      fontSize: roomPxW < 70 || roomPxH < 70 ? '8.5px' : '10.5px',
-                      fontWeight: 700,
-                      letterSpacing: '0.01em',
-                      textTransform: 'uppercase',
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      maxWidth: '100%',
-                      color: 'var(--text)'
+                  {/* Room name as a floating pill badge (matches the reference
+                      floor plan style) instead of plain text, so it reads
+                      clearly against the furniture drawing behind it. */}
+                  <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 'auto', pointerEvents: 'none' }}>
+                    <div style={{
+                      background: 'var(--text)',
+                      color: 'var(--bg2)',
+                      borderRadius: '999px',
+                      padding: roomPxW < 70 || roomPxH < 70 ? '2px 8px' : '4px 12px',
+                      maxWidth: '92%',
+                      textAlign: 'center',
+                      lineHeight: 1.25
                     }}>
-                      {room.label}
-                    </span>
-                    {roomPxW > 55 && roomPxH > 55 && (
-                      <span style={{ fontSize: '8px', color: 'var(--text3)', fontFamily: 'var(--fm)' }}>
-                        {Math.round(wFeet)}' x {Math.round(hFeet)}'
-                      </span>
-                    )}
+                      <div style={{
+                        fontSize: roomPxW < 70 || roomPxH < 70 ? '8px' : '10.5px',
+                        fontWeight: 700,
+                        letterSpacing: '0.01em',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word'
+                      }}>
+                        {room.label}
+                      </div>
+                      {roomPxW > 55 && roomPxH > 55 && (
+                        <div style={{ fontSize: '7.5px', opacity: 0.75, fontFamily: 'var(--fm)' }}>
+                          {Math.round(wFeet)}' x {Math.round(hFeet)}'
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
