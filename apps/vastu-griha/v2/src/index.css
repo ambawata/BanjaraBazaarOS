@@ -586,6 +586,20 @@ body {
   color: #dc2626;
 }
 
+/* Small Vastu-status dot — replaces the old full-width status pill so a
+   room reads as "a room" (label + drawing) instead of "a dashboard card" */
+.placed-room-vastu-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+  z-index: 3;
+}
+.compliance-dot-excellent { background: #10b981; }
+.compliance-dot-good { background: #f59e0b; }
+.compliance-dot-warning { background: #f97316; }
+.compliance-dot-poor { background: #ef4444; }
+
 /* Sidebar Designer Drawer - Canva Room Catalog */
 .designer-drawer {
   width: 240px;

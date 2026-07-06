@@ -8,6 +8,16 @@ import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
 import RoomSymbol from './RoomSymbol'
 
+// evaluateRoom's status text has spaces ("Needs Attention"), which breaks a
+// className if used directly -- the browser reads it as two separate classes.
+// Map to a single CSS-safe word instead.
+function complianceClassFor(status) {
+  if (status === 'Excellent') return 'excellent'
+  if (status === 'Good' || status === 'Neutral') return 'good'
+  if (status === 'Can Be Improved') return 'warning'
+  return 'poor'
+}
+
 export default function Canvas() {
   const {
     rooms,
@@ -408,21 +418,23 @@ export default function Canvas() {
           const wFeet = coordinateSystem.pctToFeet(room.width, plot.width)
           const hFeet = coordinateSystem.pctToFeet(room.height, plot.length)
           const areaFeet = wFeet * hFeet
-          
+          const roomPxW = (room.width / 100) * plotDims.w
+          const roomPxH = (room.height / 100) * plotDims.h
+
           return (
             <div
               key={room.id}
-              className={`placed-room compliance-${evalRes.status.toLowerCase()} ${isSelected ? 'selected' : ''}`}
+              className={`placed-room compliance-${complianceClassFor(evalRes.status)} ${isSelected ? 'selected' : ''}`}
               style={{
                 left: `${room.x}%`,
                 top: `${room.y}%`,
                 width: `${room.width}%`,
                 height: `${room.height}%`,
                 background: room.category === 'opening' || room.category === 'remedy' ? 'transparent' : undefined,
-                border: room.category === 'opening' 
-                  ? (isSelected ? '1.5px dashed var(--accent)' : 'none') 
+                border: room.category === 'opening'
+                  ? (isSelected ? '1.5px dashed var(--accent)' : 'none')
                   : (room.category === 'remedy' ? 'none' : '5px double var(--text)'),
-                boxShadow: room.category === 'opening' || room.category === 'remedy' ? 'none' : '0 4px 10px rgba(0,0,0,0.15)',
+                boxShadow: 'none',
                 transform: room.rotation ? `rotate(${room.rotation}deg)` : undefined,
                 borderRadius: room.category === 'remedy' ? '50%' : '2px',
                 padding: '6px',
@@ -633,39 +645,43 @@ export default function Canvas() {
                 </div>
               )}
 
-              {/* Standard Room Card rendering */}
+              {/* Standard Room rendering — drawn like an actual floor-plan room
+                  (label + symbol + dimensions inside the walls), not a UI card
+                  with a header/footer bar, so it reads as "a room" not "a box".
+                  Small Vastu-status dot in the corner replaces the old status
+                  pill; delete happens via the selection toolbar below. */}
               {(!room.category || room.category === 'room') && (
                 <>
-                  <div className="placed-room-header" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '4px', marginBottom: '4px' }}>
-                    <span className="placed-room-title" style={{ textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em', fontSize: '11.5px' }}>{room.label}</span>
-                    {editMode !== 'view' && (
-                      <i 
-                        className="ti ti-x placed-room-close"
-                        onClick={(e) => handleRemoveRoom(room.id, e)}
-                        title="Remove room"
-                      ></i>
-                    )}
-                  </div>
-                  
+                  {isSelected && editMode !== 'view' && (
+                    <i
+                      className="ti ti-x placed-room-close"
+                      onClick={(e) => handleRemoveRoom(room.id, e)}
+                      title="Remove room"
+                      style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 3 }}
+                    ></i>
+                  )}
+                  <span
+                    className={`placed-room-vastu-dot compliance-dot-${complianceClassFor(evalRes.status)}`}
+                    title={evalRes.status}
+                    style={{ position: 'absolute', top: '4px', left: '4px' }}
+                  />
+
                   {/* Detailed 2D architectural symbols inside rooms — drawn clearly
                       (not faded watermarks) so the plan reads like a real drawing.
                       Shared with the printable professional floor plan export. */}
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.62, pointerEvents: 'none' }}>
                     <RoomSymbol type={room.type} label={room.label} />
                   </div>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.02)', paddingTop: '4px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span className="placed-room-size" style={{ fontSize: '9px', fontWeight: 'bold', fontFamily: 'var(--fm)' }}>
-                        {Math.round(wFeet)}x{Math.round(hFeet)} FT
-                      </span>
-                      <span className="placed-room-size" style={{ fontSize: '8px', color: 'var(--text3)', fontFamily: 'var(--fm)' }}>
-                        {Math.round(areaFeet)} SQ FT
-                      </span>
-                    </div>
-                    <span className="placed-room-status" style={{ fontSize: '8.5px', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                      {evalRes.status.toUpperCase()}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 'auto', textAlign: 'center' }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.01em', textTransform: 'uppercase', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                      {room.label}
                     </span>
+                    {roomPxW > 55 && roomPxH > 55 && (
+                      <span style={{ fontSize: '8px', color: 'var(--text3)', fontFamily: 'var(--fm)' }}>
+                        {Math.round(wFeet)}' x {Math.round(hFeet)}'
+                      </span>
+                    )}
                   </div>
                 </>
               )}
