@@ -560,29 +560,36 @@ export default function Canvas() {
               {/* Specialized Blueprint Renderings depending on Category */}
               {room.category === 'opening' && (
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                  {/* Standard architectural door symbol: a thin door-leaf
+                      line at the hinge, plus a quarter-circle swing arc to
+                      the fully-open position — the same convention used on
+                      real blueprints (matches the reference style Vinod
+                      pointed to). Solid ink-black lines, not a colored or
+                      dashed decoration. */}
                   {room.type === 'door' && (
                     <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                      {/* Wall line cut indicator */}
-                      <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text3)" strokeWidth="3" />
-                      {/* Door panel swing */}
-                      <line x1="0" y1="95" x2="0" y2="5" stroke="var(--accent)" strokeWidth="5.5" strokeLinecap="round" />
-                      {/* Swing arc */}
-                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--accent)" strokeWidth="2" strokeDasharray="4 4" />
+                      <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="2" />
+                      <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="2" />
+                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.2" />
                     </svg>
                   )}
+                  {/* Standard window symbol: a break in the wall filled
+                      with two thin parallel lines (the glass pane), no
+                      color tint — same as the door/room drawings. */}
                   {room.type === 'window' && (
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-                      <rect x="0" y="30" width="100" height="40" fill="rgba(0, 180, 216, 0.15)" stroke="var(--text2)" strokeWidth="2" />
-                      <line x1="0" y1="50" x2="100" y2="50" stroke="var(--text)" strokeWidth="1.5" />
+                      <rect x="0" y="30" width="100" height="40" fill="var(--bg2)" stroke="var(--text)" strokeWidth="2" />
+                      <line x1="0" y1="40" x2="100" y2="40" stroke="var(--text)" strokeWidth="1.2" />
+                      <line x1="0" y1="60" x2="100" y2="60" stroke="var(--text)" strokeWidth="1.2" />
                     </svg>
                   )}
                   {room.type === 'ventilator' && (
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-                      <rect x="0" y="15" width="100" height="70" fill="none" stroke="var(--text2)" strokeWidth="2" />
-                      <line x1="20" y1="15" x2="20" y2="85" stroke="var(--text2)" strokeWidth="1.5" />
-                      <line x1="40" y1="15" x2="40" y2="85" stroke="var(--text2)" strokeWidth="1.5" />
-                      <line x1="60" y1="15" x2="60" y2="85" stroke="var(--text2)" strokeWidth="1.5" />
-                      <line x1="80" y1="15" x2="80" y2="85" stroke="var(--text2)" strokeWidth="1.5" />
+                      <rect x="0" y="15" width="100" height="70" fill="none" stroke="var(--text)" strokeWidth="2" />
+                      <line x1="20" y1="15" x2="20" y2="85" stroke="var(--text)" strokeWidth="1.2" />
+                      <line x1="40" y1="15" x2="40" y2="85" stroke="var(--text)" strokeWidth="1.2" />
+                      <line x1="60" y1="15" x2="60" y2="85" stroke="var(--text)" strokeWidth="1.2" />
+                      <line x1="80" y1="15" x2="80" y2="85" stroke="var(--text)" strokeWidth="1.2" />
                     </svg>
                   )}
                   {/* Floating minimal category name when selected */}
