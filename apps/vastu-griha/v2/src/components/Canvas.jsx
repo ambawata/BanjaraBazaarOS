@@ -7,6 +7,7 @@ import { useUiStore } from '../stores/uiStore'
 import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
 import { hasRoomCollision } from '../lib/geometry/collisionEngine'
+import { getPadasInZone } from '../lib/vastu/padaKnowledge'
 import RoomSymbol from './RoomSymbol'
 
 // evaluateRoom's status text has spaces ("Needs Attention"), which breaks a
@@ -101,10 +102,13 @@ export default function Canvas() {
   // Which single inner-wall edge of the selected room has its own
   // thickness-editing panel open — { roomId, side } or null.
   const [selectedWallEdge, setSelectedWallEdge] = useState(null)
+  // Which pada's "Why?" detail is expanded in the Vastu tab, if any.
+  const [expandedPadaId, setExpandedPadaId] = useState(null)
 
   useEffect(() => {
     setActivePanel(null)
     setSelectedWallEdge(null)
+    setExpandedPadaId(null)
   }, [selectedRoomId])
 
   // The zoomed pixel size of the plot — dragging/resizing math and the
@@ -1226,15 +1230,83 @@ export default function Canvas() {
                 </div>
               )
             })()}
-            {activePanel === 'info' && (
-              <div className="room-action-panel room-action-panel-text">
-                <span className={`compliance-dot-${complianceClassFor(info.status)} room-info-dot`}></span>
-                <div>
-                  <strong>{info.status}</strong> in the {info.zone}
-                  <p>{info.desc}</p>
+            {activePanel === 'info' && (() => {
+              // evaluateRoom's zone code uses 'C' for center; the pada
+              // knowledge table spells it 'Center'.
+              const zoneCode = info.zone === 'C' ? 'Center' : info.zone
+              const padas = getPadasInZone(zoneCode)
+              const dots = (pct) => {
+                const filled = Math.round((pct ?? 0) / 20)
+                return '●'.repeat(filled) + '○'.repeat(5 - filled)
+              }
+
+              return (
+                <div className="room-action-panel room-action-panel-stack room-action-panel-text pada-panel">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <span className={`compliance-dot-${complianceClassFor(info.status)} room-info-dot`}></span>
+                    <div>
+                      <strong>{info.status}</strong> in the {zoneCode} zone
+                      <p>{info.desc}</p>
+                    </div>
+                  </div>
+
+                  {/* This zone spans several padas at the app's current
+                      3x3 scoring resolution — each has its own deity and
+                      (where researched) its own confidence-scored reading,
+                      shown honestly rather than collapsed into one verdict. */}
+                  <div className="pada-list">
+                    {padas.map(p => (
+                      <div key={p.pada_id} className="pada-row">
+                        <div className="pada-row-header">
+                          <span className="pada-deity">{p.deity_name}</span>
+                          <span className="pada-ring">{p.ring} ring</span>
+                        </div>
+                        <div className="pada-confidence-line">
+                          <span>Location {dots(p.location_confidence)} {p.location_confidence}%</span>
+                        </div>
+                        {p.effectResearched ? (
+                          <div className="pada-confidence-line">
+                            <span>Effect consensus {dots(p.effect_confidence)} {p.effect_confidence}%</span>
+                          </div>
+                        ) : (
+                          <div className="pada-not-researched">Effect reading not yet researched for this pada.</div>
+                        )}
+                        <button
+                          className="pada-why-btn"
+                          onClick={() => setExpandedPadaId(id => id === p.pada_id ? null : p.pada_id)}
+                        >
+                          {expandedPadaId === p.pada_id ? 'Hide' : 'Why?'}
+                        </button>
+                        {expandedPadaId === p.pada_id && (
+                          <div className="pada-why-detail">
+                            {p.effectResearched ? (
+                              <>
+                                {p.traditional_interpretation.reported_benefits.length > 0 && (
+                                  <>
+                                    <strong>Reported benefits</strong>
+                                    <ul>{p.traditional_interpretation.reported_benefits.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                                  </>
+                                )}
+                                {p.traditional_interpretation.reported_challenges.length > 0 && (
+                                  <>
+                                    <strong>Reported challenges</strong>
+                                    <ul>{p.traditional_interpretation.reported_challenges.map((c, i) => <li key={i}>{c}</li>)}</ul>
+                                  </>
+                                )}
+                                <p className="pada-disagreement-note">{p.traditional_interpretation.source_disagreement_note}</p>
+                              </>
+                            ) : (
+                              <p className="pada-disagreement-note">{p.traditional_interpretation.source_disagreement_note}</p>
+                            )}
+                            <p className="pada-sources">Sources: {p.classical_references.join(' · ')}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
             {activePanel === 'more' && (
               <div className="room-action-panel room-action-panel-stack">
                 <input

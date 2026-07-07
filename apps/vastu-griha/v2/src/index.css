@@ -592,6 +592,96 @@ body {
   margin-top: 4px;
 }
 
+/* Vastu Knowledge Engine panel — one card per pada in the room's zone,
+   each showing its own confidence-scored reading rather than one
+   collapsed verdict for the whole zone. */
+.pada-panel {
+  max-width: 340px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.pada-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.pada-row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+}
+.pada-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.pada-deity {
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.pada-ring {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+.pada-confidence-line {
+  font-size: 10.5px;
+  color: var(--text2);
+  font-family: var(--fm);
+  margin-top: 2px;
+}
+.pada-not-researched {
+  font-size: 10.5px;
+  color: var(--text3);
+  font-style: italic;
+  margin-top: 2px;
+}
+.pada-why-btn {
+  margin-top: 6px;
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.pada-why-detail {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+}
+.pada-why-detail strong {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 6px;
+}
+.pada-why-detail ul {
+  margin: 4px 0 0 0;
+  padding-left: 16px;
+}
+.pada-why-detail li {
+  margin-bottom: 2px;
+}
+.pada-disagreement-note {
+  margin-top: 8px !important;
+  font-style: italic;
+  color: var(--text2);
+}
+.pada-sources {
+  margin-top: 6px !important;
+  font-size: 9.5px;
+  color: var(--text3);
+}
+
 .room-action-tabs {
   width: 100%;
   max-width: 420px;
