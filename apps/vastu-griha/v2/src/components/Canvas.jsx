@@ -6,6 +6,7 @@ import { useSettingsStore } from '../stores/settingsStore'
 import { useUiStore } from '../stores/uiStore'
 import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
+import { hasRoomCollision } from '../lib/geometry/collisionEngine'
 import RoomSymbol from './RoomSymbol'
 
 // evaluateRoom's status text has spaces ("Needs Attention"), which breaks a
@@ -237,6 +238,27 @@ export default function Canvas() {
           newX = Math.max(0, Math.min(100 - targetRoom.width, newX))
           newY = Math.max(0, Math.min(100 - targetRoom.height, newY))
         }
+      } else {
+        // Collision-aware move: try both axes together first; if that
+        // would overlap a neighboring room, try each axis alone so the
+        // room can still slide along a wall it's touching instead of
+        // just refusing to move the instant it makes contact.
+        const prevX = targetRoom.x
+        const prevY = targetRoom.y
+        const tryBoth = { ...targetRoom, x: newX, y: newY }
+
+        if (hasRoomCollision(tryBoth, rooms, targetRoom.id)) {
+          const tryX = { ...targetRoom, x: newX, y: prevY }
+          const tryY = { ...targetRoom, x: prevX, y: newY }
+          if (!hasRoomCollision(tryX, rooms, targetRoom.id)) {
+            newY = prevY
+          } else if (!hasRoomCollision(tryY, rooms, targetRoom.id)) {
+            newX = prevX
+          } else {
+            newX = prevX
+            newY = prevY
+          }
+        }
       }
 
       targetRoom.x = Math.round(newX * 10) / 10
@@ -265,6 +287,17 @@ export default function Canvas() {
       } else {
         newY = Math.max(0, Math.min(farY - 10, snap(dragState.startYCoord + deltaYPercent)))
         newH = farY - newY
+      }
+
+      // Reject this frame's resize if it would grow into a neighboring
+      // room — the room stops right at the shared wall instead of
+      // overlapping it.
+      const resizeCandidate = { ...targetRoom, x: newX, y: newY, width: newW, height: newH }
+      if (hasRoomCollision(resizeCandidate, rooms, targetRoom.id)) {
+        newX = targetRoom.x
+        newY = targetRoom.y
+        newW = targetRoom.width
+        newH = targetRoom.height
       }
 
       targetRoom.x = Math.round(newX * 10) / 10
@@ -325,6 +358,25 @@ export default function Canvas() {
     deleteRoom(roomId)
   }
 
+  // A room drawn on top of the grid (z-index puts rooms above it) can slice
+  // straight through the middle of a zone label, leaving an illegible
+  // fragment like "N R" or "OUND" visible on either side of it. Rather than
+  // let that happen, hide a cell's text entirely once a room covers a
+  // meaningful chunk of it — better a blank cell than a sliced one.
+  const isVastuCellCovered = (r, c) => {
+    const cellX = c * (100 / 3)
+    const cellY = r * (100 / 3)
+    const cellSize = 100 / 3
+    return rooms.some(room => {
+      if (room.category && room.category !== 'room') return false
+      const overlapX = Math.min(cellX + cellSize, room.x + room.width) - Math.max(cellX, room.x)
+      const overlapY = Math.min(cellY + cellSize, room.y + room.height) - Math.max(cellY, room.y)
+      if (overlapX <= 0 || overlapY <= 0) return false
+      const overlapArea = overlapX * overlapY
+      return overlapArea / (cellSize * cellSize) > 0.3
+    })
+  }
+
   // Draw grid overlays
   const renderVastuGrid = () => {
     const zones = [
@@ -337,11 +389,12 @@ export default function Canvas() {
       ['Space Element', 'Sacred Center', 'Solar Energy'],
       ['Earth Stability', 'Ancestral Ground', 'Sacral Fire']
     ]
-    
+
     const cells = []
     for(let r=0; r<3; r++) {
       for(let c=0; c<3; c++) {
         const isBrahmasthan = r === 1 && c === 1
+        const covered = isVastuCellCovered(r, c)
         cells.push(
           <div 
             key={`${r}-${c}`} 
@@ -359,7 +412,7 @@ export default function Canvas() {
               background: isBrahmasthan ? 'radial-gradient(circle, rgba(245, 166, 35, 0.05) 0%, transparent 80%)' : undefined
             }}
           >
-            {isBrahmasthan && (
+            {isBrahmasthan && !covered && (
               <svg viewBox="0 0 100 100" style={{ position: 'absolute', width: '70%', height: '70%', opacity: 0.22, pointerEvents: 'none', fill: 'none', stroke: 'var(--gold)', strokeWidth: 1.2 }}>
                 <circle cx="50" cy="50" r="40" />
                 <circle cx="50" cy="50" r="28" strokeDasharray="3 3" />
@@ -370,12 +423,16 @@ export default function Canvas() {
                 <circle cx="50" cy="50" r="6" fill="var(--gold)" />
               </svg>
             )}
-            <span className="vastu-cell-label" style={{ fontSize: '9px', fontFamily: 'var(--fd)', fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.04em' }}>
-              {zones[r][c]}
-            </span>
-            <span className="vastu-cell-element" style={{ fontSize: '8px', fontFamily: 'var(--fb)', fontWeight: 600, opacity: 0.7, color: 'var(--text2)', textTransform: 'uppercase' }}>
-              {elements[r][c]}
-            </span>
+            {!covered && (
+              <>
+                <span className="vastu-cell-label" style={{ fontSize: '9px', fontFamily: 'var(--fd)', fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.04em' }}>
+                  {zones[r][c]}
+                </span>
+                <span className="vastu-cell-element" style={{ fontSize: '8px', fontFamily: 'var(--fb)', fontWeight: 600, opacity: 0.7, color: 'var(--text2)', textTransform: 'uppercase' }}>
+                  {elements[r][c]}
+                </span>
+              </>
+            )}
           </div>
         )
       }
@@ -402,6 +459,132 @@ export default function Canvas() {
   const clipPathVal = shape === 'Irregular'
     ? `polygon(0% 0%, ${pctTR_X}% 0%, ${pctBR_X}% ${pctBR_Y}%, 0% ${pctBL_Y}%)`
     : 'none'
+
+  // Contractor-grade dimension lines around the outside of the plot
+  // boundary — one per side, with a tick mark (✕, not an arrowhead) at
+  // each breakpoint. A side shows its own segment lengths (where rooms
+  // touching that wall break it up) plus one overall total further out,
+  // reusing the same 0-100% room coordinate space everything else here
+  // already uses rather than introducing a separate measurement system.
+  const DIM_MARGIN = 46
+  const DIM_NEAR = 14
+  const DIM_FAR = 32
+
+  const getSideBreakpoints = (side) => {
+    const EPS = 1.5
+    const spans = []
+    rooms.forEach(room => {
+      if (room.category && room.category !== 'room') return
+      if (side === 'top' && room.y <= EPS) spans.push([room.x, room.x + room.width])
+      else if (side === 'bottom' && room.y + room.height >= 100 - EPS) spans.push([room.x, room.x + room.width])
+      else if (side === 'left' && room.x <= EPS) spans.push([room.y, room.y + room.height])
+      else if (side === 'right' && room.x + room.width >= 100 - EPS) spans.push([room.y, room.y + room.height])
+    })
+    const points = new Set([0, 100])
+    spans.forEach(([a, b]) => {
+      points.add(Math.round(a * 10) / 10)
+      points.add(Math.round(b * 10) / 10)
+    })
+    return [...points].sort((a, b) => a - b)
+  }
+
+  const renderDimensionLines = () => {
+    const W = zoomedDims.w
+    const H = zoomedDims.h
+    const sideLengthFt = {
+      top: shape === 'Irregular' ? northWall : plot.width,
+      bottom: shape === 'Irregular' ? southWall : plot.width,
+      left: shape === 'Irregular' ? westWall : plot.length,
+      right: shape === 'Irregular' ? eastWall : plot.length
+    }
+
+    let key = 0
+    const els = []
+
+    const tick = (x, y) => {
+      els.push(
+        <g key={`tick-${key++}`} stroke="var(--text2)" strokeWidth="1">
+          <line x1={x - 3.5} y1={y - 3.5} x2={x + 3.5} y2={y + 3.5} />
+          <line x1={x - 3.5} y1={y + 3.5} x2={x + 3.5} y2={y - 3.5} />
+        </g>
+      )
+    }
+
+    const label = (x, y, text) => {
+      els.push(
+        <text
+          key={`label-${key++}`}
+          x={x} y={y}
+          fill="var(--text2)"
+          fontSize="8"
+          fontFamily="var(--fm)"
+          fontWeight="700"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {text}
+        </text>
+      )
+    }
+
+    ;['top', 'bottom', 'left', 'right'].forEach(side => {
+      const isHorizontal = side === 'top' || side === 'bottom'
+      const totalFt = sideLengthFt[side]
+      const breakpoints = getSideBreakpoints(side)
+      const segments = []
+      for (let i = 0; i < breakpoints.length - 1; i++) segments.push([breakpoints[i], breakpoints[i + 1]])
+      const showSegments = segments.length > 1
+
+      const pctToPx = (pct) => DIM_MARGIN + (pct / 100) * (isHorizontal ? W : H)
+      const nearPos = side === 'top' ? DIM_MARGIN - DIM_NEAR
+        : side === 'bottom' ? DIM_MARGIN + H + DIM_NEAR
+        : side === 'left' ? DIM_MARGIN - DIM_NEAR
+        : DIM_MARGIN + W + DIM_NEAR
+      const farPos = side === 'top' ? DIM_MARGIN - DIM_FAR
+        : side === 'bottom' ? DIM_MARGIN + H + DIM_FAR
+        : side === 'left' ? DIM_MARGIN - DIM_FAR
+        : DIM_MARGIN + W + DIM_FAR
+
+      // Segment line (closer to the wall) — only when the wall is
+      // actually broken into more than one piece by rooms touching it.
+      if (showSegments) {
+        segments.forEach(([a, b]) => {
+          const pA = pctToPx(a)
+          const pB = pctToPx(b)
+          const mid = (pA + pB) / 2
+          const segFt = Math.round(((b - a) / 100) * totalFt * 10) / 10
+          if (isHorizontal) {
+            els.push(<line key={`seg-${key++}`} x1={pA} y1={nearPos} x2={pB} y2={nearPos} stroke="var(--text2)" strokeWidth="1" />)
+            tick(pA, nearPos); tick(pB, nearPos)
+            label(mid, nearPos + (side === 'top' ? -6 : 10), `${segFt}'`)
+          } else {
+            els.push(<line key={`seg-${key++}`} x1={nearPos} y1={pA} x2={nearPos} y2={pB} stroke="var(--text2)" strokeWidth="1" />)
+            tick(nearPos, pA); tick(nearPos, pB)
+            label(side === 'left' ? nearPos - 10 : nearPos + 10, mid, `${segFt}'`)
+          }
+        })
+      }
+
+      // Overall total — always shown; sits further out than the segment
+      // line when both are present.
+      const overallPos = showSegments ? farPos : nearPos
+      const p0 = pctToPx(0)
+      const p100 = pctToPx(100)
+      const overallMid = (p0 + p100) / 2
+      const totalLabel = `${Math.round(totalFt * 10) / 10}'`
+      if (isHorizontal) {
+        els.push(<line key={`all-${key++}`} x1={p0} y1={overallPos} x2={p100} y2={overallPos} stroke="var(--text2)" strokeWidth="1.2" />)
+        tick(p0, overallPos); tick(p100, overallPos)
+        label(overallMid, overallPos + (side === 'top' ? -6 : 10), totalLabel)
+      } else {
+        els.push(<line key={`all-${key++}`} x1={overallPos} y1={p0} x2={overallPos} y2={p100} stroke="var(--text2)" strokeWidth="1.2" />)
+        tick(overallPos, p0); tick(overallPos, p100)
+        label(side === 'left' ? overallPos - 10 : overallPos + 10, overallMid, totalLabel)
+      }
+    })
+
+    return els
+  }
 
   return (
     <div
@@ -434,23 +617,33 @@ export default function Canvas() {
           )}
         </div>
       )}
-      <div
-        className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
-        ref={plotRef}
-        style={{
-          width: `${zoomedDims.w}px`,
-          height: `${zoomedDims.h}px`,
-          position: 'relative',
-          clipPath: clipPathVal,
-          // Outer (plot boundary) wall renders visibly thicker than the
-          // 3px inner room walls above — that's the real distinction a
-          // contractor needs, not just a thin outline.
-          border: shape === 'Irregular' ? 'none' : `6px solid ${isBlueprint ? '#000' : 'var(--text)'}`,
-          borderRadius: '0px',
-          flexShrink: 0,
-          background: isBlueprint ? '#fff' : undefined
-        }}
-      >
+      {/* Frame around the plot boundary that reserves space for the
+          dimension lines drawn outside it, so they don't get clipped by
+          the plot-wrapper's own overflow:hidden. */}
+      <div style={{ position: 'relative', padding: `${DIM_MARGIN}px`, flexShrink: 0 }}>
+        <svg
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible', zIndex: 6 }}
+          viewBox={`0 0 ${zoomedDims.w + DIM_MARGIN * 2} ${zoomedDims.h + DIM_MARGIN * 2}`}
+        >
+          {renderDimensionLines()}
+        </svg>
+        <div
+          className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
+          ref={plotRef}
+          style={{
+            width: `${zoomedDims.w}px`,
+            height: `${zoomedDims.h}px`,
+            position: 'relative',
+            clipPath: clipPathVal,
+            // Outer (plot boundary) wall renders visibly thicker than the
+            // 3px inner room walls above — that's the real distinction a
+            // contractor needs, not just a thin outline.
+            border: shape === 'Irregular' ? 'none' : `6px solid ${isBlueprint ? '#000' : 'var(--text)'}`,
+            borderRadius: '0px',
+            flexShrink: 0,
+            background: isBlueprint ? '#fff' : undefined
+          }}
+        >
         {/* Custom Wall Outline & Length Labels overlay — only while the plot is
             still empty; once rooms are placed these labels just clutter the canvas */}
         {shape === 'Irregular' && rooms.length === 0 && (
@@ -853,6 +1046,7 @@ export default function Canvas() {
             </div>
           )
         })}
+        </div>
       </div>
 
       {/* Canva-style bottom action bar — a row of tabs docked to the
@@ -880,10 +1074,14 @@ export default function Canvas() {
                 if (!feet || feet <= 0) return
                 if (dimension === 'w') {
                   const pct = Math.min(100 - selectedRoom.x, Math.max(3, feet) / plot.width * 100)
-                  setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, width: Math.round(pct * 10) / 10 } : r))
+                  const candidate = { ...selectedRoom, width: Math.round(pct * 10) / 10 }
+                  if (hasRoomCollision(candidate, rooms, selectedRoomId)) return
+                  setRooms(rooms.map(r => r.id === selectedRoomId ? candidate : r))
                 } else {
                   const pct = Math.min(100 - selectedRoom.y, Math.max(3, feet) / plot.length * 100)
-                  setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, height: Math.round(pct * 10) / 10 } : r))
+                  const candidate = { ...selectedRoom, height: Math.round(pct * 10) / 10 }
+                  if (hasRoomCollision(candidate, rooms, selectedRoomId)) return
+                  setRooms(rooms.map(r => r.id === selectedRoomId ? candidate : r))
                 }
               }
               const wFt = Math.round((selectedRoom.width / 100) * plot.width)

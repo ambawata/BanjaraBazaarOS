@@ -1,36 +1,7 @@
 import { create } from 'zustand'
 import { useHistoryStore } from './historyStore'
 import { useProjectStore } from './projectStore'
-
-let autosaveTimeout = null
-const DEBOUNCE_INTERVAL = 1500
-
-// New rooms used to always land at the same spot (35, 35) and stack directly
-// on top of whatever was already there — on a small phone screen that made
-// it impossible to tell rooms apart or tap the one you wanted. This scans a
-// grid of candidate spots and picks the first one that doesn't overlap an
-// existing room, so each new room lands somewhere you can actually see and
-// grab it.
-function findOpenSpot(rooms, w, h) {
-  const overlaps = (x, y) => rooms.some(r => {
-    if (r.category === 'opening' || r.category === 'remedy') return false
-    return x < r.x + r.width && x + w > r.x && y < r.y + r.height && y + h > r.y
-  })
-
-  const step = 8
-  for (let y = 2; y + h <= 100; y += step) {
-    for (let x = 2; x + w <= 100; x += step) {
-      if (!overlaps(x, y)) return { x, y }
-    }
-  }
-  // Plot is full — cascade diagonally from center so the new room is at
-  // least offset enough to see and drag it off the pile.
-  const offset = (rooms.length * 4) % 40
-  return {
-    x: Math.min(100 - w, 10 + offset),
-    y: Math.min(100 - h, 10 + offset)
-  }
-}
+import { hasRoomCollision, findOpenSpot, resolveOverlaps } from '../lib/geometry/collisionEngine'
 
 const triggerAutosave = (rooms, plot) => {
   if (typeof window === 'undefined') return
@@ -84,7 +55,7 @@ export const useCanvasStore = create((set, get) => ({
     // over from there.
     const { x, y } = template.category === 'opening'
       ? { x: Math.max(2, 50 - w / 2), y: 0 }
-      : findOpenSpot(rooms, w, h)
+      : findOpenSpot(w, h, rooms)
 
     const newRoom = {
       id: Date.now().toString(),
@@ -132,10 +103,7 @@ export const useCanvasStore = create((set, get) => ({
     const index = rooms.findIndex(r => r.id === id)
     if (index === -1) return
 
-    useHistoryStore.getState().pushState(rooms, plot)
-
-    const updated = [...rooms]
-    const r = { ...updated[index] }
+    const r = { ...rooms[index] }
     // A fixed percentage step moved a different number of real feet
     // depending on the plot's size — 1 tap could nudge a room 2ft on one
     // wall and 3ft on another. Converting 1 real foot into the matching
@@ -148,6 +116,12 @@ export const useCanvasStore = create((set, get) => ({
     else if (direction === 'up') r.y = Math.max(0, r.y - stepY)
     else if (direction === 'down') r.y = Math.min(100 - r.height, r.y + stepY)
 
+    // Stop the nudge right at a neighboring room's edge instead of
+    // stepping through it.
+    if (hasRoomCollision(r, rooms, id)) return
+
+    useHistoryStore.getState().pushState(rooms, plot)
+    const updated = [...rooms]
     updated[index] = r
     set({ rooms: updated })
     triggerAutosave(updated, plot)
@@ -159,10 +133,7 @@ export const useCanvasStore = create((set, get) => ({
     const index = rooms.findIndex(r => r.id === id)
     if (index === -1) return
 
-    useHistoryStore.getState().pushState(rooms, plot)
-
-    const updated = [...rooms]
-    const r = { ...updated[index] }
+    const r = { ...rooms[index] }
 
     // Same fix as nudge — step by exactly 1 real foot on whichever axis,
     // instead of a flat 5% that translated to a different foot count
@@ -179,6 +150,12 @@ export const useCanvasStore = create((set, get) => ({
       else r.height = Math.max(minHeight, r.height - step)
     }
 
+    // Stop the resize right at a neighboring room's edge instead of
+    // growing through it.
+    if (hasRoomCollision(r, rooms, id)) return
+
+    useHistoryStore.getState().pushState(rooms, plot)
+    const updated = [...rooms]
     updated[index] = r
     set({ rooms: updated })
     triggerAutosave(updated, plot)
@@ -214,7 +191,16 @@ export const useCanvasStore = create((set, get) => ({
     if (saved) {
       try {
         const { rooms, plot } = JSON.parse(saved)
-        if (Array.isArray(rooms)) set({ rooms })
+        if (Array.isArray(rooms)) {
+          // Layouts saved before overlap-prevention existed (or from any
+          // other bad state) may already have rooms stacked on top of each
+          // other. Repair that once on load instead of leaving it broken
+          // forever, since the drag/resize/nudge guards only stop new
+          // overlaps from forming going forward.
+          const { rooms: fixedRooms, changed } = resolveOverlaps(rooms)
+          set({ rooms: fixedRooms })
+          if (changed) triggerAutosave(fixedRooms, plot || useProjectStore.getState().plot)
+        }
         if (plot) useProjectStore.getState().setPlot(plot)
         return true
       } catch (e) {
