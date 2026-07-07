@@ -19,6 +19,17 @@ function complianceClassFor(status) {
   return 'poor'
 }
 
+// Same 3x3 zone grid & thresholds evaluateRoom() in AnalysisPanel.jsx uses
+// for a room's own Vastu zone — reused here so a wall's compass label
+// always agrees with the zone math already driving the Vastu score,
+// instead of a second parallel definition of the grid.
+function getZoneCode(cx, cy) {
+  const col = cx < 33.3 ? 0 : cx >= 66.6 ? 2 : 1
+  const row = cy < 33.3 ? 0 : cy >= 66.6 ? 2 : 1
+  const zoneMap = [['NW', 'N', 'NE'], ['W', 'Center', 'E'], ['SW', 'S', 'SE']]
+  return zoneMap[row][col]
+}
+
 // How close (in % of plot) a door/window has to get to a wall line before
 // it snaps onto it. Candidate walls are the plot boundary plus every other
 // room's 4 edges — there's no separate "wall" object in this data model,
@@ -87,9 +98,13 @@ export default function Canvas() {
   // mirrors Canva's Transparency/Layers/Position/Nudge/More tab row, but
   // scoped to what's actually useful for a floor plan room.
   const [activePanel, setActivePanel] = useState(null)
+  // Which single inner-wall edge of the selected room has its own
+  // thickness-editing panel open — { roomId, side } or null.
+  const [selectedWallEdge, setSelectedWallEdge] = useState(null)
 
   useEffect(() => {
     setActivePanel(null)
+    setSelectedWallEdge(null)
   }, [selectedRoomId])
 
   // The zoomed pixel size of the plot — dragging/resizing math and the
@@ -389,6 +404,15 @@ export default function Canvas() {
       ['Space Element', 'Sacred Center', 'Solar Energy'],
       ['Earth Stability', 'Ancestral Ground', 'Sacral Fire']
     ]
+    // Pastel per-zone tint, Vastu Purusha Mandala convention (water/air/
+    // fire/earth palette) — kept subtle (~10% opacity) so it stays legible
+    // next to room walls/labels instead of competing with them, but the
+    // zones are now visually distinct from each other, not just bordered.
+    const zoneTints = [
+      ['rgba(148, 163, 184, 0.16)', 'rgba(34, 197, 94, 0.14)', 'rgba(56, 189, 248, 0.16)'],
+      ['rgba(168, 85, 247, 0.10)', null, 'rgba(250, 204, 21, 0.16)'],
+      ['rgba(146, 64, 14, 0.12)', 'rgba(239, 68, 68, 0.12)', 'rgba(249, 115, 22, 0.16)']
+    ]
 
     const cells = []
     for(let r=0; r<3; r++) {
@@ -396,11 +420,11 @@ export default function Canvas() {
         const isBrahmasthan = r === 1 && c === 1
         const covered = isVastuCellCovered(r, c)
         cells.push(
-          <div 
-            key={`${r}-${c}`} 
+          <div
+            key={`${r}-${c}`}
             className={`vastu-cell ${isBrahmasthan ? 'brahmasthan' : ''}`}
             style={{
-              border: '1.5px dashed rgba(245, 166, 35, 0.22)',
+              border: '2px dashed rgba(200, 145, 40, 0.5)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -409,7 +433,7 @@ export default function Canvas() {
               padding: '6px',
               boxSizing: 'border-box',
               position: 'relative',
-              background: isBrahmasthan ? 'radial-gradient(circle, rgba(245, 166, 35, 0.05) 0%, transparent 80%)' : undefined
+              background: isBrahmasthan ? 'radial-gradient(circle, rgba(245, 166, 35, 0.10) 0%, transparent 80%)' : zoneTints[r][c]
             }}
           >
             {isBrahmasthan && !covered && (
@@ -425,10 +449,10 @@ export default function Canvas() {
             )}
             {!covered && (
               <>
-                <span className="vastu-cell-label" style={{ fontSize: '9px', fontFamily: 'var(--fd)', fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.04em' }}>
+                <span className="vastu-cell-label" style={{ fontSize: '10px', fontFamily: 'var(--fd)', fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.04em', textShadow: '0 0 4px var(--bg2), 0 0 4px var(--bg2)' }}>
                   {zones[r][c]}
                 </span>
-                <span className="vastu-cell-element" style={{ fontSize: '8px', fontFamily: 'var(--fb)', fontWeight: 600, opacity: 0.7, color: 'var(--text2)', textTransform: 'uppercase' }}>
+                <span className="vastu-cell-element" style={{ fontSize: '8px', fontFamily: 'var(--fb)', fontWeight: 700, opacity: 0.85, color: 'var(--text2)', textTransform: 'uppercase', textShadow: '0 0 4px var(--bg2), 0 0 4px var(--bg2)' }}>
                   {elements[r][c]}
                 </span>
               </>
@@ -721,6 +745,13 @@ export default function Canvas() {
           const areaFeet = wFeet * hFeet
           const roomPxW = (room.width / 100) * zoomedDims.w
           const roomPxH = (room.height / 100) * zoomedDims.h
+          const isPlainRoom = !room.category || room.category === 'room'
+          // Inner-wall thickness override — per edge, in px, defaulting to
+          // the standard 3px inner-wall weight unless the wall panel below
+          // has been used to thicken/thin that specific side. The outer
+          // plot boundary a few lines up is untouched by any of this.
+          const wallThickness = room.wallThickness || {}
+          const wallColor = isBlueprint ? '#000' : 'var(--text)'
 
           return (
             <div
@@ -736,10 +767,20 @@ export default function Canvas() {
                   : (isBlueprint ? '#fff' : undefined),
                 // Inner (room-to-room) walls render thinner than the outer
                 // plot boundary below, so the two read as different wall
-                // thicknesses at a glance, the way a real plan does.
-                border: room.category === 'opening'
-                  ? (isSelected ? '1.5px dashed var(--accent)' : 'none')
-                  : (room.category === 'remedy' ? 'none' : `3px solid ${isBlueprint ? '#000' : 'var(--text)'}`),
+                // thicknesses at a glance, the way a real plan does. Each
+                // edge can be independently thickened via the wall panel.
+                ...(isPlainRoom ? {
+                  borderStyle: 'solid',
+                  borderColor: wallColor,
+                  borderTopWidth: `${wallThickness.top || 3}px`,
+                  borderRightWidth: `${wallThickness.right || 3}px`,
+                  borderBottomWidth: `${wallThickness.bottom || 3}px`,
+                  borderLeftWidth: `${wallThickness.left || 3}px`
+                } : {
+                  border: room.category === 'opening'
+                    ? (isSelected ? '1.5px dashed var(--accent)' : 'none')
+                    : 'none'
+                }),
                 boxShadow: 'none',
                 transform: room.rotation ? `rotate(${room.rotation}deg)` : undefined,
                 borderRadius: room.category === 'remedy' ? '50%' : '2px',
@@ -803,27 +844,54 @@ export default function Canvas() {
               )}
 
               {/* Construction Dimension lines (Ticks + Center Text) — only for the
-                  room you're currently editing, to keep the canvas uncluttered */}
+                  room you're currently editing, to keep the canvas uncluttered.
+                  Each wall's label now also carries the compass zone it sits
+                  in/borders (same 3x3 grid the Vastu score already uses), so
+                  every inner wall reads its direction the same way the outer
+                  9-zone overlay does — recomputed live as the room moves. */}
               {isSelected && (!room.category || room.category === 'room' || room.category === 'furniture') && (
                 <>
-                  {/* Horizontal dimension line */}
+                  {/* Bottom wall */}
                   <div style={{ position: 'absolute', bottom: '4px', left: '12px', right: '12px', height: '1px', background: 'var(--accent)', opacity: 0.9, pointerEvents: 'none' }}>
                     <div style={{ position: 'absolute', left: 0, top: '-3px', width: '1px', height: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <div style={{ position: 'absolute', right: 0, top: '-3px', width: '1px', height: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <span style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', fontSize: '8.5px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', whiteSpace: 'nowrap', background: 'var(--bg2)', padding: '0 3px' }}>
-                      {Math.round(wFeet)} ft
+                      {getZoneCode(room.x + room.width / 2, room.y + room.height)} · {Math.round(wFeet)} ft
                     </span>
                   </div>
-                  {/* Vertical dimension line */}
+                  {/* Right wall */}
                   <div style={{ position: 'absolute', right: '4px', top: '12px', bottom: '12px', width: '1px', background: 'var(--accent)', opacity: 0.9, pointerEvents: 'none' }}>
                     <div style={{ position: 'absolute', top: 0, left: '-3px', height: '1px', width: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <div style={{ position: 'absolute', bottom: 0, left: '-3px', height: '1px', width: '7px', background: 'var(--accent)', transform: 'rotate(45deg)' }}></div>
                     <span style={{ position: 'absolute', left: '4px', top: '50%', transform: 'translateY(-50%) rotate(90deg)', transformOrigin: 'center', fontSize: '8.5px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', whiteSpace: 'nowrap', background: 'var(--bg2)', padding: '0 3px' }}>
-                      {Math.round(hFeet)} ft
+                      {getZoneCode(room.x + room.width, room.y + room.height / 2)} · {Math.round(hFeet)} ft
                     </span>
                   </div>
+                  {/* Top wall — compass code only; width is already on the bottom wall */}
+                  <span style={{ position: 'absolute', top: '2px', left: '50%', transform: 'translateX(-50%)', fontSize: '8px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', background: 'var(--bg2)', padding: '0 3px', pointerEvents: 'none' }}>
+                    {getZoneCode(room.x + room.width / 2, room.y)}
+                  </span>
+                  {/* Left wall — compass code only; height is already on the right wall */}
+                  <span style={{ position: 'absolute', left: '2px', top: '50%', transform: 'translateY(-50%) rotate(-90deg)', transformOrigin: 'center', fontSize: '8px', fontFamily: 'var(--fm)', color: 'var(--accent)', fontWeight: 'bold', background: 'var(--bg2)', padding: '0 3px', pointerEvents: 'none' }}>
+                    {getZoneCode(room.x, room.y + room.height / 2)}
+                  </span>
                 </>
               )}
+
+              {/* Tappable inner-wall edges — select one to open its own
+                  thickness panel below, independent of the other 3 sides.
+                  Only plain rooms have real walls to tune; doors/furniture/
+                  remedies don't. */}
+              {isSelected && isPlainRoom && editMode !== 'view' && ['top', 'right', 'bottom', 'left'].map(side => (
+                <div
+                  key={`wall-edge-${side}`}
+                  className={`wall-edge-hit wall-edge-${side} ${selectedWallEdge?.roomId === room.id && selectedWallEdge?.side === side ? 'active' : ''}`}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); setSelectedWallEdge({ roomId: room.id, side }) }}
+                  title={`Edit this wall (${side})`}
+                />
+              ))}
 
               {/* Specialized Blueprint Renderings depending on Category */}
               {room.category === 'opening' && (
@@ -839,6 +907,19 @@ export default function Canvas() {
                       <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="2" />
                       <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="2" />
                       <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.2" />
+                    </svg>
+                  )}
+                  {/* Main entrance — same swing-arc convention as a room
+                      door, but wider and with a filled threshold arrow
+                      pointing into the house, so the plot's one primary
+                      entrance is never confused with an internal room
+                      door at a glance. */}
+                  {room.type === 'main-door' && (
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                      <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="3" />
+                      <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="3" />
+                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.5" />
+                      <path d="M 30 78 L 55 78 L 55 68 L 70 85 L 55 102 L 55 92 L 30 92 Z" fill="var(--text)" transform="translate(0,-15)" />
                     </svg>
                   )}
                   {/* Standard window symbol: a break in the wall filled
@@ -1057,6 +1138,35 @@ export default function Canvas() {
         const selectedRoom = rooms.find(r => r.id === selectedRoomId)
         if (!selectedRoom) return null
         const info = evaluateRoom(selectedRoom, plot)
+
+        // A wall edge is selected — show its own thickness panel instead
+        // of the room's usual tabs. Rotate/extend-with-connected-joints/
+        // split aren't implemented: this app doesn't model a wall as its
+        // own connected object the way a real CAD wall network would (a
+        // wall here is just one room's border), so those three genuinely
+        // need that bigger data model rather than a shortcut bolted onto
+        // room rectangles — thickness-per-edge is the piece that works
+        // cleanly on top of what exists today.
+        if (selectedWallEdge && selectedWallEdge.roomId === selectedRoomId) {
+          const side = selectedWallEdge.side
+          const current = (selectedRoom.wallThickness && selectedRoom.wallThickness[side]) || 3
+          const setThickness = (val) => {
+            const clamped = Math.max(1, Math.min(12, val))
+            const nextWallThickness = { ...(selectedRoom.wallThickness || {}), [side]: clamped }
+            setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, wallThickness: nextWallThickness } : r))
+          }
+          return (
+            <div className="room-action-dock" onClick={(e) => e.stopPropagation()}>
+              <div className="room-action-panel">
+                <span className="room-action-panel-label">{side[0].toUpperCase() + side.slice(1)} wall thickness</span>
+                <button className="btn-icon" onClick={() => setThickness(current - 1)} title="Thinner"><i className="ti ti-minus"></i></button>
+                <span className="room-size-input" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{current}px</span>
+                <button className="btn-icon" onClick={() => setThickness(current + 1)} title="Thicker"><i className="ti ti-plus"></i></button>
+                <button className="btn-icon" onClick={() => setSelectedWallEdge(null)} title="Done"><i className="ti ti-check"></i></button>
+              </div>
+            </div>
+          )
+        }
 
         return (
           <div className="room-action-dock" onClick={(e) => e.stopPropagation()}>

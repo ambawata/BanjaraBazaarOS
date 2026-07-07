@@ -2138,6 +2138,26 @@ body {
 .placed-room.selected .handle-bl::after { bottom: 13px; left: 13px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); }
 .placed-room.selected .handle-br::after { bottom: 13px; right: 13px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); }
 
+/* Tappable inner-wall edges — thin strips along each side of a selected
+   room. Tapping one opens that wall's own thickness panel. Sits above the
+   corner resize handles' z-index so a tap near a corner still prefers the
+   resize handle (handles are small circles, these are thin bands along
+   the rest of the edge). */
+.wall-edge-hit {
+  position: absolute;
+  background: transparent;
+  cursor: pointer;
+  z-index: 12;
+}
+.wall-edge-top, .wall-edge-bottom { left: 20px; right: 20px; height: 14px; }
+.wall-edge-left, .wall-edge-right { top: 20px; bottom: 20px; width: 14px; }
+.wall-edge-top { top: -7px; }
+.wall-edge-bottom { bottom: -7px; }
+.wall-edge-left { left: -7px; }
+.wall-edge-right { right: -7px; }
+.wall-edge-hit:hover { background: var(--accent-dim); }
+.wall-edge-hit.active { background: var(--accent-dim); outline: 1.5px dashed var(--accent); }
+
 /* Alignment Smart Guides */
 .smart-guide-x, .smart-guide-y {
   position: absolute;

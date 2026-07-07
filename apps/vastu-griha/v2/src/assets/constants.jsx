@@ -88,6 +88,7 @@ export const EXPANDED_ROOMS_CATALOG = {
   ],
   doors_windows: [
     { type: 'door', label: 'Door', icon: 'ti ti-door-enter', w: 4, h: 2, category: 'opening' },
+    { type: 'main-door', label: 'Main Entrance', icon: 'ti ti-door-enter', w: 6, h: 2, category: 'opening' },
     { type: 'window', label: 'Window', icon: 'ti ti-window', w: 6, h: 2, category: 'opening' },
     { type: 'ventilator', label: 'Ventilator', icon: 'ti ti-air-conditioning', w: 5, h: 2, category: 'opening' }
   ],

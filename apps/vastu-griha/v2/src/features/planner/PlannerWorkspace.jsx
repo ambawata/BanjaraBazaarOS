@@ -78,7 +78,8 @@ export default function PlannerWorkspace() {
     nudgeRoom,
     resizeRoom,
     undoLayout,
-    redoLayout
+    redoLayout,
+    autoAssignOpenings
   } = useCanvasStore()
 
   const [showTip, setShowTip] = React.useState(() => {
@@ -662,6 +663,16 @@ export default function PlannerWorkspace() {
                     </button>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      className="btn btn-icon"
+                      onClick={() => {
+                        const added = autoAssignOpenings()
+                        if (added === 0) alert('Every room already has a door, and every exterior wall already has a window.')
+                      }}
+                      title="Add a door to any room missing one, and a window to any exterior wall missing one"
+                    >
+                      <i className="ti ti-door-enter"></i>
+                    </button>
                     <button className="btn btn-icon" onClick={undoLayout} title="Undo last action">
                       <i className="ti ti-arrow-back-up"></i>
                     </button>

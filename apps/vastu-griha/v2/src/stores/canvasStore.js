@@ -3,6 +3,9 @@ import { useHistoryStore } from './historyStore'
 import { useProjectStore } from './projectStore'
 import { hasRoomCollision, findOpenSpot, resolveOverlaps } from '../lib/geometry/collisionEngine'
 
+let autosaveTimeout = null
+const DEBOUNCE_INTERVAL = 1500
+
 const triggerAutosave = (rooms, plot) => {
   if (typeof window === 'undefined') return
   if (autosaveTimeout) clearTimeout(autosaveTimeout)
@@ -159,6 +162,99 @@ export const useCanvasStore = create((set, get) => ({
     updated[index] = r
     set({ rooms: updated })
     triggerAutosave(updated, plot)
+  },
+
+  // Confirms every plain room has a door and every exterior-facing wall has
+  // a window, adding whichever are missing. A room's own rectangle edge is
+  // the only thing that represents a wall in this data model, so "does
+  // this room have a door" means "is there a door-category opening
+  // touching this room's rectangle at all", and "exterior wall" means
+  // "this specific edge sits on the plot boundary".
+  autoAssignOpenings: () => {
+    const { rooms } = get()
+    const { plot } = useProjectStore.getState()
+    const EPS = 1.5
+
+    const plainRooms = rooms.filter(r => !r.category || r.category === 'room')
+    const openings = rooms.filter(r => r.category === 'opening')
+
+    const touchesEdge = (opening, room, side) => {
+      if (!(opening.x < room.x + room.width && opening.x + opening.width > room.x &&
+            opening.y < room.y + room.height && opening.y + opening.height > room.y)) return false
+      const oCenterX = opening.x + opening.width / 2
+      const oCenterY = opening.y + opening.height / 2
+      if (side === 'top') return Math.abs(oCenterY - room.y) <= EPS * 2
+      if (side === 'bottom') return Math.abs(oCenterY - (room.y + room.height)) <= EPS * 2
+      if (side === 'left') return Math.abs(oCenterX - room.x) <= EPS * 2
+      return Math.abs(oCenterX - (room.x + room.width)) <= EPS * 2
+    }
+
+    const placeOpening = (room, side, type) => {
+      const isNarrowDoor = type === 'door' && room.type === 'toilet'
+      const widthPct = type === 'window' ? 6 : (isNarrowDoor ? 3 : 4)
+      const thickPct = 2
+      const isHorizontalEdge = side === 'top' || side === 'bottom'
+      const wPct = isHorizontalEdge ? Math.min(widthPct, room.width) : thickPct
+      const hPct = isHorizontalEdge ? thickPct : Math.min(widthPct, room.height)
+
+      let x, y
+      if (side === 'top') { x = room.x + room.width / 2 - wPct / 2; y = room.y - hPct / 2 }
+      else if (side === 'bottom') { x = room.x + room.width / 2 - wPct / 2; y = room.y + room.height - hPct / 2 }
+      else if (side === 'left') { x = room.x - wPct / 2; y = room.y + room.height / 2 - hPct / 2 }
+      else { x = room.x + room.width - wPct / 2; y = room.y + room.height / 2 - hPct / 2 }
+
+      x = Math.max(0, Math.min(100 - wPct, x))
+      y = Math.max(0, Math.min(100 - hPct, y))
+
+      return {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        type,
+        label: type === 'door' ? 'Door' : 'Window',
+        x: Math.round(x * 10) / 10,
+        y: Math.round(y * 10) / 10,
+        width: Math.round(wPct * 10) / 10,
+        height: Math.round(hPct * 10) / 10,
+        category: 'opening',
+        rotation: 0
+      }
+    }
+
+    const additions = []
+
+    plainRooms.forEach(room => {
+      const hasDoor = openings.some(o => (o.type === 'door' || o.type === 'main-door') &&
+        ['top', 'bottom', 'left', 'right'].some(side => touchesEdge(o, room, side)))
+
+      if (!hasDoor) {
+        const edges = ['bottom', 'right', 'top', 'left']
+        const isBoundary = {
+          top: room.y <= EPS,
+          bottom: room.y + room.height >= 100 - EPS,
+          left: room.x <= EPS,
+          right: room.x + room.width >= 100 - EPS
+        }
+        const preferred = edges.find(side => !isBoundary[side]) || edges[0]
+        additions.push(placeOpening(room, preferred, 'door'))
+      }
+
+      ;['top', 'bottom', 'left', 'right'].forEach(side => {
+        const onBoundary = side === 'top' ? room.y <= EPS
+          : side === 'bottom' ? room.y + room.height >= 100 - EPS
+          : side === 'left' ? room.x <= EPS
+          : room.x + room.width >= 100 - EPS
+        if (!onBoundary) return
+        const hasWindow = openings.some(o => o.type === 'window' && touchesEdge(o, room, side))
+        if (!hasWindow) additions.push(placeOpening(room, side, 'window'))
+      })
+    })
+
+    if (additions.length === 0) return 0
+
+    useHistoryStore.getState().pushState(rooms, plot)
+    const nextRooms = [...rooms, ...additions]
+    set({ rooms: nextRooms })
+    triggerAutosave(nextRooms, plot)
+    return additions.length
   },
 
   undoLayout: () => {
