@@ -1094,8 +1094,17 @@ export default function Canvas() {
                       textTransform: isBlueprint ? 'uppercase' : 'none',
                       fontFamily: isBlueprint ? 'var(--fm)' : 'inherit',
                       color: isBlueprint ? '#000' : 'var(--text)',
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
+                      // A tiny room (e.g. a small bathroom) doesn't have
+                      // room to wrap "Bathroom" onto 3 lines without
+                      // fracturing the word itself ("Bat/hro/om"). Below
+                      // that width, clip to one line with an ellipsis
+                      // instead — a cleanly truncated label reads better
+                      // than a broken one. Roomier labels still wrap
+                      // normally at word boundaries only.
+                      whiteSpace: roomPxW < 60 ? 'nowrap' : 'normal',
+                      overflow: roomPxW < 60 ? 'hidden' : 'visible',
+                      textOverflow: roomPxW < 60 ? 'ellipsis' : 'clip',
+                      wordBreak: 'normal',
                       maxWidth: '92%'
                     }}>
                       {room.label}

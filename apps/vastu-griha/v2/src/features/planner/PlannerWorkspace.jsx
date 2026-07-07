@@ -79,7 +79,8 @@ export default function PlannerWorkspace() {
     resizeRoom,
     undoLayout,
     redoLayout,
-    autoAssignOpenings
+    autoAssignOpenings,
+    fixOverlaps
   } = useCanvasStore()
 
   const [showTip, setShowTip] = React.useState(() => {
@@ -672,6 +673,16 @@ export default function PlannerWorkspace() {
                       title="Add a door to any room missing one, and a window to any exterior wall missing one"
                     >
                       <i className="ti ti-door-enter"></i>
+                    </button>
+                    <button
+                      className="btn btn-icon"
+                      onClick={() => {
+                        const fixed = fixOverlaps()
+                        if (!fixed) alert('No overlapping rooms found — the layout is already clean.')
+                      }}
+                      title="Separate any rooms that are stacked on top of each other"
+                    >
+                      <i className="ti ti-layout-grid"></i>
                     </button>
                     <button className="btn btn-icon" onClick={undoLayout} title="Undo last action">
                       <i className="ti ti-arrow-back-up"></i>

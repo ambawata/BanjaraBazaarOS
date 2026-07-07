@@ -257,6 +257,22 @@ export const useCanvasStore = create((set, get) => ({
     return additions.length
   },
 
+  // Manual safety net for the same repair loadFromLocalStorage runs
+  // automatically on app load — a browser tab left open from before
+  // overlap-prevention shipped won't get that automatic pass until it's
+  // reloaded, so this gives a one-tap fix without needing a refresh.
+  fixOverlaps: () => {
+    const { rooms } = get()
+    const { plot } = useProjectStore.getState()
+    const { rooms: fixedRooms, changed } = resolveOverlaps(rooms)
+    if (!changed) return false
+
+    useHistoryStore.getState().pushState(rooms, plot)
+    set({ rooms: fixedRooms })
+    triggerAutosave(fixedRooms, plot)
+    return true
+  },
+
   undoLayout: () => {
     const { rooms } = get()
     const { plot } = useProjectStore.getState()
