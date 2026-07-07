@@ -8,6 +8,10 @@ export const useUiStore = create((set) => ({
   theme: typeof window !== 'undefined' ? (localStorage.getItem('vg-theme') || 'light') : 'light',
   showVastuGrid: true,
   showNormalGrid: true,
+  // 'colorful' = today's warm, friendly look for daily editing/sharing.
+  // 'blueprint' = black & white, uppercase monospace labels — for
+  // printing or handing the plan to a contractor.
+  renderMode: 'colorful',
   showAddPopup: false,
   searchQuery: '',
   selectedIssueRoom: null,
@@ -63,6 +67,7 @@ export const useUiStore = create((set) => ({
   }),
   setShowVastuGrid: (showVastuGrid) => set({ showVastuGrid }),
   setShowNormalGrid: (showNormalGrid) => set({ showNormalGrid }),
+  setRenderMode: (renderMode) => set({ renderMode }),
   setShowAddPopup: (showAddPopup) => set({ showAddPopup }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setSelectedIssueRoom: (selectedIssueRoom) => set({ selectedIssueRoom }),

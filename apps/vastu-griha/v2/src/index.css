@@ -517,6 +517,18 @@ body {
   animation: slideUpFade 0.15s ease-out;
 }
 
+.room-rename-input {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: var(--bg);
+}
+
 .room-size-input {
   width: 44px;
   text-align: center;

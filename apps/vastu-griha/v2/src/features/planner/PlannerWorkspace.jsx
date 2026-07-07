@@ -37,6 +37,8 @@ export default function PlannerWorkspace() {
     setShowVastuGrid,
     showNormalGrid,
     setShowNormalGrid,
+    renderMode,
+    setRenderMode,
     showAddPopup,
     setShowAddPopup,
     customRoomName,
@@ -650,6 +652,13 @@ export default function PlannerWorkspace() {
                     </button>
                     <button className={`toggle-chip ${showVastuGrid ? 'active' : ''}`} onClick={() => setShowVastuGrid(!showVastuGrid)}>
                       <i className="ti ti-compass"></i> <span className="hidden-mobile">Vastu Grid</span>
+                    </button>
+                    <button
+                      className={`toggle-chip ${renderMode === 'blueprint' ? 'active' : ''}`}
+                      onClick={() => setRenderMode(renderMode === 'blueprint' ? 'colorful' : 'blueprint')}
+                      title="Switch between the everyday view and a black & white print/contractor view"
+                    >
+                      <i className="ti ti-ruler-2"></i> <span className="hidden-mobile">Blueprint</span>
                     </button>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>

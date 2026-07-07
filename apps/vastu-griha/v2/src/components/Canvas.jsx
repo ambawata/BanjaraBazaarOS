@@ -73,6 +73,8 @@ export default function Canvas() {
   const showVastuGrid = useUiStore((state) => state.showVastuGrid)
   const showNormalGrid = useUiStore((state) => state.showNormalGrid)
   const editMode = useUiStore((state) => state.editMode)
+  const renderMode = useUiStore((state) => state.renderMode)
+  const isBlueprint = renderMode === 'blueprint'
 
   const containerRef = useRef(null)
   const plotRef = useRef(null)
@@ -440,9 +442,13 @@ export default function Canvas() {
           height: `${zoomedDims.h}px`,
           position: 'relative',
           clipPath: clipPathVal,
-          border: shape === 'Irregular' ? 'none' : '1.5px solid var(--text)',
+          // Outer (plot boundary) wall renders visibly thicker than the
+          // 3px inner room walls above — that's the real distinction a
+          // contractor needs, not just a thin outline.
+          border: shape === 'Irregular' ? 'none' : `6px solid ${isBlueprint ? '#000' : 'var(--text)'}`,
           borderRadius: '0px',
-          flexShrink: 0
+          flexShrink: 0,
+          background: isBlueprint ? '#fff' : undefined
         }}
       >
         {/* Custom Wall Outline & Length Labels overlay — only while the plot is
@@ -532,10 +538,15 @@ export default function Canvas() {
                 top: `${room.y}%`,
                 width: `${room.width}%`,
                 height: `${room.height}%`,
-                background: room.category === 'opening' || room.category === 'remedy' ? 'transparent' : undefined,
+                background: room.category === 'opening' || room.category === 'remedy'
+                  ? 'transparent'
+                  : (isBlueprint ? '#fff' : undefined),
+                // Inner (room-to-room) walls render thinner than the outer
+                // plot boundary below, so the two read as different wall
+                // thicknesses at a glance, the way a real plan does.
                 border: room.category === 'opening'
                   ? (isSelected ? '1.5px dashed var(--accent)' : 'none')
-                  : (room.category === 'remedy' ? 'none' : '4px solid var(--text)'),
+                  : (room.category === 'remedy' ? 'none' : `3px solid ${isBlueprint ? '#000' : 'var(--text)'}`),
                 boxShadow: 'none',
                 transform: room.rotation ? `rotate(${room.rotation}deg)` : undefined,
                 borderRadius: room.category === 'remedy' ? '50%' : '2px',
@@ -773,11 +784,16 @@ export default function Canvas() {
                       style={{ position: 'absolute', top: '2px', right: '2px', zIndex: 3 }}
                     ></i>
                   )}
-                  <span
-                    className={`placed-room-vastu-dot compliance-dot-${complianceClassFor(evalRes.status)}`}
-                    title={evalRes.status}
-                    style={{ position: 'absolute', top: '4px', left: '4px' }}
-                  />
+                  {/* Vastu compliance dot is a daily-editing aid — a
+                      contractor print doesn't need it, so it's hidden in
+                      Blueprint mode. */}
+                  {!isBlueprint && (
+                    <span
+                      className={`placed-room-vastu-dot compliance-dot-${complianceClassFor(evalRes.status)}`}
+                      title={evalRes.status}
+                      style={{ position: 'absolute', top: '4px', left: '4px' }}
+                    />
+                  )}
 
                   {/* Detailed 2D architectural symbols inside rooms — drawn clearly
                       (not faded watermarks) so the plan reads like a real drawing.
@@ -793,9 +809,10 @@ export default function Canvas() {
                       clearly against the furniture drawing behind it. */}
                   <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 'auto', pointerEvents: 'none' }}>
                     <div style={{
-                      background: 'var(--text)',
-                      color: 'var(--bg2)',
-                      borderRadius: '999px',
+                      background: isBlueprint ? '#fff' : 'var(--text)',
+                      color: isBlueprint ? '#000' : 'var(--bg2)',
+                      border: isBlueprint ? '1.5px solid #000' : 'none',
+                      borderRadius: isBlueprint ? '2px' : '999px',
                       padding: roomPxW < 70 || roomPxH < 70 ? '2px 8px' : '4px 12px',
                       maxWidth: '92%',
                       textAlign: 'center',
@@ -805,6 +822,8 @@ export default function Canvas() {
                         fontSize: roomPxW < 70 || roomPxH < 70 ? '8px' : '10.5px',
                         fontWeight: 700,
                         letterSpacing: '0.01em',
+                        textTransform: isBlueprint ? 'uppercase' : 'none',
+                        fontFamily: isBlueprint ? 'var(--fm)' : 'inherit',
                         whiteSpace: 'normal',
                         wordBreak: 'break-word'
                       }}>
@@ -909,7 +928,15 @@ export default function Canvas() {
               </div>
             )}
             {activePanel === 'more' && (
-              <div className="room-action-panel">
+              <div className="room-action-panel room-action-panel-stack">
+                <input
+                  type="text"
+                  className="room-rename-input"
+                  value={selectedRoom.label}
+                  placeholder="Room name"
+                  onChange={(e) => setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, label: e.target.value } : r))}
+                />
+                <div className="room-action-panel-row">
                 <button
                   className="btn-icon"
                   title="Duplicate"
@@ -938,6 +965,7 @@ export default function Canvas() {
                 >
                   <i className="ti ti-trash"></i>
                 </button>
+                </div>
               </div>
             )}
 
