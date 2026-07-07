@@ -1082,37 +1082,29 @@ export default function Canvas() {
                     </div>
                   )}
 
-                  {/* Room name as a floating pill badge (matches the reference
-                      floor plan style) instead of plain text, so it reads
-                      clearly against the furniture drawing behind it. */}
-                  <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 'auto', pointerEvents: 'none' }}>
+                  {/* Room name as plain text directly on the floor, like a
+                      real architectural drawing — no pill/badge background.
+                      That was reading as an oversized dark oval dominating
+                      each room instead of a label. */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 'auto', pointerEvents: 'none', textAlign: 'center', lineHeight: 1.25 }}>
                     <div style={{
-                      background: isBlueprint ? '#fff' : 'var(--text)',
-                      color: isBlueprint ? '#000' : 'var(--bg2)',
-                      border: isBlueprint ? '1.5px solid #000' : 'none',
-                      borderRadius: isBlueprint ? '2px' : '999px',
-                      padding: roomPxW < 70 || roomPxH < 70 ? '2px 8px' : '4px 12px',
-                      maxWidth: '92%',
-                      textAlign: 'center',
-                      lineHeight: 1.25
+                      fontSize: roomPxW < 70 || roomPxH < 70 ? '8px' : '10.5px',
+                      fontWeight: 700,
+                      letterSpacing: '0.01em',
+                      textTransform: isBlueprint ? 'uppercase' : 'none',
+                      fontFamily: isBlueprint ? 'var(--fm)' : 'inherit',
+                      color: isBlueprint ? '#000' : 'var(--text)',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      maxWidth: '92%'
                     }}>
-                      <div style={{
-                        fontSize: roomPxW < 70 || roomPxH < 70 ? '8px' : '10.5px',
-                        fontWeight: 700,
-                        letterSpacing: '0.01em',
-                        textTransform: isBlueprint ? 'uppercase' : 'none',
-                        fontFamily: isBlueprint ? 'var(--fm)' : 'inherit',
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word'
-                      }}>
-                        {room.label}
-                      </div>
-                      {roomPxW > 55 && roomPxH > 55 && (
-                        <div style={{ fontSize: '7.5px', opacity: 0.75, fontFamily: 'var(--fm)' }}>
-                          {Math.round(wFeet)}' x {Math.round(hFeet)}'
-                        </div>
-                      )}
+                      {room.label}
                     </div>
+                    {roomPxW > 55 && roomPxH > 55 && (
+                      <div style={{ fontSize: '7.5px', opacity: 0.7, fontFamily: 'var(--fm)', color: 'var(--text2)' }}>
+                        {Math.round(wFeet)}' x {Math.round(hFeet)}'
+                      </div>
+                    )}
                   </div>
                 </>
               )}
