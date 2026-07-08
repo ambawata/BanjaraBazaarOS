@@ -12,6 +12,10 @@ export const useUiStore = create((set) => ({
   // 'blueprint' = black & white, uppercase monospace labels — for
   // printing or handing the plan to a contractor.
   renderMode: 'colorful',
+  // Canva-style full-screen design studio — hides the "Plan Editor" header
+  // and the guided-tip banner so the canvas fills the whole screen instead
+  // of losing vertical space to chrome above it.
+  isFullscreenStudio: false,
   showAddPopup: false,
   searchQuery: '',
   selectedIssueRoom: null,
@@ -68,6 +72,7 @@ export const useUiStore = create((set) => ({
   setShowVastuGrid: (showVastuGrid) => set({ showVastuGrid }),
   setShowNormalGrid: (showNormalGrid) => set({ showNormalGrid }),
   setRenderMode: (renderMode) => set({ renderMode }),
+  setIsFullscreenStudio: (isFullscreenStudio) => set({ isFullscreenStudio }),
   setShowAddPopup: (showAddPopup) => set({ showAddPopup }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setSelectedIssueRoom: (selectedIssueRoom) => set({ selectedIssueRoom }),

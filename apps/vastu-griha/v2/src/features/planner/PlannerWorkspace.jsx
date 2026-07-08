@@ -39,6 +39,8 @@ export default function PlannerWorkspace() {
     setShowNormalGrid,
     renderMode,
     setRenderMode,
+    isFullscreenStudio,
+    setIsFullscreenStudio,
     showAddPopup,
     setShowAddPopup,
     customRoomName,
@@ -420,7 +422,7 @@ export default function PlannerWorkspace() {
 
       {/* Main Workspace Frame */}
       <div id="main">
-        {activeTab !== 'home' && activeTab !== 'profile' && (
+        {activeTab !== 'home' && activeTab !== 'profile' && !(isFullscreenStudio && activeTab === 'designer') && (
           <header id="topbar">
             <div className="topbar-left">
               <span className="page-title">
@@ -649,6 +651,13 @@ export default function PlannerWorkspace() {
               <div className="canvas-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div className="canvas-toolbar">
                   <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      className={`toggle-chip ${isFullscreenStudio ? 'active' : ''}`}
+                      onClick={() => setIsFullscreenStudio(!isFullscreenStudio)}
+                      title={isFullscreenStudio ? 'Exit full-screen studio' : 'Full-screen design studio — hide the header and tips so the canvas fills the screen'}
+                    >
+                      <i className={`ti ti-${isFullscreenStudio ? 'arrows-minimize' : 'arrows-maximize'}`}></i> <span className="hidden-mobile">{isFullscreenStudio ? 'Exit Full Screen' : 'Full Screen'}</span>
+                    </button>
                     <button className={`toggle-chip ${showNormalGrid ? 'active' : ''}`} onClick={() => setShowNormalGrid(!showNormalGrid)}>
                       <i className="ti ti-grid-dots"></i> <span className="hidden-mobile">Grid</span>
                     </button>
@@ -696,7 +705,7 @@ export default function PlannerWorkspace() {
                   </div>
                 </div>
 
-                {showTip && (
+                {showTip && !isFullscreenStudio && (
                   <div className="guided-tips-banner">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}>
                       <i className="ti ti-bulb" style={{ color: 'var(--gold)', fontSize: '18px' }}></i>
