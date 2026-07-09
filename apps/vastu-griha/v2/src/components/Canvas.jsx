@@ -31,6 +31,43 @@ function getZoneCode(cx, cy) {
   return zoneMap[row][col]
 }
 
+// A room's edge counts as a genuine shared wall with a neighbor when the
+// neighbor's matching edge sits at (almost) the same coordinate AND their
+// spans overlap by a meaningful amount — not just corners grazing each
+// other. This is what makes "extend/shorten while staying connected"
+// possible without a full wall-graph rewrite: moving a shared wall just
+// resizes both rooms in lockstep along their shared edge.
+const SHARED_WALL_TOLERANCE = 1
+const SHARED_WALL_MIN_OVERLAP = 3
+
+function findSharedWall(room, side, allRooms) {
+  const isBlockingCategory = (r) => !r.category || r.category === 'room'
+  if (!isBlockingCategory(room)) return null
+
+  for (const other of allRooms) {
+    if (other.id === room.id || !isBlockingCategory(other)) continue
+
+    if (side === 'right') {
+      if (Math.abs((room.x + room.width) - other.x) > SHARED_WALL_TOLERANCE) continue
+      const overlap = Math.min(room.y + room.height, other.y + other.height) - Math.max(room.y, other.y)
+      if (overlap >= SHARED_WALL_MIN_OVERLAP) return { neighborId: other.id, neighborSide: 'left', axis: 'x' }
+    } else if (side === 'left') {
+      if (Math.abs(room.x - (other.x + other.width)) > SHARED_WALL_TOLERANCE) continue
+      const overlap = Math.min(room.y + room.height, other.y + other.height) - Math.max(room.y, other.y)
+      if (overlap >= SHARED_WALL_MIN_OVERLAP) return { neighborId: other.id, neighborSide: 'right', axis: 'x' }
+    } else if (side === 'bottom') {
+      if (Math.abs((room.y + room.height) - other.y) > SHARED_WALL_TOLERANCE) continue
+      const overlap = Math.min(room.x + room.width, other.x + other.width) - Math.max(room.x, other.x)
+      if (overlap >= SHARED_WALL_MIN_OVERLAP) return { neighborId: other.id, neighborSide: 'top', axis: 'y' }
+    } else if (side === 'top') {
+      if (Math.abs(room.y - (other.y + other.height)) > SHARED_WALL_TOLERANCE) continue
+      const overlap = Math.min(room.x + room.width, other.x + other.width) - Math.max(room.x, other.x)
+      if (overlap >= SHARED_WALL_MIN_OVERLAP) return { neighborId: other.id, neighborSide: 'bottom', axis: 'y' }
+    }
+  }
+  return null
+}
+
 // How close (in % of plot) a door/window has to get to a wall line before
 // it snaps onto it. Candidate walls are the plot boundary plus every other
 // room's 4 edges — there's no separate "wall" object in this data model,
@@ -215,6 +252,50 @@ export default function Canvas() {
     })
   }
 
+  // Free rotation — like Canva's own rotate handle, drag it around the
+  // room's center to spin the room to any angle, not just 90° steps. This
+  // stays on the existing rectangle room model (x/y/width/height never
+  // change, only the CSS rotation), so nothing else about how a room is
+  // stored has to change. The honest trade-off: collision detection still
+  // checks the room's un-rotated bounding box, so once a room is rotated
+  // off a 90°-multiple, overlap-blocking against neighbors is only
+  // approximate — true polygon-vs-polygon collision for arbitrary angles
+  // is real-shape-model territory, not a small add-on.
+  const handleRotateStart = (clientX, clientY, roomId) => {
+    if (editMode === 'view' || !plotRef.current) return
+    const room = rooms.find(r => r.id === roomId)
+    if (!room) return
+    setSelectedRoomId(roomId)
+
+    const plotRect = plotRef.current.getBoundingClientRect()
+    const centerX = plotRect.left + ((room.x + room.width / 2) / 100) * plotRect.width
+    const centerY = plotRect.top + ((room.y + room.height / 2) / 100) * plotRect.height
+    const startAngle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI)
+
+    setDragState({
+      type: 'rotate',
+      roomId,
+      centerX,
+      centerY,
+      startAngle,
+      startRotation: room.rotation || 0
+    })
+  }
+
+  const applyRotate = (clientX, clientY) => {
+    const currentAngle = Math.atan2(clientY - dragState.centerY, clientX - dragState.centerX) * (180 / Math.PI)
+    let newRotation = dragState.startRotation + (currentAngle - dragState.startAngle)
+    newRotation = ((newRotation % 360) + 360) % 360
+    // Snap to 15° steps when close, so landing back on a clean angle
+    // (0/90/180/270 included) is easy instead of fighting for the exact
+    // pixel.
+    const snapped = Math.round(newRotation / 15) * 15
+    if (Math.abs(newRotation - snapped) < 4) newRotation = snapped % 360
+
+    const rounded = Math.round(newRotation)
+    setRooms(rooms.map(r => r.id === dragState.roomId ? { ...r, rotation: rounded } : r))
+  }
+
   // Shared by mouse and touch — handles a plain move, and resizing from
   // any of the 4 corners (Canva lets you resize from any corner, not just
   // bottom-right, so the opposite corner needs to stay anchored in place).
@@ -332,6 +413,10 @@ export default function Canvas() {
   const handleMouseMove = (e) => {
     if (editMode === 'view' || !dragState || !plotRef.current) return
     e.preventDefault()
+    if (dragState.type === 'rotate') {
+      applyRotate(e.clientX, e.clientY)
+      return
+    }
     const deltaXPercent = ((e.clientX - dragState.startX) / zoomedDims.w) * 100
     const deltaYPercent = ((e.clientY - dragState.startY) / zoomedDims.h) * 100
     applyDrag(deltaXPercent, deltaYPercent)
@@ -342,6 +427,10 @@ export default function Canvas() {
     e.preventDefault()
     const touch = e.touches?.[0]
     if (!touch) return
+    if (dragState.type === 'rotate') {
+      applyRotate(touch.clientX, touch.clientY)
+      return
+    }
     const deltaXPercent = ((touch.clientX - dragState.startX) / zoomedDims.w) * 100
     const deltaYPercent = ((touch.clientY - dragState.startY) / zoomedDims.h) * 100
     applyDrag(deltaXPercent, deltaYPercent)
@@ -892,7 +981,11 @@ export default function Canvas() {
                   className={`wall-edge-hit wall-edge-${side} ${selectedWallEdge?.roomId === room.id && selectedWallEdge?.side === side ? 'active' : ''}`}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
-                  onClick={(e) => { e.stopPropagation(); setSelectedWallEdge({ roomId: room.id, side }) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const shared = findSharedWall(room, side, rooms)
+                    setSelectedWallEdge({ roomId: room.id, side, shared })
+                  }}
                   title={`Edit this wall (${side})`}
                 />
               ))}
@@ -1129,6 +1222,20 @@ export default function Canvas() {
                   onTouchStart={(e) => handleTouchStart(e, room.id, `resize-${corner}`)}
                 />
               ))}
+
+              {/* Free-rotate handle — Canva-style circular grip floating
+                  above the selected room; drag it around the room's
+                  center to spin to any angle. */}
+              {isSelected && editMode !== 'view' && isPlainRoom && (
+                <div
+                  className="room-rotate-handle"
+                  onMouseDown={(e) => { e.stopPropagation(); handleRotateStart(e.clientX, e.clientY, room.id) }}
+                  onTouchStart={(e) => { e.stopPropagation(); const t = e.touches?.[0]; if (t) handleRotateStart(t.clientX, t.clientY, room.id) }}
+                  title="Drag to rotate freely"
+                >
+                  <i className="ti ti-rotate-2"></i>
+                </div>
+              )}
             </div>
           )
         })}
@@ -1154,20 +1261,75 @@ export default function Canvas() {
         // cleanly on top of what exists today.
         if (selectedWallEdge && selectedWallEdge.roomId === selectedRoomId) {
           const side = selectedWallEdge.side
+          const shared = selectedWallEdge.shared
           const current = (selectedRoom.wallThickness && selectedRoom.wallThickness[side]) || 3
           const setThickness = (val) => {
             const clamped = Math.max(1, Math.min(12, val))
             const nextWallThickness = { ...(selectedRoom.wallThickness || {}), [side]: clamped }
             setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, wallThickness: nextWallThickness } : r))
           }
+
+          // Extend/shorten this wall while staying connected — since a
+          // room here is a rectangle, "moving the wall" means growing one
+          // side's room and shrinking the neighbor's by the same amount
+          // along their shared edge, so no gap or overlap ever opens up
+          // between them. Only possible when this edge is a genuine shared
+          // wall with a neighbor (findSharedWall) — a wall against the
+          // plot boundary or an unshared edge has nothing to extend into.
+          const moveSharedWall = (deltaFt) => {
+            if (!shared) return
+            const neighbor = rooms.find(r => r.id === shared.neighborId)
+            if (!neighbor) return
+
+            const axis = shared.axis
+            const totalFt = axis === 'x' ? plot.width : plot.length
+            const deltaPct = (deltaFt / totalFt) * 100
+            const dim = axis === 'x' ? 'width' : 'height'
+            const pos = axis === 'x' ? 'x' : 'y'
+
+            const growsWithDelta = side === 'right' || side === 'bottom'
+            const leftRoom = growsWithDelta ? selectedRoom : neighbor
+            const rightRoom = growsWithDelta ? neighbor : selectedRoom
+
+            const minDimPct = (3 / totalFt) * 100
+            const newLeftDim = leftRoom[dim] + deltaPct
+            const newRightDim = rightRoom[dim] - deltaPct
+            if (newLeftDim < minDimPct || newRightDim < minDimPct) return
+
+            const updatedLeft = { ...leftRoom, [dim]: Math.round(newLeftDim * 10) / 10 }
+            const updatedRight = {
+              ...rightRoom,
+              [pos]: Math.round((rightRoom[pos] + deltaPct) * 10) / 10,
+              [dim]: Math.round(newRightDim * 10) / 10
+            }
+
+            const others = rooms.filter(r => r.id !== leftRoom.id && r.id !== rightRoom.id)
+            if (hasRoomCollision(updatedLeft, others, null) || hasRoomCollision(updatedRight, others, null)) return
+
+            setRooms(rooms.map(r => {
+              if (r.id === updatedLeft.id) return updatedLeft
+              if (r.id === updatedRight.id) return updatedRight
+              return r
+            }))
+          }
+
           return (
             <div className="room-action-dock" onClick={(e) => e.stopPropagation()}>
-              <div className="room-action-panel">
-                <span className="room-action-panel-label">{side[0].toUpperCase() + side.slice(1)} wall thickness</span>
-                <button className="btn-icon" onClick={() => setThickness(current - 1)} title="Thinner"><i className="ti ti-minus"></i></button>
-                <span className="room-size-input" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{current}px</span>
-                <button className="btn-icon" onClick={() => setThickness(current + 1)} title="Thicker"><i className="ti ti-plus"></i></button>
-                <button className="btn-icon" onClick={() => setSelectedWallEdge(null)} title="Done"><i className="ti ti-check"></i></button>
+              <div className="room-action-panel room-action-panel-stack">
+                {shared && (
+                  <div className="room-action-panel-row">
+                    <span className="room-action-panel-label">Move wall (both rooms)</span>
+                    <button className="btn-icon" onClick={() => moveSharedWall(-1)} title="Shift wall back 1 ft"><i className="ti ti-minus"></i></button>
+                    <button className="btn-icon" onClick={() => moveSharedWall(1)} title="Shift wall forward 1 ft"><i className="ti ti-plus"></i></button>
+                  </div>
+                )}
+                <div className="room-action-panel-row">
+                  <span className="room-action-panel-label">{side[0].toUpperCase() + side.slice(1)} thickness</span>
+                  <button className="btn-icon" onClick={() => setThickness(current - 1)} title="Thinner"><i className="ti ti-minus"></i></button>
+                  <span className="room-size-input" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{current}px</span>
+                  <button className="btn-icon" onClick={() => setThickness(current + 1)} title="Thicker"><i className="ti ti-plus"></i></button>
+                  <button className="btn-icon" onClick={() => setSelectedWallEdge(null)} title="Done"><i className="ti ti-check"></i></button>
+                </div>
               </div>
             </div>
           )
