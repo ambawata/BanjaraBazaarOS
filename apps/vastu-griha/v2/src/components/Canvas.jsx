@@ -68,6 +68,75 @@ function findSharedWall(room, side, allRooms) {
   return null
 }
 
+const SNAP_TOLERANCE_PCT = 1.2
+
+// Magnetically snaps a moving room's left/center/right and top/center/
+// bottom to whichever other room (or the plot's own center) it's closest
+// to lining up with, and reports which guide line(s) to draw. Only one
+// horizontal and one vertical guide show at a time — the closest match
+// on each axis — so the canvas doesn't fill with lines while dragging.
+function computeSnapGuides(room, x, y, allRooms) {
+  const isBlockingCategory = (r) => !r.category || r.category === 'room'
+  const targetsX = [{ pos: 0 }, { pos: 50 }, { pos: 100 }]
+  const targetsY = [{ pos: 0 }, { pos: 50 }, { pos: 100 }]
+  allRooms.forEach(r => {
+    if (r.id === room.id || !isBlockingCategory(r)) return
+    targetsX.push({ pos: r.x }, { pos: r.x + r.width / 2 }, { pos: r.x + r.width })
+    targetsY.push({ pos: r.y }, { pos: r.y + r.height / 2 }, { pos: r.y + r.height })
+  })
+
+  const roomEdgesX = [
+    { edge: 'left', pos: x },
+    { edge: 'center', pos: x + room.width / 2 },
+    { edge: 'right', pos: x + room.width }
+  ]
+  const roomEdgesY = [
+    { edge: 'top', pos: y },
+    { edge: 'center', pos: y + room.height / 2 },
+    { edge: 'bottom', pos: y + room.height }
+  ]
+
+  let bestX = null
+  roomEdgesX.forEach(({ edge, pos }) => {
+    targetsX.forEach(t => {
+      const dist = Math.abs(pos - t.pos)
+      if (dist <= SNAP_TOLERANCE_PCT && (!bestX || dist < bestX.dist)) {
+        bestX = { dist, guidePos: t.pos, edge, targetPos: t.pos }
+      }
+    })
+  })
+
+  let bestY = null
+  roomEdgesY.forEach(({ edge, pos }) => {
+    targetsY.forEach(t => {
+      const dist = Math.abs(pos - t.pos)
+      if (dist <= SNAP_TOLERANCE_PCT && (!bestY || dist < bestY.dist)) {
+        bestY = { dist, guidePos: t.pos, edge, targetPos: t.pos }
+      }
+    })
+  })
+
+  let snappedX = x
+  let snappedY = y
+  if (bestX) {
+    const offset = bestX.edge === 'left' ? 0 : bestX.edge === 'center' ? room.width / 2 : room.width
+    snappedX = bestX.targetPos - offset
+  }
+  if (bestY) {
+    const offset = bestY.edge === 'top' ? 0 : bestY.edge === 'center' ? room.height / 2 : room.height
+    snappedY = bestY.targetPos - offset
+  }
+
+  return {
+    x: snappedX,
+    y: snappedY,
+    guides: {
+      vertical: bestX ? bestX.guidePos : null,
+      horizontal: bestY ? bestY.guidePos : null
+    }
+  }
+}
+
 // How close (in % of plot) a door/window has to get to a wall line before
 // it snaps onto it. Candidate walls are the plot boundary plus every other
 // room's 4 edges — there's no separate "wall" object in this data model,
@@ -141,6 +210,11 @@ export default function Canvas() {
   const [selectedWallEdge, setSelectedWallEdge] = useState(null)
   // Which pada's "Why?" detail is expanded in the Vastu tab, if any.
   const [expandedPadaId, setExpandedPadaId] = useState(null)
+  // Canva-style snap guides while dragging a room — a dashed line appears
+  // (and the room snaps to it) when its edge/center lines up with another
+  // room's edge/center or the plot's own center. { horizontal: pct|null,
+  // vertical: pct|null } in plot-percent coordinates.
+  const [activeGuides, setActiveGuides] = useState({ horizontal: null, vertical: null })
 
   useEffect(() => {
     setActivePanel(null)
@@ -359,6 +433,14 @@ export default function Canvas() {
             newY = prevY
           }
         }
+
+        // Canva-style snap guides — magnetically align this room's edges/
+        // center with another room's edges/center, or the plot's own
+        // center, and show the dashed line it snapped to.
+        const snapped = computeSnapGuides(targetRoom, newX, newY, rooms)
+        newX = snapped.x
+        newY = snapped.y
+        setActiveGuides(snapped.guides)
       }
 
       targetRoom.x = Math.round(newX * 10) / 10
@@ -438,6 +520,7 @@ export default function Canvas() {
 
   const handleMouseUp = () => {
     setDragState(null)
+    setActiveGuides({ horizontal: null, vertical: null })
   }
 
   useEffect(() => {
@@ -813,6 +896,16 @@ export default function Canvas() {
           <div className="vastu-grid-overlay">
             {renderVastuGrid()}
           </div>
+        )}
+
+        {/* Canva-style snap guides — dashed lines that appear while
+            dragging a room, exactly where it just snapped into alignment
+            with another room's edge/center or the plot's own center. */}
+        {activeGuides.horizontal !== null && (
+          <div className="smart-guide-x" style={{ top: `${activeGuides.horizontal}%` }} />
+        )}
+        {activeGuides.vertical !== null && (
+          <div className="smart-guide-y" style={{ left: `${activeGuides.vertical}%` }} />
         )}
 
         {/* Empty state overlay inside plot-wrapper — anchored to the bottom edge
@@ -1508,6 +1601,27 @@ export default function Canvas() {
                 >
                   <i className="ti ti-trash"></i>
                 </button>
+                </div>
+                {/* Layer order — rooms stack in array order (all share the
+                    same CSS z-index), so "front"/"back" just moves this
+                    room to the end/start of that array, same idea as
+                    Canva's Layer menu. */}
+                <div className="room-action-panel-row">
+                  <span className="room-action-panel-label">Layer</span>
+                  <button
+                    className="btn-icon"
+                    title="Bring to front"
+                    onClick={() => setRooms([...rooms.filter(r => r.id !== selectedRoomId), selectedRoom])}
+                  >
+                    <i className="ti ti-stack-front"></i>
+                  </button>
+                  <button
+                    className="btn-icon"
+                    title="Send to back"
+                    onClick={() => setRooms([selectedRoom, ...rooms.filter(r => r.id !== selectedRoomId)])}
+                  >
+                    <i className="ti ti-stack-back"></i>
+                  </button>
                 </div>
               </div>
             )}
