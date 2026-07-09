@@ -10,6 +10,25 @@ import { hasRoomCollision } from '../lib/geometry/collisionEngine'
 import { getPadasInZone } from '../lib/vastu/padaKnowledge'
 import RoomSymbol from './RoomSymbol'
 
+// Light pastel fill + matching thin border per room type — a plain white
+// box with a thick black outline read as generic/CAD-like; a soft color
+// per room type (kept subtle enough not to fight with the furniture
+// drawing or labels inside it) reads as an actual furnished floor plan.
+// Blueprint mode ignores this entirely and stays black & white.
+const ROOM_COLOR_PALETTE = {
+  bedroom: { fill: '#EEECFC', border: '#8B7FE0' },
+  living: { fill: '#FCEBEF', border: '#E28BA6' },
+  kitchen: { fill: '#FDEEDB', border: '#E0A25C' },
+  toilet: { fill: '#E3F7F3', border: '#4FBFA8' },
+  pooja: { fill: '#FFF6DE', border: '#D0B04A' },
+  staircase: { fill: '#ECECEC', border: '#9A9A9A' },
+  lift: { fill: '#E7ECFB', border: '#7C93D9' },
+  custom: { fill: '#F1EEFB', border: '#9C8FE0' }
+}
+function roomColors(type) {
+  return ROOM_COLOR_PALETTE[type] || ROOM_COLOR_PALETTE.custom
+}
+
 // evaluateRoom's status text has spaces ("Needs Attention"), which breaks a
 // className if used directly -- the browser reads it as two separate classes.
 // Map to a single CSS-safe word instead.
@@ -825,6 +844,27 @@ export default function Canvas() {
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible', zIndex: 6 }}
           viewBox={`0 0 ${zoomedDims.w + DIM_MARGIN * 2} ${zoomedDims.h + DIM_MARGIN * 2}`}
         >
+          {/* Diagonal-hatch outer wall band — the standard architectural
+              way to draw a cut wall in section, instead of a plain solid
+              border. Only for rectangle/square plots; Irregular keeps its
+              existing clip-path outline since the hatch frame math below
+              assumes an axis-aligned rectangle. */}
+          {shape !== 'Irregular' && (
+            <>
+              <defs>
+                <pattern id="outerWallHatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                  <line x1="0" y1="0" x2="0" y2="7" stroke={isBlueprint ? '#000' : 'var(--text)'} strokeWidth="1.5" />
+                </pattern>
+              </defs>
+              <path
+                fillRule="evenodd"
+                d={`M${DIM_MARGIN - 8},${DIM_MARGIN - 8} H${DIM_MARGIN + zoomedDims.w + 8} V${DIM_MARGIN + zoomedDims.h + 8} H${DIM_MARGIN - 8} Z M${DIM_MARGIN},${DIM_MARGIN} H${DIM_MARGIN + zoomedDims.w} V${DIM_MARGIN + zoomedDims.h} H${DIM_MARGIN} Z`}
+                fill="url(#outerWallHatch)"
+                stroke={isBlueprint ? '#000' : 'var(--text)'}
+                strokeWidth="1"
+              />
+            </>
+          )}
           {renderDimensionLines()}
         </svg>
         <div
@@ -835,10 +875,10 @@ export default function Canvas() {
             height: `${zoomedDims.h}px`,
             position: 'relative',
             clipPath: clipPathVal,
-            // Outer (plot boundary) wall renders visibly thicker than the
-            // 3px inner room walls above — that's the real distinction a
-            // contractor needs, not just a thin outline.
-            border: shape === 'Irregular' ? 'none' : `6px solid ${isBlueprint ? '#000' : 'var(--text)'}`,
+            // The hatch band drawn in the SVG above is the visible outer
+            // wall for rectangle/square plots now; this border stays as
+            // the fallback for Irregular plots, which don't get a hatch.
+            border: shape === 'Irregular' ? `6px solid ${isBlueprint ? '#000' : 'var(--text)'}` : 'none',
             borderRadius: '0px',
             flexShrink: 0,
             background: isBlueprint ? '#fff' : undefined
@@ -937,7 +977,8 @@ export default function Canvas() {
           // has been used to thicken/thin that specific side. The outer
           // plot boundary a few lines up is untouched by any of this.
           const wallThickness = room.wallThickness || {}
-          const wallColor = isBlueprint ? '#000' : 'var(--text)'
+          const colors = roomColors(room.type)
+          const wallColor = isBlueprint ? '#000' : colors.border
 
           return (
             <div
@@ -950,7 +991,7 @@ export default function Canvas() {
                 height: `${room.height}%`,
                 background: room.category === 'opening' || room.category === 'remedy'
                   ? 'transparent'
-                  : (isBlueprint ? '#fff' : undefined),
+                  : (isBlueprint ? '#fff' : (isPlainRoom ? colors.fill : undefined)),
                 // Inner (room-to-room) walls render thinner than the outer
                 // plot boundary below, so the two read as different wall
                 // thicknesses at a glance, the way a real plan does. Each
