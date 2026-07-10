@@ -1,0 +1,2481 @@
+{
+  "master_batch": "cat2_3_7_8_9",
+  "updated": "2026-07-10",
+  "source_tier": "secondary_published_guides",
+  "remedy_caveat": "Most remedies mitigate, not cure; relocation is the ideal fix. Present remedies with this caveat.",
+  "progress": {
+    "done": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pending": [],
+    "categories_complete": true,
+    "pada_granular_sublayer": "3_of_45_ongoing"
+  },
+  "entries": [
+    {
+      "id": "WE-01",
+      "category": "water_elements",
+      "topic": "underground_water_tank",
+      "element": "water",
+      "best": [
+        "N",
+        "NE",
+        "E"
+      ],
+      "fallback": [
+        "W"
+      ],
+      "avoid": [
+        "S",
+        "SE",
+        "SW",
+        "CENTER",
+        "NW"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 45,
+      "reasoning": "Water element aligns N/NE; SE fire clash; SW earth clash (major hard-to-fix); Brahmasthan open.",
+      "sources": [
+        "UltraTech",
+        "Oriplast",
+        "Ganeshaspeaks",
+        "VaastuMangaal",
+        "GeosolsVastu",
+        "SaralVaastu",
+        "NoBroker"
+      ],
+      "disagreement": "NW allowed(VaastuMangaal) vs avoid(majority); W fine(VaastuMangaal) vs avoid(others); never on NE-SW diagonal.",
+      "severity_if_wrong": {
+        "SW": "major",
+        "CENTER": "major",
+        "SE": "major",
+        "NW": "moderate",
+        "W": "moderate"
+      },
+      "remedy": "Relocate to N/NE or fill+close. SW stuck: paint top yellow (never blue/black/green/brown). Mitigation: copper strips, pyramid, rock salt. No leakage; covered; septic away.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "SW": "major",
+          "CENTER": "major",
+          "SE": "major",
+          "NW": "moderate",
+          "W": "moderate"
+        }
+      },
+      "query_aliases": [
+        "underground water tank direction",
+        "sump direction vastu",
+        "pani ki tanki zameen ke niche kahan",
+        "underground tank kis disha mein",
+        "भूमिगत पानी की टंकी की दिशा",
+        "water sump placement vastu",
+        "paani tanki kaha banaye"
+      ]
+    },
+    {
+      "id": "WE-02",
+      "category": "water_elements",
+      "topic": "overhead_water_tank",
+      "element": "earth",
+      "best": [
+        "SW",
+        "W",
+        "S"
+      ],
+      "fallback": [
+        "NW_minority"
+      ],
+      "avoid": [
+        "NE",
+        "N",
+        "NW",
+        "CENTER",
+        "above_kitchen",
+        "above_pooja"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 45,
+      "reasoning": "Heavy mass at height = earth element -> SW; heavy-in-SW rule; NE must stay light.",
+      "sources": [
+        "UltraTech",
+        "Oriplast",
+        "VaastuMangaal",
+        "NoBroker",
+        "SaralVaastu"
+      ],
+      "disagreement": "NW fallback(SaralVaastu) vs never(VaastuMangaal); majority avoid NW.",
+      "severity_if_wrong": {
+        "NE": "major",
+        "N": "moderate_to_major",
+        "above_kitchen": "moderate"
+      },
+      "remedy": "Shift to SW/W. NE unavoidable: keep small/light, copper/lead strips, add SW counter-mass. Never above kitchen/pooja.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "major",
+          "N": "moderate_to_major",
+          "above_kitchen": "moderate"
+        }
+      },
+      "query_aliases": [
+        "overhead water tank direction",
+        "chhat ki pani tanki kahan",
+        "overhead tank kis disha mein",
+        "upar wali tanki vastu",
+        "ऊपर की पानी टंकी दिशा",
+        "roof water tank placement",
+        "terrace tank direction vastu"
+      ]
+    },
+    {
+      "id": "WE-03",
+      "category": "water_elements",
+      "topic": "borewell_tubewell_handpump",
+      "element": "water",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "fallback": [
+        "NW_least_bad"
+      ],
+      "avoid": [
+        "SW",
+        "S",
+        "SE",
+        "W",
+        "CENTER",
+        "NE_SW_diagonal"
+      ],
+      "location_confidence": 92,
+      "effect_confidence": 45,
+      "reasoning": "Active groundwater = water element; NE Ishanya prosperity; SE fire, SW stability clash; never on Brahmasutra; E/N open for sun.",
+      "sources": [
+        "Ganeshaspeaks",
+        "Oriplast",
+        "NoBroker",
+        "BrickAndBolt",
+        "MyPandit",
+        "SubhaVaastu",
+        "HelpingCoaach",
+        "ArchitectureIdeas"
+      ],
+      "disagreement": "NW majority-avoid vs lesser-evil-vs-SE(ArchitectureIdeas); high-yield wrong bore keep(minority) vs fill+close(mainstream).",
+      "severity_if_wrong": {
+        "SW": "major",
+        "SE": "major",
+        "S": "major",
+        "CENTER": "major",
+        "W": "moderate_to_major",
+        "NW": "moderate"
+      },
+      "remedy": "Wrong/dead bore: fill with earth, close, lockable covered slab. Can't close: cover+buffer. Dig before construction; 15-20ft from wall; not touching house walls; away from septic; round shape.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "SW": "major",
+          "SE": "major",
+          "S": "major",
+          "CENTER": "major",
+          "W": "moderate_to_major",
+          "NW": "moderate"
+        }
+      },
+      "query_aliases": [
+        "borewell direction vastu",
+        "boring kis disha mein",
+        "borewell kahan karwaye",
+        "handpump direction",
+        "बोरवेल की दिशा",
+        "tubewell placement vastu",
+        "bore kaha khodna chahiye"
+      ]
+    },
+    {
+      "id": "WE-04",
+      "category": "water_elements",
+      "topic": "open_well",
+      "element": "water",
+      "best": [
+        "NE_eastern",
+        "N",
+        "E"
+      ],
+      "avoid": [
+        "SW",
+        "S",
+        "SE",
+        "W",
+        "NW",
+        "CENTER",
+        "NE_SW_diagonal",
+        "middle_of_plot"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 45,
+      "reasoning": "Water-element; NE well opens money flow; circular above surface.",
+      "sources": [
+        "SubhaVaastu",
+        "Ganeshaspeaks",
+        "NoBroker",
+        "MyPandit"
+      ],
+      "disagreement": "SubhaVaastu east-of-NE finer-grained.",
+      "severity_if_wrong": {
+        "SW": "major",
+        "S": "major",
+        "others": "moderate_to_major"
+      },
+      "remedy": "Fill/close wrong or dry well; lockable covered slab if cannot close; boundary buffer between house and well.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate_to_major",
+        "overrides": {
+          "SW": "major",
+          "S": "major"
+        }
+      },
+      "query_aliases": [
+        "well direction vastu",
+        "kuan kis disha mein",
+        "open well placement",
+        "कुआं की दिशा",
+        "well kahan banaye vastu"
+      ]
+    },
+    {
+      "id": "SD-01",
+      "category": "sleeping_direction",
+      "topic": "head_south",
+      "verdict": "best_overall",
+      "location_confidence": 95,
+      "effect_confidence": 50,
+      "reasoning": "Yama direction deep sleep; head(N-pole)-to-S unlike poles; low BP/longevity claims; small HIMS study cited cautiously.",
+      "best_for": [
+        "everyone",
+        "couples",
+        "elders",
+        "family_head",
+        "sleep_issues"
+      ],
+      "sources": [
+        "UltraTech",
+        "JKCement",
+        "WebMD",
+        "NoBroker",
+        "FloMattress",
+        "AppliedVastu",
+        "VastuConsultant",
+        "SleepFoundation"
+      ],
+      "disagreement": "None in vastu. Feng shui opposite (head N). Vastu-scoped.",
+      "severity_if_wrong": "na",
+      "remedy": "na_recommendation",
+      "entry_type": "rule",
+      "severity": {
+        "default": "na",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "sar kis disha mein sona hai",
+        "head direction while sleeping south",
+        "sleeping direction vastu",
+        "sote samay sir kis taraf",
+        "सोते समय सिर किस दिशा में",
+        "best sleeping direction",
+        "head south sleeping",
+        "kis taraf sir karke soye"
+      ]
+    },
+    {
+      "id": "SD-02",
+      "category": "sleeping_direction",
+      "topic": "head_east",
+      "verdict": "second_best",
+      "location_confidence": 92,
+      "effect_confidence": 50,
+      "reasoning": "Rising sun knowledge; memory/focus/career.",
+      "best_for": [
+        "students",
+        "children",
+        "teachers",
+        "scholars",
+        "writers"
+      ],
+      "sources": [
+        "SleepFoundation",
+        "WebMD",
+        "JKCement",
+        "NoBroker",
+        "AppliedVastu",
+        "VastuConsultant"
+      ],
+      "disagreement": "Ranking only; none call bad.",
+      "severity_if_wrong": "na",
+      "remedy": "na",
+      "entry_type": "rule",
+      "severity": {
+        "default": "na",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "head east sleeping vastu",
+        "sir purab ki taraf sona",
+        "east facing sleep direction",
+        "पूर्व दिशा में सिर",
+        "students sleeping direction",
+        "padhai ke liye sone ki disha"
+      ]
+    },
+    {
+      "id": "SD-03",
+      "category": "sleeping_direction",
+      "topic": "head_west",
+      "verdict": "contested_mixed",
+      "location_confidence": 60,
+      "effect_confidence": 35,
+      "reasoning": "PRO fame/ambition/business/guests; ANTI restless dreams/laziness/neutral.",
+      "sources": [
+        "WebMD",
+        "AppliedVastu",
+        "VastuConsultant",
+        "JKCement",
+        "NoBroker"
+      ],
+      "disagreement": "Most divided sleep topic; show both sides.",
+      "severity_if_wrong": "minor",
+      "remedy": "Switch head to S/E if uneasy; fine for guests as-is.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "head west sleeping vastu",
+        "sir pashchim ki taraf",
+        "west direction sleep",
+        "पश्चिम दिशा में सिर सोना",
+        "is west head sleeping good"
+      ]
+    },
+    {
+      "id": "SD-04",
+      "category": "sleeping_direction",
+      "topic": "head_north",
+      "verdict": "avoid_universal",
+      "location_confidence": 95,
+      "effect_confidence": 50,
+      "reasoning": "Dead laid head-N; like-poles-repel; restlessness/fatigue/BP/nightmares; avoid NE too.",
+      "sources": [
+        "WebMD",
+        "UltraTech",
+        "JKCement",
+        "NoBroker",
+        "FloMattress",
+        "AppliedVastu",
+        "VastuConsultant"
+      ],
+      "disagreement": "Feng shui recommends N; one study favored N-S axis. Tradition-scoped.",
+      "severity_if_wrong": "moderate",
+      "remedy": "Rotate the bed (instant zero-cost). Supplementary: sea-salt bowl, lavender.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "head north sleeping avoid",
+        "sir uttar ki taraf sona",
+        "north direction sleep bad",
+        "उत्तर दिशा में सिर क्यों नहीं",
+        "why not sleep head north",
+        "north me sir karke kyu nahi sote"
+      ]
+    },
+    {
+      "id": "SD-05",
+      "category": "sleeping_direction",
+      "topic": "master_bed_placement",
+      "best": "SW_zone_room__headboard_S_then_W_wall__head_S_or_E",
+      "avoid": [
+        "headboard_N_wall",
+        "NE_zone",
+        "corner_jammed",
+        "under_beam",
+        "inline_with_door",
+        "feet_toward_door",
+        "head_at_open_window",
+        "mirror_reflecting_bed",
+        "diagonal"
+      ],
+      "location_confidence": 88,
+      "effect_confidence": 45,
+      "reasoning": "SW earth/stability heavy bed; solid-wall grounding.",
+      "sources": [
+        "UltraTech",
+        "MyTyles",
+        "JKCement",
+        "Livspace",
+        "WoodenStreet",
+        "Houssed",
+        "BeautifulHomes",
+        "VastuTruth"
+      ],
+      "disagreement": "SW-corner vs don't-jam -> reconciled SW zone with side space.",
+      "severity_if_wrong": {
+        "headboard_N": "moderate",
+        "under_beam": "moderate",
+        "mirror_facing": "moderate",
+        "others": "minor"
+      },
+      "remedy": "Rotate for head-N; false-ceiling/shift for beam; reposition/cover mirror to N-E; add solid headboard.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {
+          "headboard_N": "moderate",
+          "under_beam": "moderate",
+          "mirror_facing": "moderate"
+        }
+      },
+      "query_aliases": [
+        "bed placement vastu master bedroom",
+        "palang kis disha mein rakhein",
+        "bed direction bedroom",
+        "master bed kaha rakhe",
+        "बेड की दिशा वास्तु",
+        "headboard direction",
+        "bed konsi deewar par"
+      ]
+    },
+    {
+      "id": "SD-06",
+      "category": "sleeping_direction",
+      "topic": "children_bed_direction",
+      "best": "head_E_then_S__room_W_zone__bed_SW_part",
+      "avoid": [
+        "head_N",
+        "inline_with_door",
+        "mirror_facing_bed"
+      ],
+      "location_confidence": 88,
+      "effect_confidence": 45,
+      "reasoning": "East knowledge/concentration; W-zone kids room.",
+      "sources": [
+        "AppliedVastu",
+        "Livspace",
+        "BeautifulHomes",
+        "MyTyles",
+        "VaastuMangaal",
+        "WoodenStreet"
+      ],
+      "disagreement": "Some allow S/NW room; East-head uncontested.",
+      "severity_if_wrong": "minor",
+      "remedy": "Rotate to head-E; move out of door-line; relocate/cover mirror.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "children bed direction vastu",
+        "bacchon ka bed kis disha",
+        "kids room sleeping direction",
+        "बच्चों के कमरे में बेड",
+        "child bed placement"
+      ]
+    },
+    {
+      "id": "SD-07",
+      "category": "sleeping_direction",
+      "topic": "guest_bed_direction",
+      "best": "room_NW_zone__head_S_or_W",
+      "location_confidence": 80,
+      "effect_confidence": 40,
+      "reasoning": "NW Vayu transience fits guests.",
+      "sources": [
+        "Livspace",
+        "BeautifulHomes",
+        "MyTyles",
+        "AppliedVastu",
+        "Houssed",
+        "WoodenStreet"
+      ],
+      "disagreement": "Corner-within-room split; common ground head-S solid wall.",
+      "severity_if_wrong": "minor",
+      "remedy": "Prioritise head-S; corner flexible for guests.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "guest room bed direction",
+        "mehmaan kamre ki disha",
+        "guest bedroom vastu",
+        "अतिथि कक्ष बेड दिशा",
+        "guest room kaha banaye"
+      ]
+    },
+    {
+      "id": "SD-08",
+      "category": "sleeping_direction",
+      "topic": "couples_newlyweds",
+      "best": "head_S__newlywed_room_NW_ok__wife_left_husband_right",
+      "avoid": [
+        "SE_zone_bedroom_conflict"
+      ],
+      "location_confidence": 75,
+      "effect_confidence": 35,
+      "sources": [
+        "VastuTruth",
+        "Livspace",
+        "AppliedVastu",
+        "NoBroker",
+        "WoodenStreet"
+      ],
+      "disagreement": "NW-newlywed prescription vs acceptable; SE-conflict effect-level.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "SE couple bedroom: metal/earth accents, soothing colours, head-S, limit red decor.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "couples bedroom vastu",
+        "newlywed room direction",
+        "shaadi shuda couple bedroom",
+        "navdampati kamra",
+        "पति पत्नी का कमरा दिशा",
+        "couple sleeping direction"
+      ]
+    },
+    {
+      "id": "DE-01",
+      "category": "doors_entry",
+      "topic": "main_door",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "fallback": [
+        "NW"
+      ],
+      "avoid": [
+        "SW",
+        "SE",
+        "bad_padas_any_direction"
+      ],
+      "location_confidence": 80,
+      "effect_confidence": 45,
+      "reasoning": "Primary energy inlet; NE morning sun; N Kubera wealth; E sun first rays.",
+      "sources": [
+        "JKCement",
+        "AnantVastu",
+        "Livspace",
+        "SubhaVaastu",
+        "Astrotalk",
+        "BeautifulHomes",
+        "AppliedVastu",
+        "Propzilla",
+        "KoltePatil"
+      ],
+      "disagreement": "DIRECTION vs PADA: advanced sources say pada (compass grid) decides, not gross direction; South-in-correct-pada fully auspicious, North-in-bad-pada harmful; 'south-facing bad' called a MYTH. Good padas: N3/N4/N5, E3/E4. Bad: E1/E2 Shikhi/Parjanya, NE Shikhi. Engine present 2 layers (beginner direction + 32-pada advanced).",
+      "severity_if_wrong": {
+        "SW": "major",
+        "wrong_pada": "moderate_to_major"
+      },
+      "remedy": "Avoid SW-facing. Mitigation: brass wire/metal strips at threshold; warm colours (green/blue/brown, no black); Om/Swastika/Ganesh/Lakshmi; plants; toran; partition. Generic mirror/wind-chime don't fix structural pada defects.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "SW": "major",
+          "wrong_pada": "moderate_to_major"
+        }
+      },
+      "query_aliases": [
+        "main door direction vastu",
+        "mukhya darwaza kis disha",
+        "main entrance direction",
+        "ghar ka mukhya dwar",
+        "मुख्य द्वार की दिशा",
+        "main gate vastu",
+        "front door direction",
+        "entrance kaha hona chahiye"
+      ]
+    },
+    {
+      "id": "DE-02",
+      "category": "doors_entry",
+      "topic": "threshold_dehleez",
+      "best": "install_raised_threshold_at_main_entrance",
+      "location_confidence": 88,
+      "effect_confidence": 40,
+      "reasoning": "Blocks negative energy; energetic boundary; retains wealth.",
+      "sources": [
+        "JKCement",
+        "KoltePatil",
+        "BeautifulHomes",
+        "Propzilla"
+      ],
+      "disagreement": "None significant.",
+      "severity_if_wrong": "minor",
+      "remedy": "Add low marble/wood threshold strip if missing.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "dehleez vastu",
+        "threshold main door",
+        "chaukhat kya zaroori hai",
+        "देहलीज वास्तु",
+        "door threshold importance"
+      ]
+    },
+    {
+      "id": "DE-03",
+      "category": "doors_entry",
+      "topic": "door_construction_dos_donts",
+      "best": "largest_door__opens_inward__wood_teak_rosewood__double_shutter__smooth__nameplate_left__no_black",
+      "avoid": [
+        "dwar_vedha_facing_door_stair_lift_toilet_wall_within_3ft",
+        "mirror_facing_main_door",
+        "shoe_rack_dustbin_broken_tiles_at_entrance",
+        "iron_metal_heavy"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 45,
+      "sources": [
+        "JKCement",
+        "Livspace",
+        "SubhaVaastu",
+        "Astrotalk",
+        "BeautifulHomes",
+        "KoltePatil"
+      ],
+      "disagreement": "Door/window NUMBER: even-only(traditional) vs even-or-odd(SubhaVaastu modern). Entrance STEPS: odd-number leaned(Astrotalk/BeautifulHomes). Open clockwise inward(BeautifulHomes).",
+      "severity_if_wrong": {
+        "dwar_vedha": "moderate",
+        "cosmetic": "minor"
+      },
+      "remedy": "Dwar vedha: toran, partition/curtain/jali screen, keep toilet door shut. Mirror-facing-door: relocate. Creak: oil hinges. Replace broken doors.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "dwar_vedha": "moderate",
+          "cosmetic": "minor"
+        }
+      },
+      "query_aliases": [
+        "main door rules vastu",
+        "darwaza banane ke niyam",
+        "door dos and donts",
+        "dwar vedha",
+        "मुख्य दरवाजे के नियम",
+        "mirror facing door",
+        "door material vastu",
+        "number of doors vastu"
+      ]
+    },
+    {
+      "id": "DE-04",
+      "category": "doors_entry",
+      "topic": "room_doors",
+      "best": "room_doors_on_N_E_NE_walls__smooth_90deg",
+      "location_confidence": 70,
+      "effect_confidence": 40,
+      "sources": [
+        "Livspace",
+        "AppliedVastu",
+        "WoodenStreet"
+      ],
+      "disagreement": "Layout-dependent, less strict; bedroom door N/W/E all cited.",
+      "severity_if_wrong": "minor",
+      "remedy": "Reposition bed/curtain for door-bed line or door-door clash.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "room door direction",
+        "kamre ka darwaza kis disha",
+        "bedroom door placement",
+        "कमरे के दरवाजे की दिशा"
+      ]
+    },
+    {
+      "id": "KI-01",
+      "category": "kitchen",
+      "topic": "kitchen_zone",
+      "best": [
+        "SE",
+        "NW"
+      ],
+      "avoid": [
+        "NE",
+        "SW",
+        "N",
+        "CENTER"
+      ],
+      "location_confidence": 92,
+      "effect_confidence": 45,
+      "reasoning": "Fire element -> SE Agni; NW air supports fire (fallback).",
+      "sources": [
+        "Livspace",
+        "GreenFortune",
+        "99acres",
+        "InteriorCompany",
+        "Asmita",
+        "NoBroker",
+        "BangurCement"
+      ],
+      "disagreement": "E-zone kitchen acceptable-not-ideal(some) vs just SE/NW(most).",
+      "severity_if_wrong": {
+        "NE": "major",
+        "SW": "major",
+        "N": "moderate_to_major"
+      },
+      "remedy": "NE: yellow/red accents+copper ceiling strip, lead strips, crystal grid. SW: saunf-wood+saltwater pot. N: garlic wreath. NW: lemon-sugar dish. Adjust cook/stove facing; keep clean+ventilated.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "major",
+          "SW": "major",
+          "N": "moderate_to_major"
+        }
+      },
+      "query_aliases": [
+        "kitchen direction vastu",
+        "rasoi kis disha mein",
+        "kitchen kaha hona chahiye",
+        "किचन की दिशा",
+        "best direction for kitchen",
+        "rasoi ghar dishaa"
+      ]
+    },
+    {
+      "id": "KI-02",
+      "category": "kitchen",
+      "topic": "gas_stove",
+      "best": [
+        "SE"
+      ],
+      "avoid": [
+        "front_of_entrance",
+        "under_window",
+        "beside_sink"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 45,
+      "reasoning": "Core fire element -> SE; SE placement makes cook face East.",
+      "sources": [
+        "Livspace",
+        "GreenFortune",
+        "99acres",
+        "InteriorCompany",
+        "NoBroker",
+        "BangurCement",
+        "Asmita"
+      ],
+      "disagreement": "None significant.",
+      "severity_if_wrong": {
+        "beside_sink": "moderate",
+        "others": "moderate"
+      },
+      "remedy": "Relocate to SE. Near sink: bone-china vase buffer or divider; max distance.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "beside_sink": "moderate"
+        }
+      },
+      "query_aliases": [
+        "gas stove direction vastu",
+        "chulha kis disha mein",
+        "gas chulha kaha rakhe",
+        "गैस चूल्हे की दिशा",
+        "cooking platform direction",
+        "stove placement kitchen"
+      ]
+    },
+    {
+      "id": "KI-03",
+      "category": "kitchen",
+      "topic": "cooking_facing",
+      "best": [
+        "E",
+        "N"
+      ],
+      "avoid": [
+        "S",
+        "W"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 40,
+      "reasoning": "East morning sun health/digestion.",
+      "sources": [
+        "Livspace",
+        "GreenFortune",
+        "99acres",
+        "InteriorCompany",
+        "NoBroker",
+        "Asmita"
+      ],
+      "disagreement": "Livspace adds 'west ok'; majority E-first N-fallback avoid-S/W.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "Rearrange stove to face E; N acceptable if fixed.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "cooking facing direction",
+        "khana banate samay muh kis taraf",
+        "cooking face east",
+        "खाना बनाते समय दिशा",
+        "kis disha me muh karke khana banaye"
+      ]
+    },
+    {
+      "id": "KI-04",
+      "category": "kitchen",
+      "topic": "sink_water",
+      "best": [
+        "N",
+        "NE"
+      ],
+      "avoid": [
+        "SE",
+        "beside_stove"
+      ],
+      "location_confidence": 80,
+      "effect_confidence": 40,
+      "reasoning": "Flowing water -> N/NE, opposite SE stove.",
+      "sources": [
+        "99acres",
+        "InteriorCompany",
+        "NoBroker",
+        "BangurCement",
+        "Asmita"
+      ],
+      "disagreement": "Livspace 'sink faces SE' is outlier/self-contradicting; consensus N/NE.",
+      "severity_if_wrong": "moderate",
+      "remedy": "Shift sink/RO to N/NE; if next to stove, divider or bone-china vase buffer.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "kitchen sink direction",
+        "sink kis disha mein",
+        "wash basin kitchen vastu",
+        "किचन सिंक दिशा",
+        "sink kaha lagaye"
+      ]
+    },
+    {
+      "id": "KI-05",
+      "category": "kitchen",
+      "topic": "appliances_storage",
+      "best": "fridge_SW_W_S__oven_mixer_SE_S__heavy_cabinets_grain_S_W__exhaust_E_N",
+      "avoid": [
+        "grain_NE",
+        "fridge_NE",
+        "platform_center"
+      ],
+      "location_confidence": 78,
+      "effect_confidence": 40,
+      "sources": [
+        "InteriorCompany",
+        "Asmita",
+        "BangurCement",
+        "99acres"
+      ],
+      "disagreement": "Fridge SW vs W vs S; firm rule = not NE.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "Move fridge out of NE to SW/W; grain storage NE->S/W.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "fridge direction vastu",
+        "refrigerator kis disha",
+        "kitchen appliances placement",
+        "फ्रिज की दिशा",
+        "microwave oven direction",
+        "grain storage kitchen"
+      ]
+    },
+    {
+      "id": "PJ-01",
+      "category": "pooja_room",
+      "topic": "pooja_zone",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "avoid": [
+        "S",
+        "SW",
+        "under_staircase",
+        "in_or_adjacent_bedroom",
+        "above_below_next_to_toilet_or_kitchen",
+        "basement",
+        "top_floor",
+        "storeroom"
+      ],
+      "location_confidence": 93,
+      "effect_confidence": 50,
+      "reasoning": "NE Ishanya Shiva zone, max solar/divine; S blocks positive energy.",
+      "sources": [
+        "AppliedVastu",
+        "NoBroker",
+        "SubhaVaastu",
+        "Livspace",
+        "DesignCafe",
+        "JKCement",
+        "WoodenStreet",
+        "VastuMandir",
+        "Bajaj",
+        "VastuArt"
+      ],
+      "disagreement": "Kitchen-adjacency: avoid(JKCement) vs fine(SubhaVaastu). NW not ideal(SubhaVaastu).",
+      "severity_if_wrong": {
+        "S": "major",
+        "under_stairs": "major",
+        "toilet_adjacent": "major",
+        "bedroom_attached": "moderate"
+      },
+      "remedy": "Relocate NE/E/N. Under-stairs->living-room NE/E wall mandir. Toilet wall->decoupled back panel + altar shift 10-15cm. Bedroom-only->NE corner covered, feet not toward it. Dosh: pyramid/copper-strips-E-wall/mirror-NE/Vastu-Dosh-Nivaran-Yantra.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "S": "major",
+          "under_stairs": "major",
+          "toilet_adjacent": "major",
+          "bedroom_attached": "moderate"
+        }
+      },
+      "query_aliases": [
+        "pooja room direction vastu",
+        "mandir kis disha mein",
+        "puja ghar kaha banaye",
+        "पूजा घर की दिशा",
+        "temple direction home",
+        "mandir kaha hona chahiye",
+        "worship room placement"
+      ]
+    },
+    {
+      "id": "PJ-02",
+      "category": "pooja_room",
+      "topic": "idol_facing",
+      "best": "idols_E_or_W_wall__worshipper_faces_E__Ganesha_E__Shiva_N",
+      "avoid": [
+        "idol_facing_S",
+        "idols_facing_each_other",
+        "idol_facing_door",
+        "idol_touching_wall",
+        "idol_on_floor",
+        "idol_over_9in"
+      ],
+      "location_confidence": 70,
+      "effect_confidence": 45,
+      "reasoning": "Worshipper facing E/N solar/divine alignment.",
+      "sources": [
+        "AppliedVastu",
+        "NoBroker",
+        "Livspace",
+        "DesignCafe",
+        "JKCement",
+        "WoodenStreet",
+        "VastuMandir",
+        "Bajaj",
+        "VastuArt"
+      ],
+      "disagreement": "Idol-faces-NE vs idol-faces-W(worshipper-E) vs idol-faces-E/W. Safe ground: worshipper faces E, idol E/W wall, NEVER S.",
+      "severity_if_wrong": {
+        "facing_S": "moderate",
+        "facing_door": "moderate"
+      },
+      "remedy": "Reorient idols to W/NE; raise >=6in; off-wall >=1in; not facing each other or door.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "facing_S": "moderate",
+          "facing_door": "moderate"
+        }
+      },
+      "query_aliases": [
+        "idol facing direction pooja",
+        "bhagwan ki murti kis disha",
+        "god idol facing",
+        "मूर्ति किस दिशा में",
+        "deity direction mandir",
+        "murti ka mukh kis taraf"
+      ]
+    },
+    {
+      "id": "PJ-03",
+      "category": "pooja_room",
+      "topic": "fixtures_dos_donts",
+      "best": "two_shutter_wood_door+threshold__light_colours__diya_agnikund_SE__window_E_N__storage_under_idols_W_S__copper_silver_utensils__fresh_flowers",
+      "avoid": [
+        "dark_colours",
+        "broken_idols",
+        "ancestor_photos_above_deity",
+        "money_valuables_hidden",
+        "dustbin",
+        "food_clutter",
+        "cabinets_above_idols",
+        "sleeping_in_pooja",
+        "inferior_wood_door"
+      ],
+      "location_confidence": 82,
+      "effect_confidence": 40,
+      "sources": [
+        "AppliedVastu",
+        "JKCement",
+        "WoodenStreet",
+        "VastuArt",
+        "Bajaj",
+        "VastuMandir",
+        "NoBroker"
+      ],
+      "disagreement": "Idol height <=9in(most) vs 2-9in vs >=18in(VastuArt). Colour white/cream/light(most) vs yellow+white-golden(VastuArt).",
+      "severity_if_wrong": {
+        "broken_idols": "moderate",
+        "ancestor_photos_above": "moderate",
+        "cosmetic": "minor"
+      },
+      "remedy": "Remove broken idols; ancestor photos low on S wall; diya->SE; declutter; storage below/beside not above idols.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "broken_idols": "moderate",
+          "ancestor_photos_above": "moderate",
+          "cosmetic": "minor"
+        }
+      },
+      "query_aliases": [
+        "pooja room dos and donts",
+        "mandir ke niyam",
+        "puja ghar mein kya na rakhe",
+        "पूजा घर के नियम",
+        "diya direction pooja",
+        "mandir fixtures vastu"
+      ]
+    },
+    {
+      "id": "EA-01",
+      "category": "eating_direction",
+      "topic": "eating_face_direction",
+      "best": [
+        "E",
+        "N"
+      ],
+      "fallback": [
+        "W"
+      ],
+      "avoid": [
+        "S"
+      ],
+      "location_confidence": 88,
+      "effect_confidence": 40,
+      "reasoning": "E morning-sun digestion/metabolism; N Kubera; head-of-family faces E.",
+      "sources": [
+        "UltraTech",
+        "WoodenStreet",
+        "SubhaVaastu",
+        "NoBroker",
+        "TrueVastu",
+        "DrNehaaGupta",
+        "MyVaastu",
+        "TheVastuPractice"
+      ],
+      "disagreement": "W: ill-health-avoid(TrueVastu,TheVastuPractice) vs fine-for-others(SubhaVaastu,WoodenStreet). S: mostly avoid, SubhaVaastu relaxed. Reconciled: head E; others E/N/W; avoid S.",
+      "severity_if_wrong": {
+        "S": "moderate",
+        "W": "minor_to_moderate"
+      },
+      "remedy": "Re-orient seating so earner/elder faces E/N; avoid S-facing head seat.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "S": "moderate",
+          "W": "minor_to_moderate"
+        }
+      },
+      "query_aliases": [
+        "eating direction vastu",
+        "khana khate samay muh kis taraf",
+        "face direction while eating",
+        "भोजन करते समय दिशा",
+        "kis disha me baith kar khana khaye",
+        "dining facing"
+      ]
+    },
+    {
+      "id": "EA-02",
+      "category": "eating_direction",
+      "topic": "dining_table_room_placement",
+      "best": [
+        "W",
+        "NW",
+        "E",
+        "N"
+      ],
+      "avoid": [
+        "CENTER",
+        "bedroom",
+        "facing_main_door",
+        "toilet_shared_wall",
+        "under_beam",
+        "against_wall_no_space"
+      ],
+      "location_confidence": 78,
+      "effect_confidence": 40,
+      "reasoning": "Dining W/NW prosperity; near/adjacent kitchen same floor; square/rectangle table.",
+      "sources": [
+        "UltraTech",
+        "WoodenStreet",
+        "SubhaVaastu",
+        "NoBroker",
+        "TrueVastu",
+        "DrNehaaGupta",
+        "TheVastuPractice",
+        "VaastuShastra"
+      ],
+      "disagreement": "Best zone W(NoBroker/TrueVastu) vs E/N-generally(SubhaVaastu, relaxed 'S fine too') vs table-in-W-zone-of-room(TheVastuPractice). Table shape: square/rect consensus, avoid round/oval/hex.",
+      "severity_if_wrong": {
+        "center": "moderate",
+        "bedroom": "moderate",
+        "facing_main_door": "minor_to_moderate"
+      },
+      "remedy": "Can't move: mirror on N/E wall reflecting table (doubles food/prosperity); Vastu pyramid; bright light; fruit/flower bowl; no cracked crockery; partition if facing main door.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "center": "moderate",
+          "bedroom": "moderate",
+          "facing_main_door": "minor_to_moderate"
+        }
+      },
+      "query_aliases": [
+        "dining table direction vastu",
+        "dining table kis disha",
+        "khane ki mez kahan",
+        "डाइनिंग टेबल दिशा",
+        "dining room placement",
+        "dining table shape vastu"
+      ]
+    },
+    {
+      "id": "FF-01",
+      "category": "furniture_fixtures",
+      "topic": "wardrobe_almirah",
+      "best": [
+        "SW",
+        "W",
+        "S"
+      ],
+      "fallback": [
+        "NW"
+      ],
+      "avoid": [
+        "NE",
+        "center",
+        "next_to_bedroom_door",
+        "blocking_N_E_walls",
+        "touching_wall"
+      ],
+      "door_open": "N_or_E",
+      "location_confidence": 88,
+      "effect_confidence": 45,
+      "reasoning": "Heavy furniture SW earth/stability; doors-open-N/E energy inflow; iron/steel almirah W/NW.",
+      "sources": [
+        "AppliedVastu",
+        "SquareYards",
+        "Livspace",
+        "VedicBirth",
+        "UltraTech",
+        "WoodenStreet",
+        "InteriorCompany",
+        "AHDFurniture",
+        "LuxuryHandicraft"
+      ],
+      "disagreement": "LuxuryHandicraft NW-or-SW; most SW-primary NW-secondary. Firm: not NE.",
+      "severity_if_wrong": {
+        "NE": "moderate",
+        "center": "moderate"
+      },
+      "remedy": "Stuck wrong: declutter internally (clutter=financial blockage), light finish, doors clear the bed, one solid wall behind.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "moderate",
+          "center": "moderate"
+        }
+      },
+      "query_aliases": [
+        "almari kis disha mein rakhein",
+        "wardrobe direction vastu",
+        "almirah placement",
+        "अलमारी की दिशा",
+        "cupboard direction",
+        "wardrobe kaha rakhe",
+        "almari kaha rakhni chahiye"
+      ]
+    },
+    {
+      "id": "FF-02",
+      "category": "furniture_fixtures",
+      "topic": "locker_safe",
+      "best": "model_a_N_wall_opens_N_E__model_b_SW_corner_opens_N",
+      "avoid": [
+        "NE",
+        "unstable_platform",
+        "empty_locker"
+      ],
+      "location_confidence": 75,
+      "effect_confidence": 40,
+      "reasoning": "N Kubera wealth; opening N/E = wealth in not out; SW stability holds wealth.",
+      "sources": [
+        "AppliedVastu",
+        "Livspace",
+        "VedicBirth",
+        "InteriorCompany",
+        "Asmita"
+      ],
+      "disagreement": "N-wall-opens-N/E(VedicBirth: never toward N wall itself) vs SW-corner-opens-N(Livspace/InteriorCompany). Agreement: opening faces N/E, never NE, never empty.",
+      "severity_if_wrong": {
+        "NE": "moderate",
+        "empty": "minor"
+      },
+      "remedy": "Keep 5-7 silver coins/cash inside (never empty); small mirror inside reflecting valuables (doubles abundance); stable platform.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "moderate",
+          "empty": "minor"
+        }
+      },
+      "query_aliases": [
+        "paisa kahan rakhein vastu",
+        "locker direction vastu",
+        "safe kis disha mein",
+        "tijori kaha rakhe",
+        "पैसे रखने की दिशा",
+        "cash locker placement",
+        "money safe direction",
+        "jewellery locker vastu"
+      ]
+    },
+    {
+      "id": "FF-03",
+      "category": "furniture_fixtures",
+      "topic": "mirror_placement",
+      "best": [
+        "N",
+        "E",
+        "NE"
+      ],
+      "avoid": [
+        "facing_bed",
+        "facing_opposite_main_door",
+        "S_wall",
+        "W_wall",
+        "two_mirrors_facing",
+        "broken_cracked",
+        "reflecting_toilet_clutter",
+        "excess_in_kitchen"
+      ],
+      "location_confidence": 90,
+      "effect_confidence": 45,
+      "reasoning": "Mirrors=energy amplifiers multiply reflection; N wealth, E clarity; reflecting bed=sleep/health/quarrels; reflecting door=energy repelled.",
+      "sources": [
+        "UltraTech",
+        "JKCement",
+        "TrueVastu",
+        "LuxuryHandicraft",
+        "Asmita",
+        "Simpolo",
+        "NoBroker"
+      ],
+      "disagreement": "NoBroker 'dressing mirror beside bed excellent' vs universal 'not facing bed' -> beside/perpendicular ok, opposite not. Dining mirror positive exception.",
+      "severity_if_wrong": {
+        "facing_bed": "moderate",
+        "facing_main_door": "moderate",
+        "broken": "moderate",
+        "wrong_wall": "minor"
+      },
+      "remedy": "Reposition to N/E; if fixed opposite bed cover at night; Bagua mirror on bedroom/main door; replace broken; fix flat to wall.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "facing_bed": "moderate",
+          "facing_main_door": "moderate",
+          "broken": "moderate",
+          "wrong_wall": "minor"
+        }
+      },
+      "query_aliases": [
+        "mirror direction vastu",
+        "sheesha kis disha mein",
+        "mirror placement bedroom",
+        "दर्पण की दिशा",
+        "aaina kaha lagaye",
+        "mirror facing bed"
+      ]
+    },
+    {
+      "id": "FF-04",
+      "category": "furniture_fixtures",
+      "topic": "study_table",
+      "best": "face_E_then_N__room_NE_or_E_W__wood_table_E_SE__metal_table_W_NW__3-4in_wall_gap",
+      "avoid": [
+        "face_S",
+        "face_NW",
+        "round_oval_table",
+        "mirror_in_study",
+        "back_to_door_window",
+        "near_toilet"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 40,
+      "reasoning": "E/N concentration+magnetic alignment; SE agni placement boosts focus.",
+      "sources": [
+        "Coohom",
+        "Astrotalk",
+        "LuxuryHandicraft",
+        "Livspace"
+      ],
+      "disagreement": "Room zone NE vs E/W-of-house-N-second (Astrotalk internal). Facing uncontested: E first N second avoid S/NW.",
+      "severity_if_wrong": {
+        "face_S_NW": "minor_to_moderate"
+      },
+      "remedy": "Rotate desk to E/N; remove mirror; 3-4in wall gap; Saraswati/Ganesha image + crystal globe.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "face_S_NW": "minor_to_moderate"
+        }
+      },
+      "query_aliases": [
+        "study table direction vastu",
+        "padhai table kis disha",
+        "study facing east",
+        "पढ़ाई की मेज दिशा",
+        "study table kaha rakhe",
+        "padhai ke liye disha"
+      ]
+    },
+    {
+      "id": "FF-05",
+      "category": "furniture_fixtures",
+      "topic": "tv_electronics",
+      "best": [
+        "SE",
+        "NW"
+      ],
+      "avoid": [
+        "bedroom",
+        "N_wall",
+        "E_wall",
+        "facing_bed"
+      ],
+      "location_confidence": 70,
+      "effect_confidence": 35,
+      "reasoning": "TV electronic/fire-linked SE; glass reflects like mirror (mirror-facing-bed caution).",
+      "sources": [
+        "AppliedVastu",
+        "LuxuryHandicraft",
+        "TrueVastu",
+        "NoBroker"
+      ],
+      "disagreement": "Zone SE(most) vs NW(LuxuryHandicraft TV-unit) vs S-cover-when-off(LuxuryHandicraft mirror-guide). Split; SE most-cited.",
+      "severity_if_wrong": {
+        "facing_bed": "minor_to_moderate",
+        "wrong_zone": "minor"
+      },
+      "remedy": "Shift to SE/NW; cover screen when off if facing bed; keep out of bedroom.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "facing_bed": "minor_to_moderate",
+          "wrong_zone": "minor"
+        }
+      },
+      "query_aliases": [
+        "tv direction vastu",
+        "television kis disha mein",
+        "tv kaha rakhe bedroom",
+        "टीवी की दिशा",
+        "tv unit placement"
+      ]
+    },
+    {
+      "id": "FF-06",
+      "category": "furniture_fixtures",
+      "topic": "sofa_seating",
+      "best": "heavy_sofa_S_or_W_wall__occupants_face_N_or_E__SW_corner_facing_E_ok",
+      "avoid": [
+        "back_to_main_entrance",
+        "heavy_seating_NE",
+        "blocking_N_E_walls"
+      ],
+      "location_confidence": 75,
+      "effect_confidence": 35,
+      "reasoning": "Heavy furniture S/W walls; occupants face N/E; NE stays light.",
+      "sources": [
+        "LuxuryHandicraft",
+        "Propzilla",
+        "VedicBirth"
+      ],
+      "disagreement": "SW-sofa-facing-E vs S/W-wall-facing-N/E: both keep heavy mass S/W, consistent.",
+      "severity_if_wrong": {
+        "back_to_entrance": "minor_to_moderate",
+        "heavy_NE": "minor_to_moderate"
+      },
+      "remedy": "Rearrange so main seat not back-to-door; move heavy sofa off NE to S/W.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "back_to_entrance": "minor_to_moderate",
+          "heavy_NE": "minor_to_moderate"
+        }
+      },
+      "query_aliases": [
+        "sofa direction vastu",
+        "sofa kis disha mein",
+        "seating direction living room",
+        "सोफे की दिशा",
+        "sofa kaha rakhe"
+      ]
+    },
+    {
+      "id": "FF-07",
+      "category": "furniture_fixtures",
+      "topic": "bed_dos_donts",
+      "best": "solid_wooden_headboard_S_or_W_wall__space_both_sides__square_rect_wooden_bed",
+      "avoid": [
+        "under_exposed_beam",
+        "head_facing_mirror",
+        "headboard_on_toilet_wall",
+        "metal_bed",
+        "inline_with_or_feet_toward_door",
+        "head_under_open_window",
+        "round_irregular"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 45,
+      "reasoning": "Complements SD-05; solid headboard grounding.",
+      "sources": [
+        "WoodenStreet",
+        "JKCement",
+        "UltraTech",
+        "Astrotalk",
+        "BeautifulHomes"
+      ],
+      "disagreement": "None major (consistent with SD-05).",
+      "severity_if_wrong": {
+        "under_beam": "moderate",
+        "mirror_facing": "moderate",
+        "toilet_wall_headboard": "moderate"
+      },
+      "remedy": "False ceiling/shift for beam; cover/relocate mirror; buffer/shift off toilet wall; switch kids to wooden bed.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "under_beam": "moderate",
+          "mirror_facing": "moderate",
+          "toilet_wall_headboard": "moderate"
+        }
+      },
+      "query_aliases": [
+        "bed rules vastu",
+        "palang ke niyam",
+        "bed under beam",
+        "बेड के नियम वास्तु",
+        "bed dos and donts",
+        "beam ke niche bed"
+      ]
+    },
+    {
+      "id": "CO-01",
+      "category": "colors",
+      "topic": "color_by_direction",
+      "domain_note": "Least rigid vastu domain; effect-level; low severity.",
+      "by_zone": {
+        "N": {
+          "rec": [
+            "green",
+            "pista_green",
+            "light_blue"
+          ],
+          "avoid": [
+            "dark",
+            "black"
+          ]
+        },
+        "NE": {
+          "rec": [
+            "light_blue",
+            "white",
+            "cream",
+            "light_yellow"
+          ],
+          "avoid": [
+            "dark",
+            "black",
+            "red"
+          ]
+        },
+        "E": {
+          "rec": [
+            "white",
+            "light_blue",
+            "green",
+            "brown"
+          ],
+          "avoid": [
+            "dark"
+          ]
+        },
+        "SE": {
+          "rec": [
+            "orange",
+            "pink",
+            "silver",
+            "white",
+            "red"
+          ],
+          "avoid": [
+            "blue",
+            "black"
+          ]
+        },
+        "S": {
+          "rec": [
+            "red",
+            "yellow",
+            "pink",
+            "coral"
+          ],
+          "avoid": [
+            "excess_dark"
+          ]
+        },
+        "SW": {
+          "rec": [
+            "brown",
+            "terracotta",
+            "beige",
+            "peach",
+            "biscuit",
+            "mud"
+          ],
+          "avoid": [
+            "blue_contested"
+          ]
+        },
+        "W": {
+          "rec": [
+            "blue",
+            "white",
+            "grey"
+          ],
+          "avoid": [
+            "dark"
+          ]
+        },
+        "NW": {
+          "rec": [
+            "white",
+            "light_grey",
+            "cream"
+          ],
+          "avoid": [
+            "dark"
+          ]
+        },
+        "CENTER": {
+          "rec": [
+            "white",
+            "light_soothing"
+          ],
+          "avoid": [
+            "heavy_dark"
+          ]
+        }
+      },
+      "location_confidence": 70,
+      "effect_confidence": 30,
+      "sources": [
+        "UltraTech",
+        "AsianPaints",
+        "LnTRealty",
+        "SMRHoldings",
+        "BirlaOpus",
+        "Lodha",
+        "AdaniRealty",
+        "Piramal"
+      ],
+      "disagreement": "SW: earthy(consensus) vs blue(SMR outlier). NE: light-blue vs white/cream(both light). E: white/light-blue vs green/brown(both light). Universal avoid: black/dark absorbs, grey dullness, red+blue clash.",
+      "severity_if_wrong": "minor",
+      "remedy": "Repaint to zone shade or use accents/furnishings/curtains; no structural fix; easiest domain to change.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "direction wise colours vastu",
+        "kis disha ka kaunsa rang",
+        "wall colour by direction",
+        "दिशा अनुसार रंग",
+        "zone colours vastu",
+        "deewar ka rang disha"
+      ]
+    },
+    {
+      "id": "CO-02",
+      "category": "colors",
+      "topic": "color_by_room",
+      "by_room": {
+        "master_bedroom": {
+          "rec": [
+            "earthy_brown_chocolate_beige",
+            "OR_light_blue_green_lavender_pastel_pink"
+          ],
+          "avoid": [
+            "dark_red",
+            "grey_overuse",
+            "black"
+          ]
+        },
+        "kitchen": {
+          "rec": [
+            "orange",
+            "red",
+            "yellow",
+            "peach",
+            "brick",
+            "green",
+            "brown"
+          ],
+          "avoid": [
+            "blue",
+            "black"
+          ]
+        },
+        "living_room": {
+          "rec": [
+            "white",
+            "beige",
+            "yellow",
+            "green",
+            "light_blue",
+            "soft_pink"
+          ],
+          "avoid": [
+            "dark_intense"
+          ]
+        },
+        "pooja": {
+          "rec": [
+            "white",
+            "cream",
+            "pale_yellow",
+            "light_orange",
+            "light_blue",
+            "soft_pink"
+          ],
+          "avoid": [
+            "dark",
+            "bold",
+            "cluttered_patterns"
+          ]
+        },
+        "dining": {
+          "rec": [
+            "warm_yellow",
+            "peach",
+            "orange",
+            "light_brown",
+            "cream",
+            "light_green"
+          ],
+          "avoid": [
+            "dark",
+            "cold"
+          ]
+        },
+        "children": {
+          "rec": [
+            "pastel_green_blue",
+            "vibrant_balanced"
+          ],
+          "avoid": [
+            "excess_bright"
+          ]
+        },
+        "guest": {
+          "rec": [
+            "grey",
+            "white",
+            "cool_tones"
+          ],
+          "avoid": []
+        },
+        "bathroom": {
+          "rec": [
+            "white",
+            "light_grey",
+            "light_blue",
+            "pastels"
+          ],
+          "avoid": [
+            "black",
+            "deep_brown"
+          ]
+        },
+        "staircase": {
+          "rec": [
+            "white",
+            "light"
+          ],
+          "avoid": [
+            "red",
+            "black",
+            "dark"
+          ]
+        }
+      },
+      "location_confidence": 72,
+      "effect_confidence": 30,
+      "sources": [
+        "UltraTech",
+        "AsianPaints",
+        "LnTRealty",
+        "BirlaOpus",
+        "Lodha",
+        "AdaniRealty",
+        "Piramal"
+      ],
+      "disagreement": "Master bedroom split: earthy-tones(SW-earth logic) vs soothing-pastel(rest logic) - present both. Kitchen(warm) & pooja(light) high consensus.",
+      "severity_if_wrong": "minor",
+      "remedy": "Repaint or accents; dark-red bedroom soften with pastel bedding; blue/black kitchen add warm accents.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "room colours vastu",
+        "kaunse kamre mein kaunsa rang",
+        "bedroom colour vastu",
+        "कमरे के रंग वास्तु",
+        "kitchen colour",
+        "room wise colour"
+      ]
+    },
+    {
+      "id": "MI-01",
+      "category": "misc",
+      "topic": "toilet_bathroom",
+      "best_beginner": [
+        "NW",
+        "W"
+      ],
+      "best_advanced_16zone": [
+        "WNW",
+        "SSW",
+        "ESE"
+      ],
+      "fallback": [
+        "SE"
+      ],
+      "avoid": [
+        "NE",
+        "SW",
+        "CENTER",
+        "NNE",
+        "N"
+      ],
+      "seat_facing": [
+        "N",
+        "S"
+      ],
+      "seat_avoid_facing": [
+        "E",
+        "W"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 45,
+      "reasoning": "Disposal function -> disposal zones (NW, SW-adjacent), never sacred NE; seat on N-S axis.",
+      "sources": [
+        "Cera",
+        "AppliedVastu",
+        "AnantVastu",
+        "NoBroker",
+        "AnjaneyVastu",
+        "GreenFortune",
+        "JKCement",
+        "GoDigit"
+      ],
+      "disagreement": "Best zone NW/W(beginner) vs WNW/SSW/ESE(advanced 16-zone) - gross SW bad but SSW sub-zone good; 2-layer like main-door. SE acceptable(Cera/NoBroker) vs marital/female-health/payment-delay(AppliedVastu/AnjaneyVastu). Under-stairs fine(AppliedVastu) vs avoid(most).",
+      "severity_if_wrong": {
+        "NE": "major",
+        "SW": "major",
+        "CENTER": "major",
+        "SE": "moderate"
+      },
+      "remedy": "Door closed; exhaust E/N; sea salt bowl inside; Vastu pyramid outer wall; money/spider/palm plant inside; light colours; slope drainage N/E/NE; commode raised 1-2ft; NE->Yantra/crystals/box; SE->wood+candle image; never share wall with kitchen/pooja.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "major",
+          "SW": "major",
+          "CENTER": "major",
+          "SE": "moderate"
+        }
+      },
+      "query_aliases": [
+        "toilet direction vastu",
+        "bathroom kis disha mein",
+        "shauchalay kaha banaye",
+        "टॉयलेट की दिशा",
+        "toilet seat facing",
+        "toilet kaha hona chahiye",
+        "bathroom placement vastu",
+        "latrine direction"
+      ]
+    },
+    {
+      "id": "MI-02",
+      "category": "misc",
+      "topic": "staircase",
+      "best": [
+        "S",
+        "W",
+        "SW"
+      ],
+      "rise": "clockwise_E_to_W_or_N_to_S",
+      "steps": "odd_number",
+      "avoid": [
+        "NE",
+        "CENTER",
+        "facing_main_entrance",
+        "ending_at_bedroom_toilet_pooja_kitchen_door",
+        "under_stair_pooja_or_kitchen"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 40,
+      "reasoning": "Heavy + up-down movement -> heavy SW/S/W; NE light/open; clockwise = positive flow.",
+      "sources": [
+        "Orientbell",
+        "Piramal",
+        "AnantVastu",
+        "JKCement",
+        "NoBroker"
+      ],
+      "disagreement": "Step-count odd-preferred consensus but echoes doors/steps modern-view-count-doesnt-matter split. Minor.",
+      "severity_if_wrong": {
+        "NE": "major",
+        "CENTER": "major",
+        "facing_main_door": "moderate"
+      },
+      "remedy": "NE staircase: keep light, add lighting, light finish; symbolic crystals; under-stair clutter-free, no pooja/kitchen; clockwise; good ventilation; no broken treads.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "major",
+          "CENTER": "major",
+          "facing_main_door": "moderate"
+        }
+      },
+      "query_aliases": [
+        "staircase direction vastu",
+        "seedhi kis disha mein",
+        "stairs placement",
+        "सीढ़ी की दिशा",
+        "staircase clockwise",
+        "seedhiyan kaha banaye"
+      ]
+    },
+    {
+      "id": "MI-03",
+      "category": "misc",
+      "topic": "plants_general",
+      "do": [
+        "healthy_vibrant",
+        "earthen_ceramic_pots",
+        "remove_dead_48hrs",
+        "odd_counts",
+        "thorny_outdoors_SW_W"
+      ],
+      "avoid_indoors": [
+        "cactus_thorny",
+        "bonsai",
+        "dead_dried_artificial",
+        "tamarind_babul_cotton_silk_near_property"
+      ],
+      "bedroom_only": [
+        "snake",
+        "aloe",
+        "money",
+        "orchid",
+        "gerbera",
+        "1-2_max"
+      ],
+      "location_confidence": 80,
+      "effect_confidence": 40,
+      "sources": [
+        "JKCement",
+        "plusvalueindia_NitienParmar",
+        "Astraroot",
+        "Housivity",
+        "UltraTech",
+        "JSWOneHomes",
+        "plantsinformation",
+        "PawanKaushik"
+      ],
+      "disagreement": "See tulsi/money sub-entries.",
+      "severity_if_wrong": {
+        "cactus_bonsai_indoor": "moderate",
+        "dead_plants": "moderate"
+      },
+      "remedy": "Cactus/thorny -> outdoor SW; remove bonsai/dead/artificial; earthen pots; trim dead leaves; odd counts.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "cactus_bonsai_indoor": "moderate",
+          "dead_plants": "moderate"
+        }
+      },
+      "query_aliases": [
+        "plants vastu direction",
+        "paudhe kis disha mein",
+        "indoor plants vastu",
+        "पौधों की दिशा",
+        "which plants at home",
+        "cactus indoor vastu"
+      ]
+    },
+    {
+      "id": "MI-03a",
+      "category": "misc",
+      "topic": "tulsi_plant",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "placement": "raised_platform_tulsi_chaura_courtyard__balcony_window_N_NE_E_if_indoor",
+      "avoid": [
+        "near_toilet_drain_garbage",
+        "under_staircase",
+        "shadowy_corner",
+        "inside_bedroom_bathroom",
+        "on_ground",
+        "metal_pot",
+        "dry_wilted"
+      ],
+      "location_confidence": 82,
+      "effect_confidence": 40,
+      "sources": [
+        "Astraroot",
+        "UltraTech",
+        "Housivity",
+        "JSWOneHomes",
+        "plantsinformation",
+        "plusvalueindia"
+      ],
+      "disagreement": "Best dir NE(Astraroot/UltraTech/Housivity) vs East-ideal(JSWOneHomes/plantsinformation) vs N/NE/E-all-fine(most). NE/E/N all auspicious, NE most-cited.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "Relocate to NE/E raised platform; earthen pot; keep healthy; away from toilet/stairs.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "tulsi plant direction vastu",
+        "tulsi kis disha mein",
+        "tulsi kaha lagaye",
+        "तुलसी की दिशा",
+        "holy basil placement",
+        "tulsi plant kaha rakhe"
+      ]
+    },
+    {
+      "id": "MI-03b",
+      "category": "misc",
+      "topic": "money_plant",
+      "best": [
+        "SE",
+        "N"
+      ],
+      "note": "SE=wealth(Venus/Ganesha), N=Kubera/career; SE+N opposite-corners balance; clockwise growth; keep bushy.",
+      "avoid": [
+        "NE",
+        "SW",
+        "E_W_axis",
+        "near_red_objects"
+      ],
+      "location_confidence": 80,
+      "effect_confidence": 40,
+      "sources": [
+        "JKCement",
+        "Housivity",
+        "UltraTech",
+        "PawanKaushik",
+        "plusvalueindia"
+      ],
+      "disagreement": "Money-plant-SE vs SE-is-fire reconciled: SE is standard wealth placement (Venus rules SE for this). Firm avoid: NE+SW.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "Relocate to SE or N; clockwise growth; away from red; healthy/bushy.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "money plant direction vastu",
+        "money plant kis disha",
+        "paisa plant kaha rakhe",
+        "मनी प्लांट दिशा",
+        "money plant placement home"
+      ]
+    },
+    {
+      "id": "MI-04",
+      "category": "misc",
+      "topic": "mirror_facing_main_door",
+      "rule": "avoid_mirror_opposite_main_entrance__place_on_side_walls_perpendicular",
+      "cross_ref": [
+        "DE-03",
+        "FF-03"
+      ],
+      "location_confidence": 88,
+      "effect_confidence": 40,
+      "severity_if_wrong": "moderate",
+      "remedy": "Relocate to N/E side wall; if fixed angle/cover; Bagua mirror is different protective use (small, outside door).",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "mirror facing main door",
+        "darwaze ke samne sheesha",
+        "mirror opposite entrance",
+        "मुख्य द्वार के सामने दर्पण"
+      ]
+    },
+    {
+      "id": "MI-05",
+      "category": "misc",
+      "topic": "vehicle_parking",
+      "best": [
+        "NW",
+        "SE"
+      ],
+      "garage_entry_facing": [
+        "N",
+        "E",
+        "NE"
+      ],
+      "avoid": [
+        "NE",
+        "SW",
+        "CENTER"
+      ],
+      "location_confidence": 60,
+      "effect_confidence": 35,
+      "reasoning": "Vehicles = movement/Vayu -> NW; SE acceptable.",
+      "sources": [
+        "derived_directional_logic",
+        "NoBroker_room_guides",
+        "JKCement_room_guides"
+      ],
+      "disagreement": "Dedicated parking-vastu sources thin this pass; documented at lower confidence per instruction; optional future top-up.",
+      "severity_if_wrong": {
+        "NE": "moderate",
+        "SW": "moderate"
+      },
+      "remedy": "Shift heavy vehicle out of NE to NW/SE; keep NE light/open.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "moderate",
+          "SW": "moderate"
+        }
+      },
+      "query_aliases": [
+        "parking direction vastu",
+        "gaadi parking kis disha",
+        "vehicle parking placement",
+        "पार्किंग की दिशा",
+        "car parking kaha",
+        "garage direction"
+      ]
+    },
+    {
+      "id": "RZ-00",
+      "category": "room_zone_placement",
+      "topic": "direction_deity_element_foundation",
+      "map": {
+        "N": "Kubera/water/wealth",
+        "NE": "Ish/water/spiritual_most_sacred",
+        "E": "Indra/air/health",
+        "SE": "Agni/fire/energy",
+        "S": "Yama/stability_ancestors_fame",
+        "SW": "Nairitya/earth/stability",
+        "W": "Varun/water/gains_social",
+        "NW": "Vayu/air/relationships_travel",
+        "CENTER": "Brahmasthan/space/keep_open"
+      },
+      "note": "Foundation for all room placement reasoning.",
+      "entry_type": "foundation",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": []
+    },
+    {
+      "id": "RZ-01",
+      "category": "room_zone_placement",
+      "topic": "room_zone_matrix",
+      "matrix": {
+        "main_entrance": {
+          "best": [
+            "N",
+            "E",
+            "NE"
+          ],
+          "alt": [
+            "NW"
+          ],
+          "avoid": [
+            "SW",
+            "bad_padas"
+          ]
+        },
+        "living_room": {
+          "best": [
+            "NE",
+            "N",
+            "E"
+          ]
+        },
+        "kitchen": {
+          "best": [
+            "SE"
+          ],
+          "alt": [
+            "NW"
+          ],
+          "avoid": [
+            "NE",
+            "SW",
+            "N",
+            "CENTER"
+          ]
+        },
+        "master_bedroom": {
+          "best": [
+            "SW"
+          ],
+          "alt": [
+            "S",
+            "W"
+          ],
+          "avoid": [
+            "NE",
+            "SE",
+            "NW",
+            "CENTER"
+          ]
+        },
+        "children_bedroom": {
+          "best": [
+            "W",
+            "NW"
+          ],
+          "avoid": [
+            "SW",
+            "CENTER"
+          ]
+        },
+        "guest_bedroom": {
+          "best": [
+            "NW"
+          ],
+          "alt": [
+            "E",
+            "SE"
+          ]
+        },
+        "pooja_room": {
+          "best": [
+            "NE"
+          ],
+          "alt": [
+            "N",
+            "E"
+          ],
+          "avoid": [
+            "S",
+            "SW",
+            "under_stairs",
+            "bedroom",
+            "toilet_adjacent"
+          ]
+        },
+        "dining_room": {
+          "best": [
+            "W",
+            "NW"
+          ],
+          "alt": [
+            "E",
+            "N"
+          ],
+          "avoid": [
+            "CENTER",
+            "bedroom"
+          ]
+        },
+        "study_room": {
+          "best": [
+            "W",
+            "NE"
+          ],
+          "alt": [
+            "E",
+            "N"
+          ],
+          "avoid": [
+            "S_facing",
+            "near_toilet"
+          ]
+        },
+        "store_room": {
+          "best": [
+            "SW",
+            "S",
+            "W"
+          ],
+          "alt": [
+            "NW"
+          ],
+          "avoid": [
+            "NE",
+            "CENTER"
+          ]
+        },
+        "toilet": {
+          "best": [
+            "NW",
+            "W"
+          ],
+          "alt": [
+            "SE",
+            "SSW_WNW_ESE_adv"
+          ],
+          "avoid": [
+            "NE",
+            "SW",
+            "CENTER"
+          ]
+        },
+        "staircase": {
+          "best": [
+            "SW",
+            "S",
+            "W"
+          ],
+          "alt": [
+            "NW",
+            "SE"
+          ],
+          "avoid": [
+            "NE",
+            "CENTER"
+          ]
+        },
+        "balcony": {
+          "best": [
+            "N",
+            "E",
+            "NE"
+          ]
+        },
+        "meditation_room": {
+          "best": [
+            "NE"
+          ],
+          "alt": [
+            "E"
+          ]
+        }
+      },
+      "location_confidence": 85,
+      "effect_confidence": 45,
+      "reasoning": "Room element matches zone: fire-rooms SE, heavy/rest SW, sacred/light NE, disposal NW/SW-adjacent, wealth N; Brahmasthan open.",
+      "sources": [
+        "KoltePatil",
+        "Propzilla",
+        "BangurCement",
+        "ebcsiliguri",
+        "ExpressBuilders",
+        "Artfactory",
+        "TogetherBuying",
+        "NoBroker",
+        "AppliedVastu",
+        "VastuArt",
+        "JKCement",
+        "UltraTech"
+      ],
+      "disagreement": "Children W-vs-NW; guest NW-vs-E/SE; study W-vs-NE-vs-E; center-pooja minority(AppliedVastu) vs keep-open(most). Main-door/toilet/staircase carry own pada/16-zone splits (DE-01,MI-01,MI-02).",
+      "severity_if_wrong": {
+        "NE_toilet": "major",
+        "NE_kitchen": "major",
+        "SW_empty": "major",
+        "master_in_NE": "major",
+        "center_obstructed": "major",
+        "others": "moderate"
+      },
+      "remedy": "Change room-usage not walls (NE bedroom->pooja; SW room->master); pyramids/yantras; crystals in SW; sea-salt NE toilet; partition incompatible zones; colour/lighting; plants; extend deficient corners; keep Brahmasthan clear.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE_toilet": "major",
+          "NE_kitchen": "major",
+          "SW_empty": "major",
+          "master_in_NE": "major",
+          "center_obstructed": "major"
+        }
+      },
+      "query_aliases": [
+        "kaunsa kamra kis disha mein",
+        "room direction guide vastu",
+        "which room in which direction",
+        "कौन सा कमरा किस दिशा",
+        "room placement vastu",
+        "ghar ke kamre ki disha",
+        "room by room vastu"
+      ]
+    },
+    {
+      "id": "RZ-02",
+      "category": "room_zone_placement",
+      "topic": "big_five_nonnegotiable",
+      "rules": [
+        "NE=sacred/light/open: pooja/meditation only, never toilet/kitchen/heavy/staircase/master/overhead-tank",
+        "SE=Agni: kitchen/fire, not UG-water not pooja",
+        "SW=earth/heavy: master bed+heaviest furniture, never empty, not kitchen/water/toilet-pit",
+        "N=Kubera: wealth/water/locker-facing, keep open",
+        "CENTER=Brahmasthan open: no staircase/toilet/heavy-mass/pillar"
+      ],
+      "note": "Engine should surface these prominently; violations = major dosh, near-universal consensus.",
+      "entry_type": "foundation",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "vastu ke main niyam",
+        "non negotiable vastu rules",
+        "big vastu rules",
+        "मुख्य वास्तु नियम",
+        "top vastu do not"
+      ]
+    },
+    {
+      "id": "RZ-PADA",
+      "category": "room_zone_placement",
+      "topic": "45_pada_granular_layer_status",
+      "done": [
+        "Gandharva_maindoor_mixed",
+        "Ish_NE_high_consensus_auspicious",
+        "Pitru_SW_auspicious_master_bedroom"
+      ],
+      "pending_count": 42,
+      "note": "Sub-project beneath Cat1 room-zone layer. Room-zone matrix (RZ-01) answers practical search queries; pada layer adds per-cell expert precision (cf main-door DE-01), build incrementally post-launch. NOT one of the 10 top-level categories.",
+      "entry_type": "status",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": []
+    }
+  ],
+  "not_yet_researched_optional_deeper_layers": [
+    "45_pada_granular_42_of_45_sublayer_of_cat1",
+    "parking_deep_sources",
+    "astro_vastu_birthchart",
+    "pregnancy_infant_sleep",
+    "daytime_nap",
+    "primary_sanskrit_citations"
+  ],
+  "enrichment": {
+    "added_fields": [
+      "entry_type",
+      "severity(normalized default+overrides)",
+      "query_aliases(en+hi+hinglish)"
+    ],
+    "aliases_authored_by": "Opus (pre-generated so Claude Code skips NLP judgement)",
+    "original_fields_preserved": true,
+    "note": "All original knowledge fields (disagreement, location_confidence, effect_confidence, remedy, sources, two-layer notes) untouched. severity_if_wrong kept as-is; 'severity' added as normalized shape."
+  }
+}
