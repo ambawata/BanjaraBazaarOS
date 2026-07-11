@@ -35,10 +35,10 @@ const HIGHLIGHT_BOX = {
   sofa: { x: 60, y: 76, w: 170, h: 66 },
   bed: { x: 58, y: 58, w: 204, h: 88 },
   painting: { x: 112, y: 24, w: 76, h: 58 },
-  stove: { x: 64, y: 76, w: 132, h: 64 },
-  sink: { x: 14, y: 88, w: 232, h: 54 },
+  stove: { x: 94, y: 76, w: 132, h: 64 },
+  sink: { x: 44, y: 88, w: 232, h: 54 },
   fridge: { x: 114, y: 12, w: 72, h: 130 },
-  kitchenGeneral: { x: 14, y: 54, w: 232, h: 88 },
+  kitchenGeneral: { x: 44, y: 54, w: 232, h: 88 },
   toilet: { x: 118, y: 92, w: 64, h: 44 },
   staircase: { x: 64, y: 16, w: 190, h: 124 },
   tankUnderground: { x: 94, y: 64, w: 132, h: 74 },
@@ -149,22 +149,25 @@ function InteriorObject({ objectType }) {
         </>
       )
     case 'stove':
+      // Counter recentered (was x=20-240, mid=130 — a 25% empty gap on the
+      // right, the same left-anchoring pattern that caused the bed bug).
       return (
         <>
-          <rect x="20" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
-          <rect x="70" y="82" width="120" height="22" rx="4" fill="#5c5347" />
-          <circle cx="100" cy="93" r="8" fill="#3a342a" />
-          <circle cx="160" cy="93" r="8" fill="#3a342a" />
-          <circle cx="100" cy="93" r="3" fill="#E08A3C" />
-          <circle cx="160" cy="93" r="3" fill="#E08A3C" />
+          <rect x="50" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
+          <rect x="100" y="82" width="120" height="22" rx="4" fill="#5c5347" />
+          <circle cx="130" cy="93" r="8" fill="#3a342a" />
+          <circle cx="190" cy="93" r="8" fill="#3a342a" />
+          <circle cx="130" cy="93" r="3" fill="#E08A3C" />
+          <circle cx="190" cy="93" r="3" fill="#E08A3C" />
         </>
       )
     case 'sink':
+      // Same recentering as stove/kitchenGeneral — see note above.
       return (
         <>
-          <rect x="20" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
-          <ellipse cx="130" cy="98" rx="34" ry="12" fill="#dfe9e6" stroke="#a9c3b5" strokeWidth="1.5" />
-          <path d="M130,78 v10 M122,72 h16" stroke="#8b929b" strokeWidth="2.5" strokeLinecap="round" />
+          <rect x="50" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
+          <ellipse cx="160" cy="98" rx="34" ry="12" fill="#dfe9e6" stroke="#a9c3b5" strokeWidth="1.5" />
+          <path d="M160,78 v10 M152,72 h16" stroke="#8b929b" strokeWidth="2.5" strokeLinecap="round" />
         </>
       )
     case 'fridge':
@@ -177,13 +180,15 @@ function InteriorObject({ objectType }) {
         </>
       )
     case 'kitchenGeneral':
+      // Same recentering as stove/sink — counter now spans x=50-270
+      // (mid=160) instead of x=20-240 (mid=130).
       return (
         <>
-          <rect x="20" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
-          <rect x="30" y="98" width="34" height="20" rx="3" fill="#d8cbb0" />
-          <circle cx="120" cy="106" r="9" fill="#8d6e63" opacity="0.7" />
+          <rect x="50" y="94" width="220" height="42" rx="4" fill="#e9dfcd" stroke="#cbbb99" strokeWidth="1.5" />
+          <rect x="60" y="98" width="34" height="20" rx="3" fill="#d8cbb0" />
           <circle cx="150" cy="106" r="9" fill="#8d6e63" opacity="0.7" />
-          <rect x="200" y="60" width="40" height="34" rx="4" fill="#cfe0d6" stroke="#a9c3b5" strokeWidth="1.5" />
+          <circle cx="180" cy="106" r="9" fill="#8d6e63" opacity="0.7" />
+          <rect x="230" y="60" width="40" height="34" rx="4" fill="#cfe0d6" stroke="#a9c3b5" strokeWidth="1.5" />
         </>
       )
     case 'toilet':
