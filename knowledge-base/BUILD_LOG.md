@@ -109,3 +109,50 @@ Phase 7's `RoomScene` mapped by **category** (e.g. every `furniture_fixtures` en
 - Confirmed `CO-01`/`CO-02` still render via `VastuColorCard` (swatch grid), untouched by this change, per the task's explicit "keep as-is."
 - **Spot-checked 26 entries** across every category (door ×4, mirror, wardrobe, locker, study table, TV, sofa, bed, stove ×2, sink, fridge, pooja ×3, toilet, staircase, both water tanks, well ×2, fish tank, tulsi, money plant, parking, the new house-facing scene, the new mandala scene, the houseGeneric scene) via live DOM inspection of the actual rendered SVG markup against the local API — confirmed genuinely distinct compositions per object, and confirmed intentional sharing only where the underlying object is actually the same thing. (Pixel screenshots weren't available this session — the browser tool's screenshot capability was down with a timeout on every attempt, confirmed not app-related since `get_page_text` and direct DOM/JS inspection worked fine throughout; used DOM-level SVG-markup comparison instead, which is a more precise check than eyeballing a screenshot for "are these two illustrations actually different.")
 - `npm run build` passes cleanly.
+
+## Phase 9 — Fixed silently-empty cards for entries with a different data shape (normalizeDirections)
+
+**Root cause**: the KB does not use one consistent field shape for "what direction does this recommend." The frontend previously read `entry.best_direction` / `entry.avoid` directly (which the API only populates from the raw entry's `best`/`avoid` keys) — so any entry using a different shape rendered with empty pills and no highlight, most visibly the sleeping-direction cards ("Sona" category) which looked like a broken, nearly-empty card with a small illustration.
+
+**Step 1 — shape audit** (all 60 live entries, by which of `best/avoid/fallback/verdict/best_for/conditions_for_good_outcome/door_open` keys are present):
+
+| Shape | Count | Example |
+|---|---|---|
+| `avoid`+`best` | 26 | most furniture/kitchen/pooja entries |
+| `avoid`+`best`+`fallback` | 7 | `WE-01/02/03/05`, `DE-01`, `EA-01`, `MI-07` |
+| `avoid`+`best`+`fallback`+`door_open` | 1 | `FF-01` (wardrobe) |
+| `best` only, and it's a **string**, not an array | 3 | `SD-07`, `DE-02`, `DE-04` — e.g. `"install_raised_threshold_at_main_entrance"` |
+| `verdict`+`best_for` | 2 | `SD-01`, `SD-02` — `best_for` is a list of *who* it suits (`"students"`, `"couples"`), not a direction |
+| `verdict` only | 5 | `SD-03`, `SD-04`, `MI-08`, `RZ-04`, `KI-06` |
+| `avoid`+`best_beginner`+`best_advanced_16zone`+`fallback` | 1 | `MI-01` (toilet, two-layer) |
+| `by_zone` / `by_room` | 2 | `CO-01`/`CO-02` — handled separately by `VastuColorCard`, out of scope here |
+| `map` / `matrix` / `rules` | 3 | `RZ-00`/`RZ-01`/`RZ-02` — foundation-level, no single direction |
+| `conditions_for_good_outcome`+`verdict` | 1 | `RZ-07` — a list of prose conditions, not compass tokens |
+| none of the above | 9 | `MI-03`, `MI-04`, `MI-06`, `MI-09`, `MI-10`, `FF-08`, `RZ-03`, `RZ-05`, `RZ-PADA` — genuinely non-directional (plant care rules, a painting-motif list, a plot-shape list, foundation/status entries) |
+
+The sleeping-direction case (`SD-01`–`SD-04`) is the clearest example of why this needed a real fix rather than a patch: those four entries have **no direction field of any kind** — the direction they're about is the *topic itself* (`head_south`, `head_east`, `head_west`, `head_north`), with a `verdict` (`best_overall` / `second_best` / `contested_mixed` / `avoid_universal`) saying whether that direction is good, mixed, or to avoid.
+
+(The task's hypothesis referenced `RZ-08`–`RZ-14`; the live dataset only goes up to `RZ-07`, so those don't exist yet — audited against the real data rather than the assumed IDs, per how the KB actually looks today. The normalizer is written to handle the shape generically, so if `RZ-08`+ facing-direction entries are added later they'll work automatically.)
+
+**Step 2 — `normalizeDirections(entry)`** in `vastuEntryHelpers.js` replaces the old `getBestDirections()`/`getAvoidDirections()`, and is now the *only* place `VastuCard` and `VastuDetailView` read direction data from — neither reads `entry.best_direction`/`entry.avoid` directly anymore. It returns `{ bestDirections, avoidDirections, fallbackDirections, hasVerdictOnly, verdictText, conditions }`:
+- Extracts compass tokens from anywhere inside a string or array via `extractDirectionTokens()` — handles both clean arrays (`["NW","W"]`) and compound descriptive strings (`"room_NW_zone__head_S_or_W"` → finds `NW`, `S`, `W`; `"install_raised_threshold_at_main_entrance"` → finds nothing, correctly).
+- `fallback` is a **third pill tier**, not merged into `best` or dropped — `DirectionPills` now renders it as a dashed light-orange pill, visually distinct from a solid "best" and a red "avoid."
+- Sleeping-direction entries: direction comes from the topic (`head_south` → `S`), routed into best/avoid/fallback by `verdict` (`avoid_universal` → avoid, `contested_mixed` → fallback tier since the opinion is genuinely split, anything else → best).
+- `conditions_for_good_outcome` (RZ-07-style) is surfaced as-is — `VastuDetailView` now renders it as a bullet list ("Achhe result ke liye zaroori baatein" / "What matters for a good outcome") rather than trying to force prose conditions into direction pills.
+- When an entry truly has no derivable direction (`hasVerdictOnly`), the raw `verdict` or descriptive `best` string is humanized and shown as a plain text line instead of the badge/pills disappearing silently — e.g. `DE-02` (threshold) now shows "Install Raised Threshold At Main Entrance" instead of a blank space.
+- Badge/pill visibility in both components now checks `bestDirections.length > 0 || avoidDirections.length > 0 || fallbackDirections.length > 0` (or `hasVerdictOnly && verdictText`) — never shows a false "IS DISHA MEIN SAHI!" claim when there's no real verdict.
+
+**Step 3 — bed illustration sizing bug**: the `bed` object type was left-anchored at x=24–188 of the 320-wide canvas (a leftover from copying the sofa layout, which has a plant filling the right side that bed never got) — leaving ~40% of the frame empty on the right and reading as a "tiny, mostly-empty scene." Recentered the bed (now x=64–256, centered on the canvas) and made it taller (headboard now 32 units tall instead of 16) so it reads at the same visual weight as the other centered illustrations (mirror, door, stove). Updated `HIGHLIGHT_BOX.bed` to match.
+
+**Step 4 — re-verification**, via live DOM inspection against the local API (screenshots intermittently available this session; used DOM/pill-color inspection as the primary check since it's more precise than eyeballing anyway):
+- `SD-01` (head_south, best_overall) → **S** pill solid orange (best). ✓
+- `SD-02` (head_east, second_best) → **E** pill solid orange (best). ✓
+- `SD-03` (head_west, contested_mixed) → **W** pill dashed light-orange (fallback/mixed tier), correctly *not* claimed as a clean best or avoid. ✓
+- `SD-04` (head_north, avoid_universal) → **N** pill red (avoid). ✓ Bed illustration now centered and fully visible for all four.
+- `EA-01` (eating direction) → **N**/**E** best, **S** avoid, **W** fallback — all three tiers rendering distinctly in one card. ✓
+- `RZ-07` (south-facing-house myth, `conditions_for_good_outcome`) → no false badge, all 6 conditions rendered as a bullet list in the detail view. ✓
+- `DE-02` (threshold, descriptive `best` string with zero direction tokens) → 0 pills, shows "Install Raised Threshold At Main Entrance" as plain text instead of a blank card. ✓
+- **Regression check**: `DE-01` (main door — best/avoid/fallback) and `MI-01` (toilet — two-layer best_beginner/avoid/fallback) both still render identically to before this change. ✓
+- `npm run build` passes cleanly.
+
+**Step 5 — IA note (not fixed, flagged for Vinod)**: the pre-existing "Where do you want to place?" `ItemPlacementWidget` (the shop tool with Add to Cart, mirror-only) and the new Vastu Griha knowledge feed are two separate direction-guidance experiences that currently coexist on the same home screen. Left untouched as instructed — this is a product/IA decision (whether to merge, relabel, or keep them distinct) for Vinod to make later, not a bug.

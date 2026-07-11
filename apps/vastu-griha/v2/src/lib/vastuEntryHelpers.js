@@ -197,16 +197,110 @@ export function isLowConfidence(entry) {
   return loc < 60
 }
 
-export function getBestDirections(entry) {
-  const best = entry.best_direction
-  if (Array.isArray(best)) return best
-  if (typeof best === 'string') return [best]
-  return []
+// ---------------------------------------------------------------------------
+// normalizeDirections — the ONE place that knows how to read "what
+// direction(s) does this entry recommend" across every field shape the KB
+// actually uses. Audited across all 60 live entries (2026-07-11):
+//
+//   avoid+best (+fallback, +door_open)   38 entries  — the common case
+//   verdict+best_for                      2 entries  (SD-01, SD-02)
+//   verdict only                          5 entries  (SD-03, SD-04, MI-08, RZ-04, KI-06)
+//   best only (string, not array)         3 entries  (SD-07, DE-02, DE-04)
+//   best_advanced_16zone+best_beginner    1 entry    (MI-01, two-layer)
+//   by_zone / by_room                     2 entries  (CO-01/CO-02, handled by VastuColorCard, not this function)
+//   map / matrix / rules                  3 entries  (RZ-00/01/02, foundation-level, no single direction)
+//   conditions_for_good_outcome+verdict   1 entry    (RZ-07 — prose conditions, not compass tokens)
+//   none of the above                     9 entries  (MI-03/04/06/09/10, FF-08, RZ-03/05/PADA — genuinely non-directional)
+//
+// The earlier version read entry.best_direction / entry.avoid directly
+// (which the API only populates from raw.best / raw.avoid) — so anything
+// using verdict+best_for, verdict-only, or a descriptive string instead of
+// a clean direction token silently rendered as empty pills. This is most
+// visible in the sleeping-direction category: SD-01 to SD-04 have no
+// best/avoid arrays at all — the direction they're about is the TOPIC
+// itself ("head_south", "head_east", ...), with a verdict describing
+// whether that direction is good, mixed, or to avoid.
+// ---------------------------------------------------------------------------
+
+const COMPASS_TOKENS = new Set(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'CENTER'])
+
+/** Pull any recognizable compass tokens out of a string, an array of strings, or a mix — handles both clean arrays (["NW","W"]) and compound descriptive strings ("room_NW_zone__head_S_or_W"). */
+function extractDirectionTokens(value) {
+  if (value === null || value === undefined) return []
+  const items = Array.isArray(value) ? value : [value]
+  const found = []
+  for (const item of items) {
+    if (typeof item !== 'string') continue
+    for (const token of item.toUpperCase().split(/[^A-Z]+/)) {
+      if (COMPASS_TOKENS.has(token) && !found.includes(token)) found.push(token)
+    }
+  }
+  return found
 }
 
-export function getAvoidDirections(entry) {
-  const avoid = entry.avoid
-  if (Array.isArray(avoid)) return avoid
-  if (typeof avoid === 'string') return [avoid]
-  return []
+const HEAD_DIRECTION_BY_TOPIC = {
+  head_north: 'N',
+  head_south: 'S',
+  head_east: 'E',
+  head_west: 'W',
+}
+
+/**
+ * @returns {{
+ *   bestDirections: string[],
+ *   avoidDirections: string[],
+ *   fallbackDirections: string[],
+ *   hasVerdictOnly: boolean,
+ *   verdictText: string|null,
+ *   conditions: string[]|null,
+ * }}
+ */
+export function normalizeDirections(entry) {
+  const raw = entry.detail || {}
+
+  let bestDirections = extractDirectionTokens(raw.best ?? entry.best_direction ?? raw.best_beginner)
+  let avoidDirections = extractDirectionTokens(raw.avoid ?? entry.avoid)
+  let fallbackDirections = extractDirectionTokens(raw.fallback)
+
+  // Sleeping-direction entries (SD-01..04): the direction is the topic
+  // itself, not a field — route it into best/avoid/fallback by verdict
+  // rather than leaving it undiscoverable.
+  const headDirection = HEAD_DIRECTION_BY_TOPIC[entry.topic]
+  if (headDirection && bestDirections.length === 0 && avoidDirections.length === 0) {
+    const verdict = raw.verdict
+    if (verdict === 'avoid_universal') {
+      avoidDirections = [headDirection]
+    } else if (verdict === 'contested_mixed') {
+      // Genuinely split opinion — same "don't overstate certainty" idea as
+      // the fallback tier, not a clean recommendation either way.
+      fallbackDirections = [headDirection]
+    } else {
+      // best_overall, second_best, or any other positive verdict.
+      bestDirections = [headDirection]
+    }
+  }
+
+  const conditions = Array.isArray(raw.conditions_for_good_outcome) ? raw.conditions_for_good_outcome : null
+
+  const hasVerdictOnly = bestDirections.length === 0 && avoidDirections.length === 0 && fallbackDirections.length === 0
+
+  // Textual fallback so a verdict/description never just disappears when
+  // no compass token could be extracted from it (e.g. DE-02's best is the
+  // sentence "install_raised_threshold_at_main_entrance", not a direction).
+  let verdictText = null
+  if (hasVerdictOnly) {
+    if (typeof raw.verdict === 'string') {
+      verdictText = humanizeSlug(raw.verdict)
+    } else if (typeof raw.best === 'string') {
+      verdictText = humanizeSlug(raw.best)
+    } else if (typeof raw.rule === 'string') {
+      verdictText = humanizeSlug(raw.rule)
+    }
+  }
+
+  return { bestDirections, avoidDirections, fallbackDirections, hasVerdictOnly, verdictText, conditions }
+}
+
+function humanizeSlug(slug) {
+  return slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }

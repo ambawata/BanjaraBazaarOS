@@ -3,14 +3,14 @@ import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
-  getObjectType, getItemName, getBestDirections, getAvoidDirections, isLowConfidence,
+  getObjectType, getItemName, normalizeDirections, isLowConfidence,
 } from '../../lib/vastuEntryHelpers'
 
 export default function VastuCard({ entry, lang, onOpen }) {
   const objectType = getObjectType(entry)
-  const best = getBestDirections(entry)
-  const avoid = getAvoidDirections(entry)
+  const { bestDirections, avoidDirections, fallbackDirections, hasVerdictOnly, verdictText } = normalizeDirections(entry)
   const lowConfidence = isLowConfidence(entry)
+  const hasPills = bestDirections.length > 0 || avoidDirections.length > 0 || fallbackDirections.length > 0
 
   return (
     <div style={{
@@ -34,7 +34,7 @@ export default function VastuCard({ entry, lang, onOpen }) {
         />
       </div>
 
-      {(lowConfidence || best.length > 0 || avoid.length > 0) && (
+      {(lowConfidence || hasPills || (hasVerdictOnly && verdictText)) && (
         <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {lowConfidence ? (
             <span style={{
@@ -43,8 +43,10 @@ export default function VastuCard({ entry, lang, onOpen }) {
             }}>
               {t(lang, 'lowConfidenceBadge')}
             </span>
+          ) : hasPills ? (
+            <DirectionPills best={bestDirections} avoid={avoidDirections} fallback={fallbackDirections} size="sm" />
           ) : (
-            <DirectionPills best={best} avoid={avoid} size="sm" />
+            <span style={{ fontSize: '11px', color: '#8A7A5C' }}>{verdictText}</span>
           )}
         </div>
       )}

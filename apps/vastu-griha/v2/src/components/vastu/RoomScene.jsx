@@ -33,7 +33,7 @@ const HIGHLIGHT_BOX = {
   studyTable: { x: 94, y: 60, w: 130, h: 56 },
   tv: { x: 106, y: 24, w: 108, h: 70 },
   sofa: { x: 60, y: 76, w: 170, h: 66 },
-  bed: { x: 18, y: 78, w: 170, h: 68 },
+  bed: { x: 58, y: 58, w: 204, h: 88 },
   painting: { x: 112, y: 24, w: 76, h: 58 },
   stove: { x: 64, y: 76, w: 132, h: 64 },
   sink: { x: 14, y: 88, w: 232, h: 54 },
@@ -127,13 +127,17 @@ function InteriorObject({ objectType }) {
         </>
       )
     case 'bed':
+      // Centered on the 320-wide canvas (was left-anchored at x=24-188,
+      // leaving ~40% of the frame empty on the right — the "tiny cut-off
+      // bed in a mostly-empty scene" bug) and made taller so it reads at
+      // the same visual weight as the other centered illustrations.
       return (
         <>
-          <rect x="30" y="96" width="150" height="44" rx="6" fill="#e6d9c8" stroke="#c9b596" strokeWidth="1.5" />
-          <rect x="30" y="86" width="150" height="16" rx="4" fill="#f3e9db" stroke="#c9b596" strokeWidth="1.5" />
-          <rect x="24" y="80" width="10" height="60" rx="3" fill="#c9b596" />
-          <ellipse cx="55" cy="92" rx="14" ry="7" fill="#ffffff" stroke="#e2d8c4" strokeWidth="1" />
-          <ellipse cx="80" cy="92" rx="14" ry="7" fill="#ffffff" stroke="#e2d8c4" strokeWidth="1" />
+          <rect x="70" y="94" width="180" height="46" rx="6" fill="#e6d9c8" stroke="#c9b596" strokeWidth="1.5" />
+          <rect x="70" y="66" width="180" height="32" rx="6" fill="#f3e9db" stroke="#c9b596" strokeWidth="1.5" />
+          <rect x="64" y="62" width="10" height="80" rx="3" fill="#c9b596" />
+          <ellipse cx="102" cy="82" rx="17" ry="10" fill="#ffffff" stroke="#e2d8c4" strokeWidth="1" />
+          <ellipse cx="136" cy="82" rx="17" ry="10" fill="#ffffff" stroke="#e2d8c4" strokeWidth="1" />
         </>
       )
     case 'painting':

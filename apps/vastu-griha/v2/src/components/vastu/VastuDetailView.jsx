@@ -3,7 +3,7 @@ import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
-  getObjectType, getItemName, getBestDirections, getAvoidDirections,
+  getObjectType, getItemName, normalizeDirections,
   isLowConfidence, isColorRuleEntry, findDevanagariAlias,
 } from '../../lib/vastuEntryHelpers'
 
@@ -25,18 +25,21 @@ function ConfidenceBar({ label, value, lang }) {
 
 export default function VastuDetailView({ entry, lang, onBack }) {
   const objectType = getObjectType(entry)
-  const best = getBestDirections(entry)
-  const avoid = getAvoidDirections(entry)
+  const {
+    bestDirections, avoidDirections, fallbackDirections, hasVerdictOnly, verdictText, conditions,
+  } = normalizeDirections(entry)
   const lowConfidence = isLowConfidence(entry)
   const colorRule = isColorRuleEntry(entry)
   const hindiAlias = findDevanagariAlias(entry)
   const itemName = lang === 'hi' && hindiAlias ? hindiAlias : getItemName(entry, lang)
+  const hasPills = bestDirections.length > 0 || avoidDirections.length > 0 || fallbackDirections.length > 0
 
-  const [activeDirection, setActiveDirection] = React.useState(best[0] || null)
+  const [activeDirection, setActiveDirection] = React.useState(bestDirections[0] || fallbackDirections[0] || null)
   const [showBothSides, setShowBothSides] = React.useState(false)
 
-  const isActiveBest = activeDirection && best.some((b) => b.startsWith(activeDirection))
-  const isActiveAvoid = activeDirection && avoid.some((a) => a.startsWith(activeDirection))
+  const isActiveBest = activeDirection && bestDirections.some((b) => b.startsWith(activeDirection))
+  const isActiveAvoid = activeDirection && avoidDirections.some((a) => a.startsWith(activeDirection))
+  const isActiveFallback = activeDirection && !isActiveBest && !isActiveAvoid && fallbackDirections.some((f) => f.startsWith(activeDirection))
   const sceneState = lowConfidence ? 'lowConfidence' : isActiveAvoid ? 'avoid' : isActiveBest ? 'best' : 'neutral'
 
   const hasBothSides = Boolean(entry.both_sides?.has_disagreement && entry.both_sides?.note)
@@ -72,7 +75,7 @@ export default function VastuDetailView({ entry, lang, onBack }) {
               <RoomScene objectType={objectType} size="lg" state={sceneState} />
             </div>
 
-            {(lowConfidence || best.length > 0 || avoid.length > 0) && (
+            {(lowConfidence || hasPills || (hasVerdictOnly && verdictText)) && (
               <div style={{ padding: '14px 18px 0' }}>
                 {lowConfidence ? (
                   <span style={{
@@ -81,25 +84,28 @@ export default function VastuDetailView({ entry, lang, onBack }) {
                   }}>
                     {t(lang, 'lowConfidenceBadge')}
                   </span>
-                ) : (
+                ) : hasPills ? (
                   <span style={{
                     display: 'inline-block', fontSize: '11px', fontWeight: 700,
-                    color: isActiveAvoid ? '#C24545' : '#ffffff',
-                    background: isActiveAvoid ? '#FBEAEA' : '#E08A3C',
-                    border: isActiveAvoid ? '1px solid #E27C7C' : 'none',
+                    color: isActiveAvoid ? '#C24545' : isActiveFallback ? '#C96F24' : '#ffffff',
+                    background: isActiveAvoid ? '#FBEAEA' : isActiveFallback ? '#FBE6D0' : '#E08A3C',
+                    border: isActiveAvoid ? '1px solid #E27C7C' : isActiveFallback ? '1px dashed #E08A3C' : 'none',
                     padding: '5px 12px', borderRadius: '999px',
                   }}>
-                    {isActiveAvoid ? t(lang, 'wrongBadge') : t(lang, 'correctBadge')}
+                    {isActiveAvoid ? t(lang, 'wrongBadge') : isActiveFallback ? t(lang, 'mixedBadge') : t(lang, 'correctBadge')}
                   </span>
+                ) : (
+                  <p style={{ fontSize: '13px', color: '#2B2010', margin: 0 }}>{verdictText}</p>
                 )}
               </div>
             )}
 
-            {(best.length > 0 || avoid.length > 0) && (
+            {hasPills && (
               <div style={{ padding: '12px 18px 0' }}>
                 <DirectionPills
-                  best={best}
-                  avoid={avoid}
+                  best={bestDirections}
+                  avoid={avoidDirections}
+                  fallback={fallbackDirections}
                   activeDirection={activeDirection}
                   onSelect={setActiveDirection}
                 />
@@ -123,6 +129,19 @@ export default function VastuDetailView({ entry, lang, onBack }) {
             </div>
             <p style={{ fontSize: '13px', color: '#2B2010', lineHeight: 1.55, margin: 0 }}>{entry.remedy.text}</p>
             <p style={{ fontSize: '11px', color: '#A99A80', fontStyle: 'italic', marginTop: '6px' }}>{entry.remedy.caveat}</p>
+          </div>
+        )}
+
+        {conditions && conditions.length > 0 && (
+          <div style={{ padding: '16px 18px 0' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: '#8A4A0F', marginBottom: '6px' }}>
+              {t(lang, 'conditionsLabel')}
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {conditions.map((c) => (
+                <li key={c} style={{ fontSize: '12.5px', color: '#2B2010', lineHeight: 1.5 }}>{c}</li>
+              ))}
+            </ul>
           </div>
         )}
 
