@@ -114,6 +114,16 @@ $sourceCount = 0;
 $severityCount = 0;
 $colorRuleCount = 0;
 
+// A few entries (e.g. foundation/status types) use a descriptive string
+// instead of a 0-100 number here (RZ-03's effect_confidence is literally
+// "not_applicable_mythological_foundation"). The normalized column is
+// numeric for querying/display; non-numeric values go to NULL there but
+// are never lost — raw_json still keeps the original string verbatim.
+function numericOrNull(mixed $value): ?int
+{
+    return is_numeric($value) ? (int) $value : null;
+}
+
 $pdo->beginTransaction();
 try {
     foreach ($entries as $entry) {
@@ -124,8 +134,8 @@ try {
             'category'             => $entry['category'] ?? '',
             'topic'                => $entry['topic'] ?? '',
             'entry_type'           => $entry['entry_type'] ?? 'rule',
-            'location_confidence'  => $entry['location_confidence'] ?? null,
-            'effect_confidence'    => $entry['effect_confidence'] ?? null,
+            'location_confidence'  => numericOrNull($entry['location_confidence'] ?? null),
+            'effect_confidence'    => numericOrNull($entry['effect_confidence'] ?? null),
             'reasoning'            => $entry['reasoning'] ?? null,
             'disagreement'         => $entry['disagreement'] ?? null,
             'remedy'               => $entry['remedy'] ?? null,

@@ -42,3 +42,16 @@ Resolved correctly to `187.127.185.245` at the time of deployment — no propaga
 ## Verify on your phone
 
 Open **https://v2-one-ruby.vercel.app**, scroll to "Vastu Knowledge," and search — it now hits the live server instead of a local dev machine.
+
+## Update — 2026-07-11: 46 → 59 entries
+
+- Replaced `knowledge-base/vastu_kb_enriched.json` on the server with the updated file (13 new gap-fill entries: `WE-05`, `MI-06`–`MI-10`, `SD-09`, `FF-08`, `RZ-03`–`RZ-06`, `KI-06`; plus a re-confirmed fridge-direction verdict on `KI-05`, unchanged).
+- Re-ran `scripts/seed_vastu_kb.php` (same UPSERT-based script, no schema change) — the 46 existing entries updated in place, 13 new ones inserted, nothing duplicated.
+- **Bug found and fixed along the way:** `RZ-03`'s `effect_confidence` is a descriptive string (`"not_applicable_mythological_foundation"`) rather than a 0–100 number — the first entry in the dataset to do this. The `vastu_kb_entries.effect_confidence` column is numeric, so the raw seed insert failed. Fixed `scripts/seed_vastu_kb.php` to store `NULL` in that normalized column when the source value isn't numeric — the original string is still preserved in full inside `raw_json`, so nothing is lost, just not exposed as a fake number. Verified locally before re-running on the server.
+- Also found the deploy user (`vastu-deploy`) couldn't read the server's `.env` for this CLI run, because it had been `chown`'d to `www-data` after the first deployment (so PHP-FPM could read it) — that inadvertently locked out `vastu-deploy`'s own CLI access. Fixed by adding `vastu-deploy` to the `www-data` group, so both the running app and future manual re-seeds can read it.
+- Fresh `SELECT COUNT(*)` after re-seeding: `vastu_kb_entries` = **59**, `vastu_kb_aliases` = 330, `vastu_kb_sources` = 324, `vastu_kb_severity_overrides` = 81, `vastu_kb_color_rules` = 18.
+- Tested 3 new sample queries against the live HTTPS API — all three correctly top-matched the intended new entry:
+  - "septic tank direction vastu" → `WE-05` (septic_tank)
+  - "living room direction vastu" → `RZ-06` (living_room_drawing_room)
+  - "vastu vs feng shui" → `MI-09` (vastu_vs_feng_shui)
+- Re-checked Zybo's two live sites after this update — both still return `200 OK`, unaffected.

@@ -915,7 +915,14 @@
         "InteriorCompany",
         "Asmita",
         "BangurCement",
-        "99acres"
+        "99acres",
+        "NoBroker(2026)",
+        "Astraroot",
+        "TrueVastu",
+        "Woodsala",
+        "NoBrokerForum",
+        "Bejandaruwalla(outlier)",
+        "InstaCuppaStore"
       ],
       "disagreement": "Fridge SW vs W vs S; firm rule = not NE.",
       "severity_if_wrong": "minor_to_moderate",
@@ -932,7 +939,10 @@
         "फ्रिज की दिशा",
         "microwave oven direction",
         "grain storage kitchen"
-      ]
+      ],
+      "additional_detail_2026_recheck": "Cross-checked against 6 more sources (2026): SW remains the dominant answer (5 of 6 new sources), with W, S, NW as accepted fallbacks — matches this KB's original verdict. Door should open toward East or North. Avoid dark-coloured fridges (black/deep blue); white, cream, or light blue preferred. Keep a few inches from walls and away from the stove (fire-water clash, same logic as KI-04 sink).",
+      "additional_disagreement_2026_recheck": "One outlier source (Bejandaruwalla) claims NW is 'always auspicious' as the primary direction rather than a fallback — this contradicts the 5-source majority favoring SW-first, and is noted as a minority view, not adopted as the primary verdict.",
+      "gap_check_status": "RECHECKED against question-database claim (NW-primary) — original SW-primary verdict CONFIRMED by 5/6 new sources, discrepancy resolved, not changed."
     },
     {
       "id": "PJ-01",
@@ -2004,8 +2014,12 @@
         "indoor plants vastu",
         "पौधों की दिशा",
         "which plants at home",
-        "cactus indoor vastu"
-      ]
+        "cactus indoor vastu",
+        "bamboo plant vastu",
+        "lucky bamboo direction",
+        "bamboo kaha rakhe"
+      ],
+      "bamboo_addendum": "Bamboo plant (lucky bamboo): considered auspicious in both Vastu and Feng Shui, low-maintenance, can be placed almost anywhere indoors including bedroom (unlike cactus/thorny plants) — bedroom-safe exception noted across sources (Livspace, Astrotalk)."
     },
     {
       "id": "MI-03a",
@@ -2458,6 +2472,538 @@
         "overrides": {}
       },
       "query_aliases": []
+    },
+    {
+      "id": "WE-05",
+      "category": "water_elements",
+      "topic": "septic_tank",
+      "best": [
+        "NW"
+      ],
+      "fallback": [
+        "S_of_SW_not_exact_corner",
+        "SE_with_remedy"
+      ],
+      "avoid": [
+        "NE",
+        "SW_exact_corner",
+        "CENTER",
+        "near_main_entrance",
+        "near_bedroom_kitchen_living"
+      ],
+      "location_confidence": 78,
+      "effect_confidence": 35,
+      "reasoning": "Waste/disposal function parallels toilet logic (MI-01) -> NW most-cited; exact SW corner (stability zone) and NE (sacred zone) both avoided; keep distance from wells/borewells and main living spaces.",
+      "sources": [
+        "UltraTech",
+        "Houssed",
+        "NoBroker",
+        "Buildiyo"
+      ],
+      "disagreement": "NW vs 'south-of-southwest-but-not-exact-corner' vs SE-with-remedy — three different beginner rules exist; NW is the most-repeated single answer, so ranked first. Distance from house corners cited differently (2ft above ground vs plinth-level rules) across sources.",
+      "severity_if_wrong": {
+        "NE": "moderate_to_major",
+        "SW_exact": "moderate",
+        "CENTER": "moderate"
+      },
+      "remedy": "If already wrong-placed: copper strip or copper sheet on the tank lid; plant a neem tree nearby; light-blue paint on the tank cover; keep at least a few feet from wells, main entrance, and bedrooms; ensure no leaks (practical hygiene matters more than direction).",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE": "moderate_to_major",
+          "SW_exact": "moderate",
+          "CENTER": "moderate"
+        }
+      },
+      "query_aliases": [
+        "septic tank direction vastu",
+        "septic tank kis disha mein",
+        "cesspit placement vastu",
+        "सेप्टिक टैंक की दिशा",
+        "toilet tank kaha banaye"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "MI-06",
+      "category": "misc",
+      "topic": "missing_extended_corner_remedy",
+      "best_note": "not a direction rule — a defect-correction topic for irregular/L-shaped plots",
+      "principle": "NE corner missing/cut = most serious defect (blocks spiritual/health energy); SW or S cut = comparatively easier to manage. NE corner EXTENDED (plot juts outward) is considered POSITIVE, up to ~10% of total area. SW extension is considered the single most harmful extension of any direction.",
+      "location_confidence": 75,
+      "effect_confidence": 35,
+      "reasoning": "Vastu Purusha's body must be 'complete' (square/rectangular) for balanced energy; a missing corner is read as a missing body part of the deity pinned at that point, an extension as an amplification of that zone's quality.",
+      "sources": [
+        "VedicBirth",
+        "99acres",
+        "VastuPlus",
+        "EstateBull",
+        "VastuShastra.in",
+        "VastuEnergetics",
+        "VastuConsultantInDubai"
+      ],
+      "disagreement": "No single formula works for irregular plots — several sources explicitly warn that 'this shape is good/bad' one-line answers are inadequate and a full plot-specific audit is needed. Treat this entry as general-pattern guidance, not a definitive per-plot verdict.",
+      "severity_if_wrong": {
+        "NE_cut": "major",
+        "SW_extension": "major",
+        "S_or_W_cut": "moderate"
+      },
+      "remedy": "Missing NE corner: mirrors on the two flanking walls facing the cut (to 'energetically extend' it), a Vastu pyramid at the outer corner point, a tulsi plant near the point, keep the area very clean and well-lit. Missing/extended SW: partition strip or physical wall to separate the irregular area from the main living zone; heavy earthy objects (rocks, yellow items) to ground excess air (for NW-type cuts) or crystals/citrine for SW. None of these remedies match a truly geometric corner — they reduce impact, they don't eliminate it. For serious defects (large NE cut, large SW extension) sources recommend a plot-specific professional audit rather than generic fixes.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "NE_cut": "major",
+          "SW_extension": "major",
+          "S_or_W_cut": "moderate"
+        }
+      },
+      "query_aliases": [
+        "missing corner vastu remedy",
+        "extended corner remedy",
+        "kata hua corner vastu",
+        "L shape plot vastu",
+        "कटा हुआ कोना वास्तु",
+        "irregular plot corner fix",
+        "cut corner remedy"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "MI-07",
+      "category": "misc",
+      "topic": "fish_tank_aquarium",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "fallback": [
+        "SE_of_living_room_social_benefit_specific"
+      ],
+      "avoid": [
+        "S",
+        "SW",
+        "kitchen",
+        "bedroom",
+        "center_of_room",
+        "direct_sunlight"
+      ],
+      "location_confidence": 82,
+      "effect_confidence": 35,
+      "reasoning": "Aquarium = moving water = water element -> NE/N/E (water/wealth zones); South clashes as it's linked to lower income/high-expense claims; center-of-room placement lacks structural support and blocks movement.",
+      "sources": [
+        "NoBroker",
+        "BlessingsAquarium",
+        "GharJunction",
+        "TrueVastu"
+      ],
+      "disagreement": "Most sources say NE/N/E for wealth; one source (Quora/Shiva Om) recommends ESE specifically for the 'churning' quality of the aquarium; another (TrueVastu) says SW is ideal for the LIVING ROOM specifically 'to boost social skills,' contradicting the general avoid-SW rule — flagged as a room-specific exception, not the general answer.",
+      "severity_if_wrong": {
+        "south": "minor_to_moderate",
+        "bedroom": "minor"
+      },
+      "remedy": "Relocate to NE/N/E of living room, against a solid wall, not center of room. Keep water clean and moving (a stagnant/dirty tank is considered worse than any direction mistake). Odd number of fish (commonly 9: 8 gold + 1 black) is a popular but non-universal folk addition. Avoid direct sunlight (practical: algae growth) and avoid the kitchen entirely.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {
+          "south": "minor_to_moderate",
+          "bedroom": "minor"
+        }
+      },
+      "query_aliases": [
+        "fish tank direction vastu",
+        "aquarium kis disha mein",
+        "machli tank kaha rakhe",
+        "एक्वेरियम की दिशा",
+        "fish tank placement home"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "MI-08",
+      "category": "misc",
+      "topic": "vastu_applies_to_rented_house",
+      "verdict": "yes_applies_but_scoped_to_non_structural_micro_vastu",
+      "location_confidence": 85,
+      "effect_confidence": 30,
+      "reasoning": "Since a tenant cannot move walls, doors, or plumbing, sources consistently redirect rented-home guidance toward furniture placement, colours, lighting, plants, and small symbolic remedies rather than structural fixes.",
+      "sources": [
+        "AstroPower",
+        "JKCement",
+        "AstrologerAswiniPanda",
+        "VaastuInternational"
+      ],
+      "disagreement": "One traditional source (VaastuInternational) makes a distinct claim: Vastu defects in a rented house affect the OWNER more than the tenant (since it's the owner's asset), and that religious/pooja benefits performed by a tenant primarily accrue to the owner. This is a minority, more classical/technical claim not repeated by the mainstream modern sources, which mostly just say 'apply what you can, non-structurally.' Presented as a genuine disagreement, not a consensus fact.",
+      "severity_if_wrong": "minor",
+      "remedy": "Renter-friendly fixes only: money plant in N, mirror in N (not facing bed), salt-water bowl in NE (change weekly), warm lighting in SE, rose quartz/amethyst in SW, wind chimes in NW, correct sleeping direction (free, high-impact), toran/pyramid/Om symbol at the entrance if the door direction can't be changed.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "vastu for rented house",
+        "kiraye ke ghar mein vastu",
+        "rented flat vastu applicable",
+        "किराए के घर में वास्तु",
+        "tenant vastu tips"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "MI-09",
+      "category": "misc",
+      "topic": "vastu_vs_feng_shui",
+      "comparison": {
+        "origin": "Vastu = India (Sanskrit, 5000+ yrs); Feng Shui = China",
+        "elements": "Vastu: earth, water, fire, air, space. Feng Shui: wood, fire, earth, metal, water.",
+        "focus": "Vastu = structural (direction of doors/rooms/whole-building orientation, best applied at construction stage). Feng Shui = non-structural (furniture arrangement, colour, decluttering, mostly applicable to any existing space).",
+        "best_use_case": "New construction/major renovation -> Vastu is more practical (shapes the foundation). Existing/rented home -> Feng Shui's flexible, non-structural approach is easier to apply."
+      },
+      "location_confidence": 85,
+      "effect_confidence": 25,
+      "sources": [
+        "VastuShastraUK",
+        "JKCement",
+        "AstroPower"
+      ],
+      "disagreement": "None significant — sources broadly agree on this origin/focus/use-case framing.",
+      "severity_if_wrong": "not_applicable_comparison_topic",
+      "remedy": "Not applicable — this is a comparison/explainer entry, not a placement rule. Practical guidance from sources: use Vastu at the building/construction stage if possible, and layer Feng-Shui-style non-structural adjustments (declutter, furniture, colour) on top of whatever the fixed structure already is.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "not_applicable_comparison_topic",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "vastu vs feng shui difference",
+        "vastu aur feng shui mein antar",
+        "which is better vastu or feng shui",
+        "वास्तु और फेंग शुई में अंतर"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "MI-10",
+      "category": "misc",
+      "topic": "general_remedies_toolkit_no_structural_change",
+      "toolkit": {
+        "sea_salt": "Small bowl of uncrushed sea salt in problem corners; replace every 2-4 weeks (frequency varies by source, roughly bi-weekly to monthly); absorbs stagnant/negative energy. Can also mix in floor-cleaning water.",
+        "camphor_crystals": "Two camphor balls/crystals placed where things feel 'stuck' (career, finance); replace once fully shriveled.",
+        "wind_chimes": "6 or 8 hollow-rod metal chimes for NW/W (metal/air zones); wooden chimes for E/SE (wood/fire zones); at entrances or problem corners.",
+        "pyramids_yantras": "Small metal/crystal pyramids at the entrance or the specific defect corner; material (lead/brass/zinc/crystal) is matched to the direction/defect by a consultant in serious cases.",
+        "crystals": "Clear quartz balls or direction-specific stones (rose quartz/amethyst for SW-relationships, citrine for SW-earth) — color/type tied to the intention.",
+        "mirrors": "Used to 'energetically extend' a missing corner (see MI-06), or reposition negative reflections (see FF-03) — not a generic cure-all, direction-specific.",
+        "color": "Repainting or adding a zone-matched accent (cushion, curtain, artwork) is one of the lowest-cost, most-repeated remedies across the entire KB (see CO-01/CO-02)."
+      },
+      "location_confidence": 80,
+      "effect_confidence": 20,
+      "reasoning": "These are the standard 'no-demolition' correction tools cited across nearly every remedy entry in this KB — consolidated here as a single reference so the engine doesn't need to repeat the same list inside every individual remedy.",
+      "sources": [
+        "BhaktamarMantraHealing",
+        "SquareYards",
+        "AunkarVastu",
+        "Livspace",
+        "DesigningAxis",
+        "ThevastuPractice",
+        "PradeepJaineeVastuBaba"
+      ],
+      "disagreement": "Salt-replacement frequency varies (weekly to monthly) across sources — no consensus on exact interval. Some sources treat these as near-magical fixes ('changes your life'); this KB frames them consistently as mitigation tools, not cures — see remedy_caveat at the top of this file.",
+      "severity_if_wrong": "not_applicable_toolkit_reference",
+      "remedy": "This IS the remedy-reference entry — cross-linked from other entries' 'remedy' fields rather than repeating the full list every time. Always mitigation-only; structural correction remains the 'ideal fix' per this KB's global caveat.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "not_applicable_toolkit_reference",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "vastu remedies without breaking walls",
+        "vastu upay bina todphod",
+        "non structural vastu fix",
+        "सामान्य वास्तु उपाय",
+        "sea salt wind chime camphor vastu remedy list"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "SD-09",
+      "category": "sleeping_direction",
+      "topic": "couple_mattress_single_vs_two",
+      "best": "single_shared_mattress_on_one_bed_frame",
+      "avoid": "two_separate_mattresses_joined_together",
+      "location_confidence": 78,
+      "effect_confidence": 30,
+      "reasoning": "A single mattress is read as symbolizing togetherness/unity for a couple; two joined mattresses (common when combining two singles into a 'king') are said to symbolically create a 'crack' or division between partners.",
+      "sources": [
+        "AskAcharya"
+      ],
+      "disagreement": "Only one strong source found explicitly on this specific point — flag as lower-confidence, single-source claim rather than broad consensus, unlike most other entries in this KB.",
+      "severity_if_wrong": "minor",
+      "remedy": "If replacing the mattress isn't practical, sources suggest at minimum using one continuous top sheet/mattress topper across both mattresses to visually and physically 'join' the sleeping surface.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "single mattress vs two mattress vastu",
+        "couple mattress vastu",
+        "do gadde ya ek gadda",
+        "पति पत्नी गद्दा वास्तु"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "FF-08",
+      "category": "furniture_fixtures",
+      "topic": "paintings_artwork",
+      "bedroom_best": [
+        "pairs_of_birds_swans",
+        "romantic_couple_imagery",
+        "radha_krishna",
+        "calm_nature_gentle_water_sunrise",
+        "flowers_roses_lotus_peonies",
+        "bamboo_forest"
+      ],
+      "bedroom_avoid": [
+        "solitary_lonely_figures",
+        "wild_or_aggressive_animals",
+        "war_or_violent_scenes",
+        "storms_stormy_seas_sinking_ships",
+        "sad_or_crying_figures",
+        "deity_photos_in_bedroom",
+        "dead_family_member_photos"
+      ],
+      "kitchen_dining_best": [
+        "fruits_vegetables_meal_imagery"
+      ],
+      "kitchen_avoid": [
+        "war_scenes",
+        "sad_or_empty_imagery"
+      ],
+      "placement_note": "East/North/Southwest walls generally preferred for bedroom art; avoid south wall and floor-level placement for deity images specifically.",
+      "location_confidence": 72,
+      "effect_confidence": 25,
+      "reasoning": "Imagery is read as a constant subconscious cue — paired/harmonious images reinforce togetherness, solitary/violent/sad images are read as reinforcing the corresponding negative state.",
+      "sources": [
+        "Craftico",
+        "NoBroker",
+        "GalleryToday",
+        "VastuPlus",
+        "ArtZolo"
+      ],
+      "disagreement": "None significant — broad agreement on avoid-list (violence, sadness, solitary figures, storms) and recommend-list (pairs, nature, romance) across all sources checked.",
+      "severity_if_wrong": "minor",
+      "remedy": "Simply swap the artwork — this is one of the lowest-cost, lowest-effort remedies in the entire KB, no direction-measurement needed, just subject-matter and general wall zone.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "paintings for home vastu",
+        "which painting good for bedroom",
+        "ghar ke liye painting vastu",
+        "पेंटिंग वास्तु",
+        "paintings to avoid bedroom"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "RZ-03",
+      "category": "room_zone_placement",
+      "topic": "vastu_purusha_mandala_explainer",
+      "entry_type_note": "foundational/explainer, not a placement rule",
+      "summary": "The Vastu Purusha Mandala is the foundational cosmic diagram underlying ALL Vastu room-placement rules. A mythological being (Vastu Purusha) is depicted pinned face-down on a grid, head toward NE, feet toward SW. The grid is divided into 81 squares (9x9, the 'Paramashayika' mandala used for homes), governed by 45 deities (32 outer + 13 inner, hence '45-pada'). Every room-placement rule (kitchen->SE, pooja->NE, master bed->SW, etc.) is derived from which deity's 'body part' occupies that square, and what protecting/honoring that deity is believed to support.",
+      "core_deities_to_know": {
+        "Brahma": "center",
+        "Ishaan_Shiva": "NE",
+        "Kuber": "N",
+        "Indra": "E",
+        "Agni": "SE",
+        "Yama": "S",
+        "Nairruti": "SW",
+        "Varun": "W",
+        "Vayu": "NW"
+      },
+      "grid_sizes": "Classical texts describe multiple mandala sizes (1, 4, 9, 16, 25, 64, 81-pada) for different building types; 81-pada (9x9) is standard for residential homes — this is the basis of this KB's '45-pada' room-zone layer (RZ-PADA, 3/45 done).",
+      "location_confidence": 90,
+      "effect_confidence": "not_applicable_mythological_foundation",
+      "reasoning": "This is explanatory/mythological content, not an actionable placement instruction — included so users can understand WHY room-placement rules exist, and so it can be linked from every room-placement entry as background.",
+      "sources": [
+        "AnantVastu",
+        "ArchitectureIdeas.info",
+        "VastuShastraGuru",
+        "SquareYards",
+        "plusvalueindia",
+        "Happho"
+      ],
+      "disagreement": "Minor variations in the origin myth's specific details (which god fought which demon) across retellings — the structural facts (81 squares, 45 deities, head-NE/feet-SW orientation) are consistent across all sources.",
+      "severity_if_wrong": "not_applicable_explainer",
+      "remedy": "Not applicable — explainer entry. Cross-reference from RZ-PADA and any individual pada entry.",
+      "entry_type": "foundation",
+      "severity": {
+        "default": "not_applicable_explainer",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "what is vastu purusha mandala",
+        "vastu purusha mandala kya hai",
+        "vastu mandala explain",
+        "वास्तु पुरुष मंडल क्या है",
+        "45 devta vastu"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "RZ-04",
+      "category": "room_zone_placement",
+      "topic": "basement",
+      "verdict": "acceptable_for_non_living_use_with_conditions",
+      "best_zone_within_plot": [
+        "N",
+        "E"
+      ],
+      "conditions": [
+        "regular_geometric_shape_not_irregular",
+        "at_least_quarter_of_height_above_ground_level_for_ventilation",
+        "minimum_height_around_2.5_meters",
+        "avoid_dark_colors"
+      ],
+      "avoid_use": [
+        "living_purpose_bedroom",
+        "irregular_shape"
+      ],
+      "location_confidence": 68,
+      "effect_confidence": 25,
+      "reasoning": "A fully vacant/enclosed space below the house is generally considered inauspicious in classical Vastu; a basement is treated as an exception if it stays partially above grade (ventilation/light) and isn't used as a bedroom.",
+      "sources": [
+        "Happho"
+      ],
+      "disagreement": "Only one strong source found with this level of detail — this is a thinner-sourced entry than most in the KB; treat as directional guidance, not high-consensus fact.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "If already built with a basement not matching these conditions: use it for storage/utility only, keep well-lit and light-colored, avoid using as a bedroom or main living space.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "basement vastu good or bad",
+        "tehkhana vastu",
+        "basement direction house",
+        "बेसमेंट वास्तु"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "RZ-05",
+      "category": "room_zone_placement",
+      "topic": "plot_room_shape_ratio",
+      "best_shapes": [
+        "square",
+        "rectangular"
+      ],
+      "avoid_shapes": [
+        "circular",
+        "oval",
+        "semi_circular",
+        "triangular",
+        "L_shaped",
+        "hexagon_pentagon_octagon_per_one_source",
+        "diamond_with_corner_facing_north"
+      ],
+      "ratio_note": "If not a perfect square, sources agree rectangular is next-best; one source specifically recommends the longer sides run North-South rather than East-West; a plot narrower at the entrance and wider at the rear is considered good, the reverse is not. No single numeric ratio limit (e.g. exact 1:2) was found consistently across sources — this KB does not invent a specific number.",
+      "location_confidence": 75,
+      "effect_confidence": 30,
+      "reasoning": "Regular/symmetric shapes are read as matching the Vastu Purusha's 'complete body' (see RZ-03); irregular shapes create 'missing' or 'extended' zones (see MI-06).",
+      "sources": [
+        "Happho",
+        "HuntProperty",
+        "VaastuShastra.com"
+      ],
+      "disagreement": "One source (HuntProperty) says hexagon (8 even sides) is also acceptable, while others only endorse square/rectangle — flagged as a minority allowance.",
+      "severity_if_wrong": "moderate",
+      "remedy": "For already-irregular plots, see MI-06 (missing/extended corner remedies) — compound-wall shaping to create a visually square/rectangular boundary is the most-cited practical fix.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "plot shape vastu square rectangular",
+        "ghar ka shape kaisa hona chahiye",
+        "best plot shape vastu",
+        "भूखंड का आकार वास्तु"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "RZ-06",
+      "category": "room_zone_placement",
+      "topic": "living_room_drawing_room",
+      "best": [
+        "NE",
+        "N",
+        "E"
+      ],
+      "avoid": [
+        "SW_as_primary_though_acceptable_for_seating_per_FF-06"
+      ],
+      "location_confidence": 85,
+      "effect_confidence": 40,
+      "reasoning": "Living room is a high-traffic, guest-facing, energy-receiving space -> placed in the same auspicious open-energy zones as the main entrance (NE/N/E), consistent with RZ-01's room-zone matrix. This is the dedicated entry for what was previously only present inside the RZ-01 summary matrix (a 🔴 high-frequency question in the cross-reference database that lacked its own confidence/disagreement/remedy breakdown).",
+      "sources": [
+        "KoltePatil",
+        "Propzilla",
+        "BangurCement",
+        "TogetherBuying"
+      ],
+      "disagreement": "None significant on the room-zone itself; note that heavy seating/sofa placement WITHIN the living room follows the separate S/W-wall-heavy-furniture rule (FF-06) — the room's overall zone (NE/N/E) and the sofa's specific wall (S/W) are two different, non-contradicting rules operating at different scales.",
+      "severity_if_wrong": "minor_to_moderate",
+      "remedy": "If living room is already in a less-ideal zone, focus remedies on furniture placement (FF-06) and colour (CO-02) within the room rather than relocating the room itself.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor_to_moderate",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "living room direction vastu",
+        "drawing room kis disha mein",
+        "hall room direction",
+        "लिविंग रूम की दिशा",
+        "living room best direction"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "KI-06",
+      "category": "kitchen",
+      "topic": "kitchen_above_below_bedroom",
+      "verdict": "avoid_if_possible_thinly_sourced",
+      "location_confidence": 55,
+      "effect_confidence": 25,
+      "reasoning": "One source notes the kitchen should be directly above/below another kitchen (same vertical stack) rather than below a bedroom, on the logic that fire-element rooms shouldn't stack under rest-element rooms across floors.",
+      "sources": [
+        "Astrotalk"
+      ],
+      "disagreement": "Only one source found addressing this specific multi-floor stacking question — this KB flags it as thin/low-confidence rather than asserting it as established consensus, consistent with 'never invent, mark honestly.'",
+      "severity_if_wrong": "minor",
+      "remedy": "If a kitchen already sits below/above a bedroom in an existing multi-floor home: no structural remedy is commonly cited beyond the general kitchen colour/stove-direction remedies (KI-01–KI-05); treat as low-priority.",
+      "entry_type": "rule",
+      "severity": {
+        "default": "minor",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "kitchen above bedroom vastu",
+        "kitchen niche bedroom vastu",
+        "kitchen upar bedroom neeche"
+      ],
+      "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
     }
   ],
   "not_yet_researched_optional_deeper_layers": [
@@ -2477,5 +3023,27 @@
     "aliases_authored_by": "Opus (pre-generated so Claude Code skips NLP judgement)",
     "original_fields_preserved": true,
     "note": "All original knowledge fields (disagreement, location_confidence, effect_confidence, remedy, sources, two-layer notes) untouched. severity_if_wrong kept as-is; 'severity' added as normalized shape."
+  },
+  "gap_check": {
+    "source": "vastu_question_database.md (~65 questions cross-referenced against internet Vastu sources)",
+    "date": "2026-07",
+    "result": "23/24 high-frequency (red) items were already covered as dedicated entries; 1 (living room) was promoted from the RZ-01 matrix-only mention to its own dedicated entry (RZ-06). 1 discrepancy found and resolved (fridge direction: KI-05's SW-primary reconfirmed against question-db's NW claim via 6 new sources). 13 new dedicated entries added covering yellow/white gaps, plus 1 addendum (bamboo, folded into existing MI-03 plants entry since it is a minor variant of an already-covered topic).",
+    "entries_added": [
+      "WE-05",
+      "MI-06",
+      "MI-07",
+      "MI-08",
+      "MI-09",
+      "MI-10",
+      "SD-09",
+      "FF-08",
+      "RZ-03",
+      "RZ-04",
+      "RZ-05",
+      "RZ-06",
+      "KI-06"
+    ],
+    "entries_added_count": 13,
+    "not_added_honest_gap": "astrology_vs_vastu_override — searched but found no sufficiently sourced content to write a proper entry; left out rather than invented, per this KB's own rule."
   }
 }
