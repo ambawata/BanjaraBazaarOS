@@ -8,7 +8,7 @@ import { ActionCards } from '../planner/widgets/home/ActionCards'
 import { RecentActivity } from '../planner/widgets/home/RecentActivity'
 import { VastuScoreGauge } from '../planner/widgets/home/VastuScoreGauge'
 import { ItemPlacementWidget } from '../planner/widgets/home/ItemPlacementWidget'
-import VastuKnowledge from '../planner/widgets/home/VastuKnowledge'
+import VastuApp from '../../components/vastu/VastuApp'
 
 // HomeDashboard – production consumer dashboard
 export default function HomeDashboard() {
@@ -205,7 +205,7 @@ export default function HomeDashboard() {
             onAddToCart={handleAddToCart}
           />
 
-          <VastuKnowledge />
+          <VastuApp />
 
           {/* ── ACHARYA AI BANNER ─────────────────────────────────────────── */}
           <div
