@@ -3,7 +3,7 @@ import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
-  getRoomType, getItemName, getBestDirections, getAvoidDirections,
+  getObjectType, getItemName, getBestDirections, getAvoidDirections,
   isLowConfidence, isColorRuleEntry, findDevanagariAlias,
 } from '../../lib/vastuEntryHelpers'
 
@@ -24,7 +24,7 @@ function ConfidenceBar({ label, value, lang }) {
 }
 
 export default function VastuDetailView({ entry, lang, onBack }) {
-  const roomType = getRoomType(entry)
+  const objectType = getObjectType(entry)
   const best = getBestDirections(entry)
   const avoid = getAvoidDirections(entry)
   const lowConfidence = isLowConfidence(entry)
@@ -69,38 +69,42 @@ export default function VastuDetailView({ entry, lang, onBack }) {
         ) : (
           <>
             <div style={{ padding: '14px 18px 0' }}>
-              <RoomScene roomType={roomType} size="lg" state={sceneState} />
+              <RoomScene objectType={objectType} size="lg" state={sceneState} />
             </div>
 
-            <div style={{ padding: '14px 18px 0' }}>
-              {lowConfidence ? (
-                <span style={{
-                  display: 'inline-block', fontSize: '11px', fontWeight: 700, color: '#8A7A5C',
-                  background: '#F1ECE0', padding: '5px 12px', borderRadius: '999px',
-                }}>
-                  {t(lang, 'lowConfidenceBadge')}
-                </span>
-              ) : (
-                <span style={{
-                  display: 'inline-block', fontSize: '11px', fontWeight: 700,
-                  color: isActiveAvoid ? '#C24545' : '#ffffff',
-                  background: isActiveAvoid ? '#FBEAEA' : '#E08A3C',
-                  border: isActiveAvoid ? '1px solid #E27C7C' : 'none',
-                  padding: '5px 12px', borderRadius: '999px',
-                }}>
-                  {isActiveAvoid ? t(lang, 'wrongBadge') : t(lang, 'correctBadge')}
-                </span>
-              )}
-            </div>
+            {(lowConfidence || best.length > 0 || avoid.length > 0) && (
+              <div style={{ padding: '14px 18px 0' }}>
+                {lowConfidence ? (
+                  <span style={{
+                    display: 'inline-block', fontSize: '11px', fontWeight: 700, color: '#8A7A5C',
+                    background: '#F1ECE0', padding: '5px 12px', borderRadius: '999px',
+                  }}>
+                    {t(lang, 'lowConfidenceBadge')}
+                  </span>
+                ) : (
+                  <span style={{
+                    display: 'inline-block', fontSize: '11px', fontWeight: 700,
+                    color: isActiveAvoid ? '#C24545' : '#ffffff',
+                    background: isActiveAvoid ? '#FBEAEA' : '#E08A3C',
+                    border: isActiveAvoid ? '1px solid #E27C7C' : 'none',
+                    padding: '5px 12px', borderRadius: '999px',
+                  }}>
+                    {isActiveAvoid ? t(lang, 'wrongBadge') : t(lang, 'correctBadge')}
+                  </span>
+                )}
+              </div>
+            )}
 
-            <div style={{ padding: '12px 18px 0' }}>
-              <DirectionPills
-                best={best}
-                avoid={avoid}
-                activeDirection={activeDirection}
-                onSelect={setActiveDirection}
-              />
-            </div>
+            {(best.length > 0 || avoid.length > 0) && (
+              <div style={{ padding: '12px 18px 0' }}>
+                <DirectionPills
+                  best={best}
+                  avoid={avoid}
+                  activeDirection={activeDirection}
+                  onSelect={setActiveDirection}
+                />
+              </div>
+            )}
           </>
         )}
 

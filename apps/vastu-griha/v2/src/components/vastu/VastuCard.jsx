@@ -3,11 +3,11 @@ import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
-  getRoomType, getItemName, getBestDirections, getAvoidDirections, isLowConfidence,
+  getObjectType, getItemName, getBestDirections, getAvoidDirections, isLowConfidence,
 } from '../../lib/vastuEntryHelpers'
 
 export default function VastuCard({ entry, lang, onOpen }) {
-  const roomType = getRoomType(entry)
+  const objectType = getObjectType(entry)
   const best = getBestDirections(entry)
   const avoid = getAvoidDirections(entry)
   const lowConfidence = isLowConfidence(entry)
@@ -28,24 +28,26 @@ export default function VastuCard({ entry, lang, onOpen }) {
 
       <div style={{ padding: '12px 16px 0' }}>
         <RoomScene
-          roomType={roomType}
+          objectType={objectType}
           size="sm"
           state={lowConfidence ? 'lowConfidence' : 'best'}
         />
       </div>
 
-      <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {lowConfidence ? (
-          <span style={{
-            display: 'inline-block', width: 'fit-content', fontSize: '10.5px', fontWeight: 700,
-            color: '#8A7A5C', background: '#F1ECE0', padding: '3px 9px', borderRadius: '999px',
-          }}>
-            {t(lang, 'lowConfidenceBadge')}
-          </span>
-        ) : (
-          <DirectionPills best={best} avoid={avoid} size="sm" />
-        )}
-      </div>
+      {(lowConfidence || best.length > 0 || avoid.length > 0) && (
+        <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {lowConfidence ? (
+            <span style={{
+              display: 'inline-block', width: 'fit-content', fontSize: '10.5px', fontWeight: 700,
+              color: '#8A7A5C', background: '#F1ECE0', padding: '3px 9px', borderRadius: '999px',
+            }}>
+              {t(lang, 'lowConfidenceBadge')}
+            </span>
+          ) : (
+            <DirectionPills best={best} avoid={avoid} size="sm" />
+          )}
+        </div>
+      )}
 
       <button
         onClick={onOpen}

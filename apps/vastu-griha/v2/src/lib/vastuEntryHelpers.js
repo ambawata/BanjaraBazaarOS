@@ -65,27 +65,107 @@ const ITEM_NAMES = {
   'RZ-07': { hinglish: 'Dakshinmukhi Ghar', hi: 'दक्षिणमुखी घर', en: 'South-Facing House' },
 }
 
-// category -> base room silhouette RoomScene should draw.
-const CATEGORY_ROOM_TYPE = {
-  doors_entry: 'entrance',
-  sleeping_direction: 'bedroom',
-  kitchen: 'kitchen',
+// Per-entry object illustration type. Explicit by entry_id rather than a
+// category-level default — the earlier version mapped whole categories
+// (e.g. every furniture_fixtures entry) to one shared scene, which is
+// exactly the "generic/dummy" problem this map fixes: a wardrobe, a locker,
+// a mirror, a TV, and a sofa all rendered the same sofa illustration.
+// Anything not listed here falls back to a same-category best guess, but
+// every entry that exists in the KB today has an explicit mapping.
+const OBJECT_TYPES = {
+  'WE-01': 'tankUnderground',
+  'WE-02': 'tankOverhead',
+  'WE-03': 'well',
+  'WE-04': 'well',
+  'WE-05': 'septicTank',
+  'SD-01': 'bed',
+  'SD-02': 'bed',
+  'SD-03': 'bed',
+  'SD-04': 'bed',
+  'SD-05': 'bed',
+  'SD-06': 'bed',
+  'SD-07': 'bed',
+  'SD-08': 'bed',
+  'SD-09': 'bed',
+  'DE-01': 'door',
+  'DE-02': 'door',
+  'DE-03': 'door',
+  'DE-04': 'door',
+  'KI-01': 'kitchenGeneral',
+  'KI-02': 'stove',
+  'KI-03': 'stove',
+  'KI-04': 'sink',
+  'KI-05': 'fridge',
+  'KI-06': 'kitchenGeneral',
+  'PJ-01': 'pooja',
+  'PJ-02': 'pooja',
+  'PJ-03': 'pooja',
+  'EA-01': 'diningTable',
+  'EA-02': 'diningTable',
+  'FF-01': 'wardrobe',
+  'FF-02': 'locker',
+  'FF-03': 'mirror',
+  'FF-04': 'studyTable',
+  'FF-05': 'tv',
+  'FF-06': 'sofa',
+  'FF-07': 'bed',
+  'FF-08': 'painting',
+  'MI-01': 'toilet',
+  'MI-02': 'staircase',
+  'MI-03': 'plantGeneric',
+  'MI-03a': 'tulsi',
+  'MI-03b': 'moneyPlant',
+  'MI-04': 'door',
+  'MI-05': 'parking',
+  'MI-06': 'houseCorner',
+  'MI-07': 'fishTank',
+  'MI-08': 'houseGeneric',
+  'MI-09': 'concept',
+  'MI-10': 'concept',
+  'RZ-00': 'concept',
+  'RZ-01': 'houseGeneric',
+  'RZ-02': 'concept',
+  'RZ-PADA': 'concept',
+  'RZ-03': 'mandala',
+  'RZ-04': 'basement',
+  'RZ-05': 'plotShape',
+  'RZ-06': 'sofa',
+  'RZ-07': 'houseFacing',
+}
+
+// Category-level fallback for any future entry not yet in OBJECT_TYPES above.
+const CATEGORY_FALLBACK = {
+  doors_entry: 'door',
+  sleeping_direction: 'bed',
+  kitchen: 'kitchenGeneral',
   pooja_room: 'pooja',
-  eating_direction: 'living',
-  furniture_fixtures: 'living',
-  water_elements: 'exterior',
-  misc: 'living',
-  room_zone_placement: 'living',
+  eating_direction: 'diningTable',
+  furniture_fixtures: 'sofa',
+  water_elements: 'well',
+  misc: 'concept',
+  room_zone_placement: 'houseGeneric',
 }
 
-// A few topics need a different room than their category's default.
-const TOPIC_ROOM_TYPE_OVERRIDES = {
-  toilet_bathroom: 'bathroom',
-  vehicle_parking: 'exterior',
+// Entries about a whole house's orientation ("is a south-facing house bad?")
+// render a house-exterior + compass scene rather than an interior room —
+// detected by topic naming (…facing…house… / house…facing…) so future
+// facing-direction entries (RZ-08+) pick this up automatically too.
+const FACING_HOUSE_PATTERN = /facing.*house|house.*facing/
+
+export function getObjectType(entry) {
+  if (FACING_HOUSE_PATTERN.test(entry.topic || '')) return 'houseFacing'
+  return OBJECT_TYPES[entry.entry_id] || CATEGORY_FALLBACK[entry.category] || 'concept'
 }
 
-export function getRoomType(entry) {
-  return TOPIC_ROOM_TYPE_OVERRIDES[entry.topic] || CATEGORY_ROOM_TYPE[entry.category] || 'living'
+// Object types that render as a house-exterior/conceptual composition
+// (ground, sky, house silhouette, compass or diagram) instead of the
+// interior wall+floor+furniture+dashed-box composition.
+const EXTERIOR_OBJECT_TYPES = new Set([
+  'houseFacing', 'houseGeneric', 'houseCorner', 'basement', 'plotShape', 'mandala', 'concept',
+])
+
+export function isExteriorScene(objectType) {
+  return EXTERIOR_OBJECT_TYPES.has(objectType)
 }
 
 export function getItemName(entry, lang) {
