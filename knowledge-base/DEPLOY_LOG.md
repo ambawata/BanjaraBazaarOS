@@ -55,3 +55,25 @@ Open **https://v2-one-ruby.vercel.app**, scroll to "Vastu Knowledge," and search
   - "living room direction vastu" → `RZ-06` (living_room_drawing_room)
   - "vastu vs feng shui" → `MI-09` (vastu_vs_feng_shui)
 - Re-checked Zybo's two live sites after this update — both still return `200 OK`, unaffected.
+
+## Update — 2026-07-11: 59 → 60 entries
+
+- Replaced `knowledge-base/vastu_kb_enriched.json` on the server again with the newest file. Only one new entry versus the previous 59-entry update: `RZ-07` (south-facing-house good-or-bad). `KI-05` (fridge direction) got additional cross-check detail appended (sources, `gap_check_status`) — its core SW-primary verdict is unchanged. A new top-level `gap_check` provenance object was added to the JSON; left out of seeding as suggested — it's metadata about the update itself, not a knowledge entry, and the existing `raw_json`-per-entry design has no natural home for a document-level (non-entry) object without adding a table for a single settings row, which isn't worth it for one metadata blob.
+- Re-ran `scripts/seed_vastu_kb.php` — no code changes needed this time (last update's non-numeric-confidence fix already covers this file). UPSERT only, existing 59 entries updated in place, 1 new (`RZ-07`) inserted.
+- Before → after row counts (fresh `SELECT COUNT(*)` both times):
+  - `vastu_kb_entries`: 59 → **60**
+  - `vastu_kb_aliases`: 330 → 336
+  - `vastu_kb_sources`: 324 → 333
+  - `vastu_kb_severity_overrides`: 81 → 81 (unchanged — RZ-07 doesn't define per-direction overrides)
+  - `vastu_kb_color_rules`: 18 → 18 (unchanged — no new color-rule entries)
+- Tested all 8 new sample queries against the live HTTPS API — **8/8 correct top hit**:
+  - "septic tank direction vastu" → `WE-05`
+  - "missing corner vastu remedy" → `MI-06`
+  - "fish tank direction vastu" → `MI-07`
+  - "vastu for rented house" → `MI-08`
+  - "vastu vs feng shui difference" → `MI-09`
+  - "living room direction vastu" → `RZ-06`
+  - "south facing house good or bad" → `RZ-07`
+  - "what is vastu purusha mandala" → `RZ-03`
+- Re-ran 3 original queries to confirm nothing broke: "toilet kis disha mein" → `MI-01`, "almari kahan rakhein" → `FF-01`, "kitchen direction" → `KI-01` — all still correct.
+- Re-checked Zybo's two live sites (`banjarabazaar.online`, `myadmin.banjarabazaar.online`) — both still `200 OK`. Also diffed the `md5sum` of their nginx site files against the values recorded in the previous update — identical, confirming no accidental edits.

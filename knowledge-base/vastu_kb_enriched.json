@@ -3004,6 +3004,56 @@
         "kitchen upar bedroom neeche"
       ],
       "gap_check_status": "Added from vastu_question_database.md cross-reference gap check (2026-07)"
+    },
+    {
+      "id": "RZ-07",
+      "category": "room_zone_placement",
+      "topic": "south_facing_house_myth",
+      "verdict": "not_inherently_bad_widespread_myth_debunked_by_consensus",
+      "location_confidence": 90,
+      "effect_confidence": 30,
+      "reasoning": "South is ruled by Yama (god of death) in classical association, which is the mythological root of the 'south-facing = bad luck' belief. However, modern consultant consensus (8+ independent sources) explicitly frames this as a myth: no direction is inherently good/bad — outcomes depend on WHERE EXACTLY the main door sits within the south wall (which pada, per DE-01's beginner-vs-advanced layer), whether SE (fire, favorable) vs SW (avoid) is respected, and whether the rest of the house follows standard zone rules (kitchen SE, master bedroom SW, water NOT in south, living room N/NE).",
+      "practical_benefits_cited": [
+        "more natural sunlight through the day (lower artificial lighting/heating needs)",
+        "South ruled by Mars (Mangal) in some framings — strength, courage, career drive, favored for business owners/professionals"
+      ],
+      "conditions_for_good_outcome": [
+        "main door in SE-part of south wall or center, never SW-part",
+        "kitchen in SE or NW",
+        "master bedroom in SW",
+        "living room in N/NE",
+        "no water body/tank/septic in south (see WE-01, WE-05, RZ-06 cross-refs)",
+        "square/rectangular plot shape (see RZ-05)"
+      ],
+      "sources": [
+        "GuruPunvaanii",
+        "VaastuMangaal",
+        "GangaRealty",
+        "JKCement",
+        "VaastuDevayah",
+        "AppliedVastu",
+        "GodrejProperties",
+        "AnantVastu",
+        "Astroyogi"
+      ],
+      "disagreement": "None on the core myth-busting claim. Sources differ on HOW MUCH detail matters: some get very specific about padas/degree-variation within the south wall; others give a simpler 'follow standard SE/SW rules' answer. Both agree on the top-line myth-busting verdict.",
+      "severity_if_wrong": "not_applicable_myth_busting_entry",
+      "remedy": "Not a defect to remedy. If specific south-zone rules ARE violated, that rule's own remedy applies (cross-ref DE-01, WE-01, WE-05) — the south-facing orientation itself needs no remedy.",
+      "cross_source_verification_note": "Added after a user-submitted single-source document made 54 granular claims about south-direction placements. Most were NOT independently cross-verified and are NOT included. The document's claim that pooja room in south is acceptable was CHECKED and REJECTED — PJ-01 remains unchanged (avoid south, 93% confidence, 8+ sources).",
+      "entry_type": "rule",
+      "severity": {
+        "default": "not_applicable",
+        "overrides": {}
+      },
+      "query_aliases": [
+        "south facing house good or bad",
+        "south facing ghar theek hai kya",
+        "south mukhi ghar vastu",
+        "दक्षिण मुखी घर वास्तु",
+        "is south facing house bad myth",
+        "south facing plot vastu"
+      ],
+      "gap_check_status": "Added after user-submitted single-source document prompted a targeted cross-verification (2026-07)"
     }
   ],
   "not_yet_researched_optional_deeper_layers": [
@@ -3044,6 +3094,11 @@
       "KI-06"
     ],
     "entries_added_count": 13,
-    "not_added_honest_gap": "astrology_vs_vastu_override — searched but found no sufficiently sourced content to write a proper entry; left out rather than invented, per this KB's own rule."
+    "not_added_honest_gap": "astrology_vs_vastu_override — searched but found no sufficiently sourced content to write a proper entry; left out rather than invented, per this KB's own rule.",
+    "user_submitted_doc_review": {
+      "date": "2026-07",
+      "submitted_content": "54-item South-facing-house FAQ from a single source",
+      "action_taken": "1 claim explicitly checked and REJECTED (pooja room in south = acceptable; contradicted by 8+ sources, PJ-01 unchanged). 1 well-cross-verified topic EXTRACTED and added (RZ-07: south-facing house is not inherently bad, 9 independent sources agree). Remaining ~52 granular single-source claims were NOT bulk-imported — available for future cross-verification if needed."
+    }
   }
 }
