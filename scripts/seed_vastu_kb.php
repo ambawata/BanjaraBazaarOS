@@ -23,10 +23,10 @@ require dirname(__DIR__) . '/backend/core/bootstrap.php';
 
 use Backend\Core\Database;
 
-$root       = dirname(__DIR__);
-$schemaSql  = $root . '/database/migrations/2026_07_10_vastu_kb_schema.sql';
-$jsonPath   = $root . '/knowledge-base/vastu_kb_enriched.json';
-$buildLog   = $root . '/knowledge-base/BUILD_LOG.md';
+$root         = dirname(__DIR__);
+$migrationDir = $root . '/database/migrations';
+$jsonPath     = $root . '/knowledge-base/vastu_kb_enriched.json';
+$buildLog     = $root . '/knowledge-base/BUILD_LOG.md';
 
 function logLine(string $path, string $line): void
 {
@@ -48,11 +48,20 @@ try {
 }
 fwrite(STDOUT, "Connected to MySQL.\n");
 
-if (!is_file($schemaSql)) {
-    fwrite(STDERR, "Schema file not found: $schemaSql\n");
+// Apply every vastu_kb_* migration in filename order (dated filenames sort
+// chronologically). Each file is its own CREATE TABLE IF NOT EXISTS, so
+// re-running all of them on every seed is idempotent and lets new tables
+// (like the query log) show up automatically without a separate step.
+$migrationFiles = glob($migrationDir . '/*vastu_kb*.sql') ?: [];
+sort($migrationFiles);
+if ($migrationFiles === []) {
+    fwrite(STDERR, "No vastu_kb migration files found in $migrationDir\n");
     exit(1);
 }
-$pdo->exec((string) file_get_contents($schemaSql));
+foreach ($migrationFiles as $migrationFile) {
+    $pdo->exec((string) file_get_contents($migrationFile));
+    fwrite(STDOUT, "Applied migration: " . basename($migrationFile) . "\n");
+}
 fwrite(STDOUT, "Schema applied (vastu_kb_* tables ready).\n");
 
 if (!is_file($jsonPath)) {

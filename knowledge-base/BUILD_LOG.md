@@ -72,3 +72,6 @@ Endpoints live (local dev): `GET /api/v1/vastu/search?q=`, `GET /api/v1/vastu/to
 ## Phase 2 — Schema + seed (2026-07-11 07:39:54)
 Seeded 59 entries, 330 aliases, 324 sources, 81 severity overrides, 18 color rules.
 
+## Phase 2 — Schema + seed (2026-07-11 08:58:31)
+Seeded 60 entries, 336 aliases, 333 sources, 81 severity overrides, 18 color rules.
+

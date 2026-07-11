@@ -77,3 +77,13 @@ Open **https://v2-one-ruby.vercel.app**, scroll to "Vastu Knowledge," and search
   - "what is vastu purusha mandala" → `RZ-03`
 - Re-ran 3 original queries to confirm nothing broke: "toilet kis disha mein" → `MI-01`, "almari kahan rakhein" → `FF-01`, "kitchen direction" → `KI-01` — all still correct.
 - Re-checked Zybo's two live sites (`banjarabazaar.online`, `myadmin.banjarabazaar.online`) — both still `200 OK`. Also diffed the `md5sum` of their nginx site files against the values recorded in the previous update — identical, confirming no accidental edits.
+
+## Update — 2026-07-11: query logging + zero-hit report
+
+- New table `vastu_kb_query_log` (`database/migrations/2026_07_11_vastu_kb_query_log.sql`, `CREATE TABLE IF NOT EXISTS`, additive-only): `query_text`, `matched_entry_ids` (comma-separated, NULL on zero hits), `result_count`, `matched_top_score`, `low_confidence` (boolean), `created_at`. No requester identity stored anywhere (no IP, no user id, no session) — this is aggregate usage data, not per-user tracking.
+- `low_confidence` reuses the exact score-30 cutoff the search ranking already applies internally to decide whether a match is worth showing (`VastuKbService::LOW_CONFIDENCE_SCORE_THRESHOLD`, was previously an inline literal in the ranking filter) — didn't invent a second threshold that could drift out of sync with the real one.
+- Every call to `GET /api/v1/vastu/search` now logs the query as a fire-and-forget insert inside `VastuKbService::search()`, wrapped in try/catch — a logging failure is written to the PHP error log and never affects the search response. Confirmed: search response time unaffected (~170ms for a normal query, same order of magnitude as before logging was added).
+- New endpoint: `GET https://api.banjaramarketgurgaon.com/api/v1/vastu/zero-hit-report?days=30` (days optional, defaults to 30) — returns zero/low-confidence queries from the log, deduplicated by normalized (lowercased/trimmed) query text, sorted by frequency descending. No UI, JSON only, meant to be checked periodically as the priority worklist for new knowledge-base entries.
+- `scripts/seed_vastu_kb.php` generalized to apply every `*vastu_kb*.sql` file under `database/migrations/` in filename order (was previously hardcoded to just the original schema file), so this and any future migration apply automatically on every seed run without a separate step.
+- Tested on the live API: searched "toilet kis disha" (a real, well-covered query) and "asdkjaskjd" (nonsense) — then called the zero-hit-report endpoint and confirmed **only** the nonsense query appears (`frequency: 1, best_result_count: 0`); the real query does not appear, as expected.
+- Re-checked Zybo's two live sites — both still `200 OK` after this change.

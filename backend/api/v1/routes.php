@@ -443,6 +443,22 @@ return function (Router $r): void {
         }
     });
 
+    // Admin-facing worklist of zero/low-confidence searches — no UI, just
+    // JSON, checked periodically to prioritize new knowledge-base entries.
+    $r->get('/api/v1/vastu/zero-hit-report', function (Request $request): Response {
+        $days = (int) $request->input('days', 30);
+        try {
+            $service = new \Backend\Services\VastuKbService();
+            return \Backend\Helpers\JsonResponse::success([
+                'days'    => max(1, $days),
+                'results' => $service->zeroHitReport($days),
+            ]);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            return \Backend\Helpers\JsonResponse::error('vastu_zero_hit_report_failed', $e->getMessage(), $status);
+        }
+    });
+
     $r->get('/api/v1/products/admin/pending', function (Request $request): Response {
         $limit = (int) ($request->input('limit', 20));
         $offset = (int) ($request->input('offset', 0));

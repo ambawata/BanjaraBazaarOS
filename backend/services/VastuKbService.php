@@ -19,6 +19,12 @@ final class VastuKbService
     private const REMEDY_CAVEAT = 'Most remedies mitigate, not cure — relocation is the ideal fix.';
     private const TOP_TOPICS_LIMIT = 20;
 
+    // Same cutoff the ranking already uses to decide whether a match is worth
+    // showing at all (see the array_filter in search() below) — reused here
+    // as the "low confidence" line for query logging rather than inventing a
+    // second threshold that could drift out of sync with the real one.
+    private const LOW_CONFIDENCE_SCORE_THRESHOLD = 30;
+
     // Generic English/Hindi/Hinglish filler words. Excluded only from token-
     // overlap scoring (tier 3) — without this, "kis disha mein" (which
     // appears in dozens of unrelated aliases) drowns out the one real
@@ -90,10 +96,15 @@ final class VastuKbService
             }
         }
 
+        // Captured before the >=30 filter below so a query where every match
+        // scored under the cutoff still logs its best near-miss score,
+        // instead of logging 0/null indistinguishably from a true zero-hit.
+        $topScore = $bestScorePerEntry === [] ? 0 : max($bestScorePerEntry);
+
         // Drop stray single-filler-word overlaps (e.g. only "kis" or "mein"
         // matched) so the result list stays a short, sensible set rather than
         // padding out to near the whole knowledge base.
-        $bestScorePerEntry = array_filter($bestScorePerEntry, fn (int $score) => $score >= 30);
+        $bestScorePerEntry = array_filter($bestScorePerEntry, fn (int $score) => $score >= self::LOW_CONFIDENCE_SCORE_THRESHOLD);
         arsort($bestScorePerEntry);
         $topIds = array_slice(array_keys($bestScorePerEntry), 0, 10);
 
@@ -105,7 +116,70 @@ final class VastuKbService
             }
         }
 
+        $this->logQuery($q, $topIds, count($results), $topScore);
+
         return ['query' => $q, 'results' => $results];
+    }
+
+    /**
+     * Fire-and-forget usage log — never allowed to break or slow down a
+     * search response. No requester identity is recorded (no IP, no user
+     * id, no session): just the query text and how well it matched, so
+     * this stays aggregate usage data, not per-user tracking.
+     *
+     * @param list<string> $matchedEntryIds
+     */
+    private function logQuery(string $query, array $matchedEntryIds, int $resultCount, int $topScore): void
+    {
+        try {
+            $lowConfidence = $resultCount === 0 || $topScore < self::LOW_CONFIDENCE_SCORE_THRESHOLD;
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO vastu_kb_query_log
+                    (query_text, matched_entry_ids, result_count, matched_top_score, low_confidence)
+                 VALUES
+                    (:query_text, :matched_entry_ids, :result_count, :matched_top_score, :low_confidence)'
+            );
+            $stmt->execute([
+                'query_text'        => $query,
+                'matched_entry_ids' => $matchedEntryIds === [] ? null : implode(',', $matchedEntryIds),
+                'result_count'      => $resultCount,
+                'matched_top_score' => $topScore,
+                'low_confidence'    => $lowConfidence ? 1 : 0,
+            ]);
+        } catch (\Throwable $e) {
+            error_log('vastu_kb query log insert failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zero/low-confidence queries from the last N days, deduplicated by
+     * normalized query text and sorted by frequency — the worklist for
+     * prioritizing new knowledge-base entries.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function zeroHitReport(int $days): array
+    {
+        // $days is cast to int above and clamped, so it's safe to interpolate
+        // directly — MySQL's native (non-emulated) prepares don't reliably
+        // accept a bound parameter inside INTERVAL ? DAY.
+        $days = max(1, $days);
+        $stmt = $this->pdo->query(
+            "SELECT
+                LOWER(TRIM(query_text)) AS normalized_query,
+                COUNT(*) AS frequency,
+                MAX(query_text) AS example_query_text,
+                MAX(result_count) AS best_result_count,
+                MAX(matched_top_score) AS best_top_score,
+                MAX(created_at) AS last_seen
+             FROM vastu_kb_query_log
+             WHERE low_confidence = 1
+               AND created_at >= (NOW() - INTERVAL {$days} DAY)
+             GROUP BY LOWER(TRIM(query_text))
+             ORDER BY frequency DESC, last_seen DESC
+             LIMIT 200"
+        );
+        return $stmt->fetchAll();
     }
 
     private static function normalize(string $s): string
