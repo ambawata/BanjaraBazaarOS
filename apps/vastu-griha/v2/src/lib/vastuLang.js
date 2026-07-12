@@ -49,6 +49,8 @@ const STRINGS = {
     itemLabel: 'Item',
     bestDirectionsLabel: 'Best Directions',
     conflictZoneLabel: 'Conflict Zone',
+    swipeHint: 'Agla topic dekhne ke liye side mein swipe karein',
+    topicCounter: (i, n) => `${i} / ${n}`,
   },
   hi: {
     brandSub: 'वास्तु ज्ञान केंद्र',
@@ -89,6 +91,8 @@ const STRINGS = {
     itemLabel: 'वस्तु',
     bestDirectionsLabel: 'सबसे अच्छी दिशाएं',
     conflictZoneLabel: 'टकराव क्षेत्र',
+    swipeHint: 'अगला विषय देखने के लिए साइड में स्वाइप करें',
+    topicCounter: (i, n) => `${i} / ${n}`,
   },
   en: {
     brandSub: 'Vastu Knowledge Engine',
@@ -129,6 +133,8 @@ const STRINGS = {
     itemLabel: 'Item',
     bestDirectionsLabel: 'Best Directions',
     conflictZoneLabel: 'Conflict Zone',
+    swipeHint: 'Swipe sideways for the next topic',
+    topicCounter: (i, n) => `${i} / ${n}`,
   },
 }
 

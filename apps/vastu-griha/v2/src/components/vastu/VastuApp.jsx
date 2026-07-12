@@ -12,6 +12,8 @@ export default function VastuApp() {
   const [entries, setEntries] = React.useState([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
+  const [activeIndex, setActiveIndex] = React.useState(0)
+  const trackRef = React.useRef(null)
 
   const loadDefault = React.useCallback(() => {
     setLoading(true)
@@ -43,6 +45,28 @@ export default function VastuApp() {
     }, 300)
     return () => clearTimeout(timer)
   }, [query, activeCategory, loadDefault])
+
+  // A new search/category filter is a brand new list — jump the track back
+  // to the first topic rather than leaving it scrolled to whatever index
+  // the previous list happened to be at.
+  React.useEffect(() => {
+    setActiveIndex(0)
+    trackRef.current?.scrollTo({ left: 0 })
+  }, [entries])
+
+  const scrollToIndex = (i) => {
+    const track = trackRef.current
+    if (!track) return
+    const clamped = Math.max(0, Math.min(entries.length - 1, i))
+    track.scrollTo({ left: clamped * track.clientWidth, behavior: 'smooth' })
+  }
+
+  const handleTrackScroll = () => {
+    const track = trackRef.current
+    if (!track || track.clientWidth === 0) return
+    const i = Math.round(track.scrollLeft / track.clientWidth)
+    setActiveIndex((prev) => (prev === i ? prev : i))
+  }
 
   return (
     <Shell lang={lang} setLang={setLang}>
@@ -84,15 +108,73 @@ export default function VastuApp() {
         <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'noMatch', query || activeCategory)}</p>
       )}
 
-      {!loading && !error && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {entries.map((entry) => (
-            <VastuTopicCard key={entry.entry_id} entry={entry} lang={lang} />
-          ))}
+      {!loading && !error && entries.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '11px', color: '#A99A80' }}>{t(lang, 'swipeHint')}</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#8A7A5C' }}>
+              {t(lang, 'topicCounter', activeIndex + 1, entries.length)}
+            </span>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <div
+              ref={trackRef}
+              onScroll={handleTrackScroll}
+              style={{
+                display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', borderRadius: '20px',
+              }}
+            >
+              {entries.map((entry) => (
+                <div
+                  key={entry.entry_id}
+                  style={{ flex: '0 0 100%', scrollSnapAlign: 'start', minWidth: 0, padding: '2px' }}
+                >
+                  <VastuTopicCard entry={entry} lang={lang} />
+                </div>
+              ))}
+            </div>
+
+            {activeIndex > 0 && (
+              <button onClick={() => scrollToIndex(activeIndex - 1)} aria-label="Previous" style={arrowStyle('left')}>
+                <i className="ti ti-chevron-left" />
+              </button>
+            )}
+            {activeIndex < entries.length - 1 && (
+              <button onClick={() => scrollToIndex(activeIndex + 1)} aria-label="Next" style={arrowStyle('right')}>
+                <i className="ti ti-chevron-right" />
+              </button>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {entries.slice(0, 20).map((entry, i) => (
+              <span
+                key={entry.entry_id}
+                onClick={() => scrollToIndex(i)}
+                style={{
+                  width: i === activeIndex ? '16px' : '6px', height: '6px', borderRadius: '999px',
+                  background: i === activeIndex ? BRAND.primary : '#EFE3D0', cursor: 'pointer',
+                  transition: 'width 0.2s ease',
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </Shell>
   )
+}
+
+function arrowStyle(side) {
+  return {
+    position: 'absolute', top: '50%', transform: 'translateY(-50%)', [side]: '-4px',
+    width: '32px', height: '32px', borderRadius: '999px', background: '#ffffff',
+    border: '1px solid #EFE3D0', color: '#C96F24', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(90,31,179,0.08)',
+    fontSize: '16px', zIndex: 2,
+  }
 }
 
 function Shell({ lang, setLang, children }) {
