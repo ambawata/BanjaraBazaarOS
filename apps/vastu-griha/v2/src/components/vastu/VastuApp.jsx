@@ -1,27 +1,117 @@
 import React from 'react'
-import VastuCarousel from './VastuCarousel'
-import { LANGS, t } from '../../lib/vastuLang'
-import { fetchTopVastuTopics } from '../../lib/vastuKbApi'
+import VastuCard from './VastuCard'
+import VastuColorCard from './VastuColorCard'
+import VastuDetailView from './VastuDetailView'
+import { LANGS, t, categoryLabel, allCategories } from '../../lib/vastuLang'
+import { isColorRuleEntry } from '../../lib/vastuEntryHelpers'
+import { searchVastuKb, fetchTopVastuTopics } from '../../lib/vastuKbApi'
 
 const BRAND = { primary: '#E08A3C', dark: '#C96F24', light: '#FBE6D0', cream: '#FAF5EC' }
 
-// Search bar, category chips, and the old vertical card-per-topic list are
-// gone by request — replaced entirely by one sideways-swipeable carousel
-// covering every topic (all ~60 today, plus anything added later). Each
-// card is VastuTopicCard, the single locked template for every topic.
 export default function VastuApp() {
   const [lang, setLang] = React.useState('hinglish')
+  const [query, setQuery] = React.useState('')
+  const [activeCategory, setActiveCategory] = React.useState('all')
   const [entries, setEntries] = React.useState([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
+  const [selectedEntry, setSelectedEntry] = React.useState(null)
 
-  React.useEffect(() => {
+  const loadDefault = React.useCallback(() => {
+    setLoading(true)
     fetchTopVastuTopics()
       .then((data) => { setEntries(data.results || []); setError(null) })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
 
+  React.useEffect(() => { loadDefault() }, [loadDefault])
+
+  React.useEffect(() => {
+    const q = query.trim()
+    if (q === '') {
+      if (activeCategory === 'all') { loadDefault(); return }
+      setLoading(true)
+      searchVastuKb(activeCategory)
+        .then((data) => { setEntries(data.results || []); setError(null) })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false))
+      return
+    }
+    setLoading(true)
+    const timer = setTimeout(() => {
+      searchVastuKb(q)
+        .then((data) => { setEntries(data.results || []); setError(null) })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query, activeCategory, loadDefault])
+
+  if (selectedEntry) {
+    return (
+      <Shell lang={lang} setLang={setLang}>
+        <VastuDetailView entry={selectedEntry} lang={lang} onBack={() => setSelectedEntry(null)} />
+      </Shell>
+    )
+  }
+
+  return (
+    <Shell lang={lang} setLang={setLang}>
+      <div style={{ position: 'relative' }}>
+        <i className="ti ti-search" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: BRAND.dark, fontSize: '16px' }} />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t(lang, 'searchPlaceholder')}
+          style={{
+            width: '100%', padding: '12px 14px 12px 40px', borderRadius: '14px',
+            border: '1.5px solid #EFE3D0', fontSize: '13px', color: '#2B2010',
+            outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif',
+          }}
+        />
+      </div>
+      <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#A99A80' }}>{t(lang, 'searchHint')}</p>
+
+      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0 2px' }}>
+        <CategoryChip
+          label={t(lang, 'allChip')}
+          active={activeCategory === 'all'}
+          onClick={() => { setActiveCategory('all'); setQuery('') }}
+        />
+        {allCategories().map((cat) => (
+          <CategoryChip
+            key={cat}
+            label={categoryLabel(lang, cat)}
+            active={activeCategory === cat}
+            onClick={() => { setActiveCategory(cat); setQuery('') }}
+          />
+        ))}
+      </div>
+
+      {loading && <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'loading')}</p>}
+      {error && !loading && <p style={{ fontSize: '12px', color: '#C24545' }}>{t(lang, 'connectionError')} ({error}).</p>}
+      {!loading && !error && entries.length === 0 && (
+        <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'noMatch', query || activeCategory)}</p>
+      )}
+
+      {!loading && !error && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {entries.map((entry) => (
+            isColorRuleEntry(entry) ? (
+              <VastuColorCard key={entry.entry_id} entry={entry} lang={lang} onOpen={() => setSelectedEntry(entry)} />
+            ) : (
+              <VastuCard key={entry.entry_id} entry={entry} lang={lang} onOpen={() => setSelectedEntry(entry)} />
+            )
+          ))}
+        </div>
+      )}
+    </Shell>
+  )
+}
+
+function Shell({ lang, setLang, children }) {
   return (
     <div style={{
       background: BRAND.cream, borderRadius: '20px', padding: '16px',
@@ -52,10 +142,24 @@ export default function VastuApp() {
           ))}
         </div>
       </div>
-
-      {loading && <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'loading')}</p>}
-      {error && !loading && <p style={{ fontSize: '12px', color: '#C24545' }}>{t(lang, 'connectionError')} ({error}).</p>}
-      {!loading && !error && <VastuCarousel entries={entries} lang={lang} />}
+      {children}
     </div>
+  )
+}
+
+function CategoryChip({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flexShrink: 0, padding: '7px 13px', borderRadius: '999px', fontSize: '12px',
+        fontWeight: active ? 700 : 500, whiteSpace: 'nowrap', cursor: 'pointer',
+        background: active ? BRAND.light : '#ffffff',
+        border: active ? `1px solid ${BRAND.primary}` : '1px solid #EFE3D0',
+        color: active ? BRAND.dark : '#8A7A5C', fontFamily: 'Inter, sans-serif',
+      }}
+    >
+      {label}
+    </button>
   )
 }

@@ -16,7 +16,7 @@ import { Hero } from './widgets/home/Hero';
 import { ActionCards } from './widgets/home/ActionCards';
 import { RecentActivity } from './widgets/home/RecentActivity';
 import { VastuScoreGauge } from './widgets/home/VastuScoreGauge';
-import VastuApp from '../../components/vastu/VastuApp';
+import { ItemPlacementWidget } from './widgets/home/ItemPlacementWidget';
 
 export default function PlannerWorkspace() {
   const {
@@ -92,6 +92,8 @@ export default function PlannerWorkspace() {
     localStorage.setItem('vg-dismiss-tip', 'true')
     setShowTip(false)
   }
+  const [placementDirection, setPlacementDirection] = React.useState('North')
+
   // ── Upload / Calibrate Sketch screen — component-level state & refs ────
   const [showPlotSheet, setShowPlotSheet] = React.useState(false)
   const [rotateDragAngle, setRotateDragAngle] = React.useState(null)
@@ -218,6 +220,15 @@ export default function PlannerWorkspace() {
     setActiveTab('designer')
   }
 
+  const handleHomeAddToCart = () => {
+    useUiStore.getState().addNotification({
+        id: Date.now().toString(),
+        text: 'Added Wall Mirror (Round) to Banjara Bazaar cart',
+        time: 'Just now',
+        type: 'shop'
+    });
+    alert('Added mirror item to Banjara Bazaar cart!');
+  };
 
   // Clear visual canvas
   const handleClearCanvas = () => {
@@ -563,7 +574,11 @@ export default function PlannerWorkspace() {
                     <VastuScoreGauge />
                   </div>
 
-                  <VastuApp />
+                  <ItemPlacementWidget
+                    placementDirection={placementDirection}
+                    setPlacementDirection={setPlacementDirection}
+                    onAddToCart={handleHomeAddToCart}
+                  />
 
                   {/* TALK TO ACHARYA AI BOTTOM CARD */}
                   <div 

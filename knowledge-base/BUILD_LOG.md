@@ -182,20 +182,3 @@ A reference file `vastu_shopping_style_sample.html` was requested as the locked 
 - `SD-01`, `SD-02`, `SD-04` (three of the five bed-orientation entries) DOM-inspected together — all three show identically ₹16,999 / 4.3★ (66) for "Bed with Adjustable Headboard," confirming the shared-product de-duplication actually renders identically, not just resolves identically in data.
 
 This is still placeholder data pending real vendor integration from BanjaraBazaarOS's marketplace — every price/rating/review count here is fabricated-but-plausible, not real.
-
-## Phase 11 — One locked template, sideways carousel (replaces vertical list + separate detail view + old mirror tool)
-
-Consolidated three previously-separate UI surfaces (vertical feed list with search/category chips → tap → separate detail view; plus the standalone hardcoded "Wall Mirror" `ItemPlacementWidget.jsx`) into a single locked template rendered one topic at a time, navigated by horizontal swipe. Explicit decisions confirmed by the user before building:
-- Fully replace the vertical list — search bar and category chips are gone, not just restyled.
-- Remove `ItemPlacementWidget.jsx` entirely rather than leave it alongside the new system.
-- Use the full 8-direction set (N/NE/E/SE/S/SW/W/NW) via the existing `DirectionPills` component, not the mirror tool's original 4-direction set.
-
-**New files**:
-- `apps/vastu-griha/v2/src/components/vastu/VastuTopicCard.jsx` — the single locked template every topic renders through (all 60 today, any added later via the zero-hit-report workflow). Merges what was previously split across `VastuCard.jsx` (feed card) and `VastuDetailView.jsx` (detail screen) into one component, since there's no separate "tap to see more" step anymore — the topic card is the full view. Layout is modelled on the retired mirror tool: header ("Where should X go?" pattern) → direction chip row → split box (illustration or color grid on the left, `ShopPanel` on the right) → confidence bars / remedy / conditions / both-sides / sources beneath. Colors stay the already-locked Vastu Griha orange/cream palette, not the mirror tool's `var(--accent)` token (that token is inconsistent elsewhere in the app) — only the layout/structure was copied from the mirror tool, not its color tokens.
-- `apps/vastu-griha/v2/src/components/vastu/VastuCarousel.jsx` — native CSS scroll-snap track (`scroll-snap-type: x mandatory`, one `VastuTopicCard` per full-width page) so touch swipe works for free on phones; arrow buttons + progress dots cover desktop/mouse. Progress dots are capped at the first 20 entries for visual sanity — this caps the dot *display* only, navigation itself (arrows, `scrollToIndex`) works across the full entry list regardless of dot count.
-
-**Removed**: `apps/vastu-griha/v2/src/features/planner/widgets/home/ItemPlacementWidget.jsx` (the hardcoded single-item mirror tool, plus its usages and associated `placementDirection` state in both `HomeDashboard.jsx` and `PlannerWorkspace.jsx` — the latter had its own separate mount of the same widget on its own "Home" tab, replaced with `<VastuApp />` there too for consistency), `VastuCard.jsx`, `VastuColorCard.jsx`, `VastuDetailView.jsx` (superseded by `VastuTopicCard.jsx`).
-
-**Backend**: `VastuKbService::TOP_TOPICS_LIMIT` raised from 20 to 500 — the old value was a "top picks" sample size; the carousel needs every entry, not a sample.
-
-**Verification**: `npm run build` passes. Live-tested via the `vastu-griha-v2-cors` dev server + local PHP backend at 375px mobile width: carousel renders one topic at a time with a working `n / 59` counter; tapping the next-arrow advances the topic and updates the counter; a color-rule entry (Rang/CO-01, CO-02) renders its `ColorGrid` + `ShopPanel` variant correctly inside the carousel; a verdict-only entry with no direction data (Dehleez threshold) correctly renders with no direction-pill row; a bed-orientation entry (SD-*) renders all 8 direction pills, tapping a pill updates the active-pill highlight live; the old mirror tool is confirmed gone from both `HomeDashboard.jsx` and `PlannerWorkspace.jsx`'s Home tab.
