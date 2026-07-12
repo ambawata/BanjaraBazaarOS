@@ -45,6 +45,10 @@ const STRINGS = {
     shopVastuEssentials: 'Shop Vastu Essentials',
     addedToCart: 'Cart mein add ho gaya ✓',
     reviewsCount: (n) => `(${n})`,
+    whereToPlaceTitle: 'Kahan lagayein?',
+    itemLabel: 'Item',
+    bestDirectionsLabel: 'Best Directions',
+    conflictZoneLabel: 'Conflict Zone',
   },
   hi: {
     brandSub: 'वास्तु ज्ञान केंद्र',
@@ -81,6 +85,10 @@ const STRINGS = {
     shopVastuEssentials: 'वास्तु सामान देखें',
     addedToCart: 'कार्ट में जुड़ गया ✓',
     reviewsCount: (n) => `(${n})`,
+    whereToPlaceTitle: 'कहाँ रखें?',
+    itemLabel: 'वस्तु',
+    bestDirectionsLabel: 'सबसे अच्छी दिशाएं',
+    conflictZoneLabel: 'टकराव क्षेत्र',
   },
   en: {
     brandSub: 'Vastu Knowledge Engine',
@@ -117,6 +125,10 @@ const STRINGS = {
     shopVastuEssentials: 'Shop Vastu Essentials',
     addedToCart: 'Added to cart ✓',
     reviewsCount: (n) => `(${n})`,
+    whereToPlaceTitle: 'Where do you want to place?',
+    itemLabel: 'Item',
+    bestDirectionsLabel: 'Best Directions',
+    conflictZoneLabel: 'Conflict Zone',
   },
 }
 

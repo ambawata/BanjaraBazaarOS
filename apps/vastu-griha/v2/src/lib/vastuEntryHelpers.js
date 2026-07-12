@@ -304,3 +304,18 @@ export function normalizeDirections(entry) {
 function humanizeSlug(slug) {
   return slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
+
+const INTERCARDINAL_TOKENS = new Set(['NE', 'SE', 'SW', 'NW'])
+
+/**
+ * How many direction pills an entry needs, based on what its own best/avoid/
+ * fallback tokens actually contain — not a hardcoded per-topic list. If any
+ * of those tokens is an intercardinal (NE/SE/SW/NW), the entry has genuine
+ * 8-point detail and gets all 8 pills; otherwise it only ever distinguishes
+ * at the 4 cardinal points, so 4 pills is all the data supports.
+ */
+export function getDirectionGranularity(entry) {
+  const { bestDirections, avoidDirections, fallbackDirections } = normalizeDirections(entry)
+  const all = [...bestDirections, ...avoidDirections, ...fallbackDirections]
+  return all.some((d) => INTERCARDINAL_TOKENS.has(d)) ? 8 : 4
+}

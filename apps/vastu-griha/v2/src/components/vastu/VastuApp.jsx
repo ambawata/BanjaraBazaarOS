@@ -1,9 +1,6 @@
 import React from 'react'
-import VastuCard from './VastuCard'
-import VastuColorCard from './VastuColorCard'
-import VastuDetailView from './VastuDetailView'
+import VastuTopicCard from './VastuTopicCard'
 import { LANGS, t, categoryLabel, allCategories } from '../../lib/vastuLang'
-import { isColorRuleEntry } from '../../lib/vastuEntryHelpers'
 import { searchVastuKb, fetchTopVastuTopics } from '../../lib/vastuKbApi'
 
 const BRAND = { primary: '#E08A3C', dark: '#C96F24', light: '#FBE6D0', cream: '#FAF5EC' }
@@ -15,7 +12,6 @@ export default function VastuApp() {
   const [entries, setEntries] = React.useState([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
-  const [selectedEntry, setSelectedEntry] = React.useState(null)
 
   const loadDefault = React.useCallback(() => {
     setLoading(true)
@@ -47,14 +43,6 @@ export default function VastuApp() {
     }, 300)
     return () => clearTimeout(timer)
   }, [query, activeCategory, loadDefault])
-
-  if (selectedEntry) {
-    return (
-      <Shell lang={lang} setLang={setLang}>
-        <VastuDetailView entry={selectedEntry} lang={lang} onBack={() => setSelectedEntry(null)} />
-      </Shell>
-    )
-  }
 
   return (
     <Shell lang={lang} setLang={setLang}>
@@ -99,11 +87,7 @@ export default function VastuApp() {
       {!loading && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {entries.map((entry) => (
-            isColorRuleEntry(entry) ? (
-              <VastuColorCard key={entry.entry_id} entry={entry} lang={lang} onOpen={() => setSelectedEntry(entry)} />
-            ) : (
-              <VastuCard key={entry.entry_id} entry={entry} lang={lang} onOpen={() => setSelectedEntry(entry)} />
-            )
+            <VastuTopicCard key={entry.entry_id} entry={entry} lang={lang} />
           ))}
         </div>
       )}
