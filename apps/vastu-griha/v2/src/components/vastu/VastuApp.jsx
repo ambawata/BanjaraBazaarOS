@@ -5,6 +5,20 @@ import { fetchTopVastuTopics } from '../../lib/vastuKbApi'
 
 const BRAND = { primary: '#E08A3C', dark: '#C96F24', light: '#FBE6D0', cream: '#FAF5EC' }
 
+// The carousel's default order is category/topic alphabetical from the
+// backend. The retired ItemPlacementWidget mirror tool was the app's first
+// Vastu feature, so the carousel now opens on the same topic (FF-03,
+// "mirror_placement") rather than wherever it falls alphabetically —
+// everything else keeps its existing relative order after that.
+function leadWithMirror(entries) {
+  const idx = entries.findIndex((e) => e.entry_id === 'FF-03')
+  if (idx <= 0) return entries
+  const copy = entries.slice()
+  const [mirror] = copy.splice(idx, 1)
+  copy.unshift(mirror)
+  return copy
+}
+
 // Search bar, category chips, and the old vertical card-per-topic list are
 // gone by request — replaced entirely by one sideways-swipeable carousel
 // covering every topic (all ~60 today, plus anything added later). Each
@@ -17,7 +31,7 @@ export default function VastuApp() {
 
   React.useEffect(() => {
     fetchTopVastuTopics()
-      .then((data) => { setEntries(data.results || []); setError(null) })
+      .then((data) => { setEntries(leadWithMirror(data.results || [])); setError(null) })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
