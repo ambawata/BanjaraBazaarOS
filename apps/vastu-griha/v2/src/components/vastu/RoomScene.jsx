@@ -438,8 +438,8 @@ export default function RoomScene({ objectType = 'sofa', state = 'best', highlig
         aspectRatio: '320 / 180',
         display: 'block',
         borderRadius: size === 'sm' ? '14px' : '16px',
-        background: '#faf5ec',
-        border: '1px solid #EFE3D0',
+        background: 'var(--cream)',
+        border: '1px solid var(--border-soft)',
         opacity: state === 'lowConfidence' ? 0.75 : 1,
       }}
     >
@@ -447,7 +447,7 @@ export default function RoomScene({ objectType = 'sofa', state = 'best', highlig
         <ExteriorScene objectType={objectType} color={color} dashed={dashed} />
       ) : (
         <>
-          <rect width="320" height="180" fill="#faf5ec" />
+          <rect width="320" height="180" fill="var(--cream)" />
           <rect y="136" width="320" height="44" fill="#f3ecdd" />
           <line x1="0" y1="136" x2="320" y2="136" stroke="#eadfc9" strokeWidth="2" />
 

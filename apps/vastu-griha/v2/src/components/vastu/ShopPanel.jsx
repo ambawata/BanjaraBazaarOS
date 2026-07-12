@@ -48,30 +48,30 @@ export default function ShopPanel({ entryId, lang, compact = false }) {
 
   return (
     <div style={{
-      background: '#FAF5EC', border: '1px solid #EFE3D0', borderRadius: '14px',
+      background: 'var(--cream)', border: '1px solid var(--border-soft)', borderRadius: '14px',
       padding: compact ? '10px' : '12px', display: 'flex', flexDirection: 'column', gap: '8px',
       minWidth: compact ? '132px' : '150px',
     }}>
-      <div style={{ fontSize: '10px', fontWeight: 700, color: '#C96F24', lineHeight: 1.3 }}>
+      <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--orange-dark)', lineHeight: 1.3 }}>
         {t(lang, labelKey)}
       </div>
 
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <ProductIcon icon={product.icon} size={compact ? 40 : 44} />
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#2B2010', lineHeight: 1.25 }}>
+          <div style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--text)', lineHeight: 1.25 }}>
             {product.name}
           </div>
-          <div style={{ fontSize: '9.5px', color: '#A99A80', marginTop: '1px' }}>{product.meta}</div>
+          <div style={{ fontSize: '9.5px', color: 'var(--ink-faint)', marginTop: '1px' }}>{product.meta}</div>
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
         <Stars rating={product.rating} />
-        <span style={{ fontSize: '9.5px', color: '#A99A80' }}>{product.rating} {t(lang, 'reviewsCount', product.reviews)}</span>
+        <span style={{ fontSize: '9.5px', color: 'var(--ink-faint)' }}>{product.rating} {t(lang, 'reviewsCount', product.reviews)}</span>
       </div>
 
-      <div style={{ fontSize: '15px', fontWeight: 800, color: '#2B2010' }}>
+      <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text)' }}>
         ₹{product.price.toLocaleString('en-IN')}
       </div>
 
@@ -80,9 +80,9 @@ export default function ShopPanel({ entryId, lang, compact = false }) {
         style={{
           padding: '8px', borderRadius: '10px', fontSize: '11.5px', fontWeight: 700,
           cursor: 'pointer', fontFamily: 'Inter, sans-serif', width: '100%',
-          background: isTier3 ? 'transparent' : (added ? '#3D8B5F' : '#E08A3C'),
-          color: isTier3 ? '#C96F24' : '#ffffff',
-          border: isTier3 ? '1.5px solid #E08A3C' : 'none',
+          background: isTier3 ? 'transparent' : (added ? 'var(--success)' : 'var(--orange)'),
+          color: isTier3 ? 'var(--orange-dark)' : '#ffffff',
+          border: isTier3 ? '1.5px solid var(--orange)' : 'none',
           transition: 'background 0.2s ease',
         }}
       >

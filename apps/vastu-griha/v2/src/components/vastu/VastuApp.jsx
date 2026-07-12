@@ -3,7 +3,7 @@ import VastuTopicCard from './VastuTopicCard'
 import { LANGS, t, categoryLabel, allCategories } from '../../lib/vastuLang'
 import { searchVastuKb, fetchTopVastuTopics } from '../../lib/vastuKbApi'
 
-const BRAND = { primary: '#E08A3C', dark: '#C96F24', light: '#FBE6D0', cream: '#FAF5EC' }
+const BRAND = { primary: 'var(--orange)', dark: 'var(--orange-dark)', light: 'var(--orange-light)', cream: 'var(--cream)' }
 
 export default function VastuApp() {
   const [lang, setLang] = React.useState('hinglish')
@@ -79,12 +79,12 @@ export default function VastuApp() {
           placeholder={t(lang, 'searchPlaceholder')}
           style={{
             width: '100%', padding: '12px 14px 12px 40px', borderRadius: '14px',
-            border: '1.5px solid #EFE3D0', fontSize: '13px', color: '#2B2010',
+            border: '1.5px solid var(--border-soft)', fontSize: '13px', color: 'var(--text)',
             outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif',
           }}
         />
       </div>
-      <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#A99A80' }}>{t(lang, 'searchHint')}</p>
+      <p style={{ margin: '6px 0 0', fontSize: '11px', color: 'var(--ink-faint)' }}>{t(lang, 'searchHint')}</p>
 
       <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0 2px' }}>
         <CategoryChip
@@ -102,17 +102,17 @@ export default function VastuApp() {
         ))}
       </div>
 
-      {loading && <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'loading')}</p>}
-      {error && !loading && <p style={{ fontSize: '12px', color: '#C24545' }}>{t(lang, 'connectionError')} ({error}).</p>}
+      {loading && <p style={{ fontSize: '12px', color: 'var(--ink-faint)' }}>{t(lang, 'loading')}</p>}
+      {error && !loading && <p style={{ fontSize: '12px', color: 'var(--danger)' }}>{t(lang, 'connectionError')} ({error}).</p>}
       {!loading && !error && entries.length === 0 && (
-        <p style={{ fontSize: '12px', color: '#A99A80' }}>{t(lang, 'noMatch', query || activeCategory)}</p>
+        <p style={{ fontSize: '12px', color: 'var(--ink-faint)' }}>{t(lang, 'noMatch', query || activeCategory)}</p>
       )}
 
       {!loading && !error && entries.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: '#A99A80' }}>{t(lang, 'swipeHint')}</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#8A7A5C' }}>
+            <span style={{ fontSize: '11px', color: 'var(--ink-faint)' }}>{t(lang, 'swipeHint')}</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-soft)' }}>
               {t(lang, 'topicCounter', activeIndex + 1, entries.length)}
             </span>
           </div>
@@ -155,7 +155,7 @@ export default function VastuApp() {
                 onClick={() => scrollToIndex(i)}
                 style={{
                   width: i === activeIndex ? '16px' : '6px', height: '6px', borderRadius: '999px',
-                  background: i === activeIndex ? BRAND.primary : '#EFE3D0', cursor: 'pointer',
+                  background: i === activeIndex ? BRAND.primary : 'var(--border-soft)', cursor: 'pointer',
                   transition: 'width 0.2s ease',
                 }}
               />
@@ -171,7 +171,7 @@ function arrowStyle(side) {
   return {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)', [side]: '-4px',
     width: '32px', height: '32px', borderRadius: '999px', background: '#ffffff',
-    border: '1px solid #EFE3D0', color: '#C96F24', display: 'flex', alignItems: 'center',
+    border: '1px solid var(--border-soft)', color: 'var(--orange-dark)', display: 'flex', alignItems: 'center',
     justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(90,31,179,0.08)',
     fontSize: '16px', zIndex: 2,
   }
@@ -189,9 +189,9 @@ function Shell({ lang, setLang, children }) {
           <h2 style={{ margin: 0, fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '17px', color: BRAND.dark }}>
             Vastu Griha
           </h2>
-          <p style={{ margin: 0, fontSize: '11px', color: '#A99A80' }}>{t(lang, 'brandSub')}</p>
+          <p style={{ margin: 0, fontSize: '11px', color: 'var(--ink-faint)' }}>{t(lang, 'brandSub')}</p>
         </div>
-        <div style={{ display: 'flex', gap: '3px', background: '#ffffff', borderRadius: '999px', padding: '3px', border: '1px solid #EFE3D0' }}>
+        <div style={{ display: 'flex', gap: '3px', background: '#ffffff', borderRadius: '999px', padding: '3px', border: '1px solid var(--border-soft)' }}>
           {Object.keys(LANGS).map((code) => (
             <button
               key={code}
@@ -200,7 +200,7 @@ function Shell({ lang, setLang, children }) {
                 padding: '4px 9px', borderRadius: '999px', border: 'none', cursor: 'pointer',
                 fontSize: '10.5px', fontWeight: 700, fontFamily: 'Inter, sans-serif',
                 background: lang === code ? BRAND.primary : 'transparent',
-                color: lang === code ? '#ffffff' : '#A99A80',
+                color: lang === code ? '#ffffff' : 'var(--ink-faint)',
               }}
             >
               {LANGS[code]}
@@ -221,8 +221,8 @@ function CategoryChip({ label, active, onClick }) {
         flexShrink: 0, padding: '7px 13px', borderRadius: '999px', fontSize: '12px',
         fontWeight: active ? 700 : 500, whiteSpace: 'nowrap', cursor: 'pointer',
         background: active ? BRAND.light : '#ffffff',
-        border: active ? `1px solid ${BRAND.primary}` : '1px solid #EFE3D0',
-        color: active ? BRAND.dark : '#8A7A5C', fontFamily: 'Inter, sans-serif',
+        border: active ? `1px solid ${BRAND.primary}` : '1px solid var(--border-soft)',
+        color: active ? BRAND.dark : 'var(--ink-soft)', fontFamily: 'Inter, sans-serif',
       }}
     >
       {label}

@@ -84,18 +84,23 @@ export default function VastuTopicCard({ entry, lang }) {
     bestDirections[0] || fallbackDirections[0] || pillTokens[0]
   )
 
-  // Same binary the mirror widget used (isCorrectDirection), just reading
-  // each entry's real best-directions list instead of a hardcoded
-  // ['North','East']. Avoid and fallback directions both read as "not
-  // correct" (Conflict Zone) — the mirror widget only ever had two states,
-  // so a genuinely-mixed fallback direction is folded into "not correct"
-  // rather than inventing a third visual state it never had.
-  const isCorrectDirection = bestDirections.includes(selectedDirection)
+  // Explicit membership in each list, not a single "is it the good one"
+  // boolean — some entries (e.g. SD-01..04 with an avoid_universal or
+  // contested_mixed verdict) only ever populate avoidDirections or
+  // fallbackDirections and leave bestDirections empty. A boolean derived
+  // from bestDirections.includes() alone would then be false for every
+  // pill, painting every direction red "Conflict Zone" even ones the data
+  // never actually flagged as bad. A direction only reads as avoid/red if
+  // it's explicitly in avoidDirections; anything not explicitly best or
+  // avoid (including a contested_mixed fallback direction) is genuinely
+  // unrated by this entry and shows neutral instead.
+  const isAvoidDirection = avoidDirections.includes(selectedDirection)
+  const isBestDirection = bestDirections.includes(selectedDirection)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}>
       <div>
-        <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--text)' }}>{t(lang, 'whereToPlaceTitle')}</h3>
+        <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#2B2010', fontFamily: 'Poppins, sans-serif' }}>{t(lang, 'whereToPlaceTitle')}</h3>
         <div style={{ fontSize: '12px', marginTop: '4px' }}>
           {t(lang, 'itemLabel')}: <span style={{ fontWeight: 600 }}>{itemName}</span>
         </div>
@@ -129,6 +134,7 @@ export default function VastuTopicCard({ entry, lang }) {
                   fontWeight: 'bold',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  fontFamily: 'Inter, sans-serif',
                 }}
               >
                 {directionLabel(dir, lang)}
@@ -149,9 +155,10 @@ export default function VastuTopicCard({ entry, lang }) {
               state={
                 lowConfidence ? 'lowConfidence'
                   : !hasPills ? 'neutral'
-                    : isCorrectDirection ? 'best' : 'avoid'
+                    : isAvoidDirection ? 'avoid'
+                      : isBestDirection ? 'best' : 'neutral'
               }
-              highlightText={hasPills && !isCorrectDirection && !lowConfidence ? t(lang, 'conflictZoneLabel') : undefined}
+              highlightText={hasPills && isAvoidDirection && !lowConfidence ? t(lang, 'conflictZoneLabel') : undefined}
             />
           )}
         </div>

@@ -6,7 +6,7 @@ export function ItemPlacementWidget({ placementDirection, setPlacementDirection,
   return (
     <div id="item-placement-widget" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%' }}>
       <div>
-        <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--text)' }}>Where do you want to place?</h3>
+        <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#2B2010' }}>Where do you want to place?</h3>
         <div style={{ fontSize: '12px', marginTop: '4px' }}>
           Item: <span style={{ fontWeight: 600 }}>Wall Mirror</span>
         </div>

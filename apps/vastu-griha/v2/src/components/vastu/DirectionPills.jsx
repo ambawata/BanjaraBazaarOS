@@ -31,23 +31,23 @@ export default function DirectionPills({ best = [], avoid = [], fallback = [], a
         const interactive = typeof onSelect === 'function'
 
         let background = '#ffffff'
-        let border = '1px solid #EFE3D0'
-        let color = '#8A7A5C'
+        let border = '1px solid var(--border-soft)'
+        let color = 'var(--ink-soft)'
         if (isBest) {
-          background = '#E08A3C'
-          border = '1px solid #E08A3C'
+          background = 'var(--orange)'
+          border = '1px solid var(--orange)'
           color = '#ffffff'
         } else if (isAvoid) {
           background = '#FBEAEA'
           border = '1px solid #E27C7C'
-          color = '#C24545'
+          color = 'var(--danger)'
         } else if (isFallback) {
-          background = '#FBE6D0'
-          border = '1px dashed #E08A3C'
-          color = '#C96F24'
+          background = 'var(--orange-light)'
+          border = '1px dashed var(--orange)'
+          color = 'var(--orange-dark)'
         }
         if (isActive) {
-          border = '2px solid #241408'
+          border = '2px solid var(--text)'
         }
 
         return (
