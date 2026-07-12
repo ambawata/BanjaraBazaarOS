@@ -421,7 +421,6 @@ function ExteriorScene({ objectType, color, dashed }) {
 export default function RoomScene({ objectType = 'sofa', state = 'best', highlightText, size = 'lg' }) {
   const color = HIGHLIGHT_COLORS[state] || HIGHLIGHT_COLORS.best
   const dashed = state === 'lowConfidence'
-  const height = size === 'sm' ? 84 : 150
   const exterior = isExteriorScene(objectType)
 
   return (
@@ -429,7 +428,14 @@ export default function RoomScene({ objectType = 'sofa', state = 'best', highlig
       viewBox="0 0 320 180"
       style={{
         width: '100%',
-        height: `${height}px`,
+        // Was a fixed pixel height (84/150) paired with width:100% — once
+        // the illustration column could stretch wider than its natural
+        // 320:180 shape (e.g. next to ShopPanel), the fixed height forced
+        // preserveAspectRatio to letterbox the artwork, leaving empty
+        // space on both sides instead of filling the box. Locking to the
+        // viewBox's own aspect ratio means the rendered box always matches
+        // its content regardless of how wide the flex parent makes it.
+        aspectRatio: '320 / 180',
         display: 'block',
         borderRadius: size === 'sm' ? '14px' : '16px',
         background: '#faf5ec',

@@ -32,7 +32,14 @@ export default function VastuCard({ entry, lang, onOpen }) {
           can't fit both a ~200px illustration column and a ~150px shop
           panel side by side (i.e. narrow/mobile widths). */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', padding: '12px 16px 0' }}>
-        <div style={{ flex: '1 1 200px', minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* flex: '0 1 220px' (not '1 1 200px') — this column must not grow
+            to soak up leftover width next to ShopPanel. RoomScene's SVG is
+            aspect-ratio-locked now, but a column that's free to stretch
+            wide would still make the SVG *box* wide, which just moves the
+            letterboxing from the SVG's internal scaling to visible dead
+            space around a smaller illustration — the column itself has to
+            stay capped near its natural width. */}
+        <div style={{ flex: '0 1 220px', minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <RoomScene
             objectType={objectType}
             size="sm"
