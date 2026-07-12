@@ -17,7 +17,7 @@ export function ItemPlacementWidget({ placementDirection, setPlacementDirection,
 
       {/* Direction Chips */}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-        {['North', 'East', 'West', 'South'].map(dir => {
+        {['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'].map(dir => {
           const isActive = placementDirection === dir;
           return (
             <button 
