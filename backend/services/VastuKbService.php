@@ -17,7 +17,12 @@ use PDO;
 final class VastuKbService
 {
     private const REMEDY_CAVEAT = 'Most remedies mitigate, not cure — relocation is the ideal fix.';
-    private const TOP_TOPICS_LIMIT = 20;
+    // Was 20 (a "top picks" sample) — the sideways topic carousel needs
+    // every entry, not a sample, so this is now a generous ceiling rather
+    // than a real limit: covers the current ~60 entries plus room for
+    // future growth via the zero-hit-report workflow without needing
+    // another manual bump each time.
+    private const TOP_TOPICS_LIMIT = 500;
 
     // Same cutoff the ranking already uses to decide whether a match is worth
     // showing at all (see the array_filter in search() below) — reused here

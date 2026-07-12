@@ -7,7 +7,6 @@ import { Hero } from '../planner/widgets/home/Hero'
 import { ActionCards } from '../planner/widgets/home/ActionCards'
 import { RecentActivity } from '../planner/widgets/home/RecentActivity'
 import { VastuScoreGauge } from '../planner/widgets/home/VastuScoreGauge'
-import { ItemPlacementWidget } from '../planner/widgets/home/ItemPlacementWidget'
 import VastuApp from '../../components/vastu/VastuApp'
 
 // HomeDashboard – production consumer dashboard
@@ -15,8 +14,6 @@ export default function HomeDashboard() {
   const { projects, addProject, setActiveProjectId, loadProjects, setPlot } = useProjectStore()
   const { setScreenState, setActiveTab, isMobile, showNotificationCenter, notifications } = useUiStore()
   const { setRooms } = useCanvasStore()
-
-  const [placementDirection, setPlacementDirection] = React.useState('North')
 
   React.useEffect(() => { loadProjects() }, [loadProjects])
 
@@ -44,11 +41,6 @@ export default function HomeDashboard() {
   }
 
   const recentProjects = [...projects].sort((a, b) => Number(b.id) - Number(a.id)).slice(0, 5)
-
-  const handleAddToCart = () => {
-    useUiStore.getState().addNotification({ id: Date.now().toString(), text: 'Added Wall Mirror (Round) to cart', time: 'Just now', type: 'shop' })
-    alert('Added mirror item to Banjara Bazaar cart!')
-  }
 
   // ── Bottom Nav tabs ──────────────────────────────────────────────────────
   const bottomTabs = [
@@ -198,12 +190,6 @@ export default function HomeDashboard() {
             <RecentActivity setActiveTab={(tab) => { setScreenState('workspace'); setActiveTab(tab) }} />
             <VastuScoreGauge />
           </div>
-
-          <ItemPlacementWidget
-            placementDirection={placementDirection}
-            setPlacementDirection={setPlacementDirection}
-            onAddToCart={handleAddToCart}
-          />
 
           <VastuApp />
 
