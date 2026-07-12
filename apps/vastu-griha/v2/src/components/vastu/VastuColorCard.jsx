@@ -1,4 +1,5 @@
 import React from 'react'
+import ShopPanel from './ShopPanel'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import { getItemName } from '../../lib/vastuEntryHelpers'
 
@@ -23,25 +24,29 @@ export default function VastuColorCard({ entry, lang, onOpen }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', padding: '14px 16px' }}>
-        {zoneKeys.map((zone) => {
-          const rec = zoneData[zone]?.rec?.[0] || 'white'
-          return (
-            <div key={zone} style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '100%', aspectRatio: '1', borderRadius: '10px',
-                background: colorSwatch(rec), border: '1px solid #EFE3D0', marginBottom: '4px',
-              }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#8A7A5C' }}>{zone}</span>
-            </div>
-          )
-        })}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', padding: '14px 16px 0' }}>
+        <div style={{ flex: '1 1 200px', minWidth: '180px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+          {zoneKeys.map((zone) => {
+            const rec = zoneData[zone]?.rec?.[0] || 'white'
+            return (
+              <div key={zone} style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: '100%', aspectRatio: '1', borderRadius: '10px',
+                  background: colorSwatch(rec), border: '1px solid #EFE3D0', marginBottom: '4px',
+                }} />
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#8A7A5C' }}>{zone}</span>
+              </div>
+            )
+          })}
+        </div>
+
+        <ShopPanel entryId={entry.entry_id} lang={lang} compact />
       </div>
 
       <button
         onClick={onOpen}
         style={{
-          margin: '0 16px 16px', padding: '10px', borderRadius: '10px',
+          margin: '12px 16px 16px', padding: '10px', borderRadius: '10px',
           background: '#FBE6D0', border: 'none', color: '#C96F24',
           fontWeight: 700, fontSize: '12.5px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
         }}

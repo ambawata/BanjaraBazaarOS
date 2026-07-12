@@ -1,6 +1,7 @@
 import React from 'react'
 import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
+import ShopPanel from './ShopPanel'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
   getObjectType, getItemName, normalizeDirections, isLowConfidence,
@@ -26,35 +27,42 @@ export default function VastuCard({ entry, lang, onOpen }) {
         </div>
       </div>
 
-      <div style={{ padding: '12px 16px 0' }}>
-        <RoomScene
-          objectType={objectType}
-          size="sm"
-          state={lowConfidence ? 'lowConfidence' : 'best'}
-        />
-      </div>
-
-      {(lowConfidence || hasPills || (hasVerdictOnly && verdictText)) && (
-        <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {lowConfidence ? (
-            <span style={{
-              display: 'inline-block', width: 'fit-content', fontSize: '10.5px', fontWeight: 700,
-              color: '#8A7A5C', background: '#F1ECE0', padding: '3px 9px', borderRadius: '999px',
-            }}>
-              {t(lang, 'lowConfidenceBadge')}
-            </span>
-          ) : hasPills ? (
-            <DirectionPills best={bestDirections} avoid={avoidDirections} fallback={fallbackDirections} size="sm" />
-          ) : (
-            <span style={{ fontSize: '11px', color: '#8A7A5C' }}>{verdictText}</span>
+      {/* Two-column: existing Vastu content (left) + shop panel (right).
+          Pure flex-wrap, no media query — wraps to a stack once the row
+          can't fit both a ~200px illustration column and a ~150px shop
+          panel side by side (i.e. narrow/mobile widths). */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', padding: '12px 16px 0' }}>
+        <div style={{ flex: '1 1 200px', minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <RoomScene
+            objectType={objectType}
+            size="sm"
+            state={lowConfidence ? 'lowConfidence' : 'best'}
+          />
+          {(lowConfidence || hasPills || (hasVerdictOnly && verdictText)) && (
+            <div>
+              {lowConfidence ? (
+                <span style={{
+                  display: 'inline-block', width: 'fit-content', fontSize: '10.5px', fontWeight: 700,
+                  color: '#8A7A5C', background: '#F1ECE0', padding: '3px 9px', borderRadius: '999px',
+                }}>
+                  {t(lang, 'lowConfidenceBadge')}
+                </span>
+              ) : hasPills ? (
+                <DirectionPills best={bestDirections} avoid={avoidDirections} fallback={fallbackDirections} size="sm" />
+              ) : (
+                <span style={{ fontSize: '11px', color: '#8A7A5C' }}>{verdictText}</span>
+              )}
+            </div>
           )}
         </div>
-      )}
+
+        <ShopPanel entryId={entry.entry_id} lang={lang} compact />
+      </div>
 
       <button
         onClick={onOpen}
         style={{
-          margin: '0 16px 16px', padding: '10px', borderRadius: '10px',
+          margin: '12px 16px 16px', padding: '10px', borderRadius: '10px',
           background: '#FBE6D0', border: 'none', color: '#C96F24',
           fontWeight: 700, fontSize: '12.5px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
         }}

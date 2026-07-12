@@ -1,6 +1,7 @@
 import React from 'react'
 import RoomScene from './RoomScene'
 import DirectionPills from './DirectionPills'
+import ShopPanel from './ShopPanel'
 import { t, categoryLabel } from '../../lib/vastuLang'
 import {
   getObjectType, getItemName, normalizeDirections,
@@ -166,10 +167,16 @@ export default function VastuDetailView({ entry, lang, onBack }) {
         )}
 
         {entry.sources?.length > 0 && (
-          <div style={{ padding: '14px 18px 18px', fontSize: '11px', color: '#A99A80' }}>
+          <div style={{ padding: '14px 18px 0', fontSize: '11px', color: '#A99A80' }}>
             <b style={{ color: '#8A7A5C' }}>{entry.sources.length}</b> {t(lang, 'sourcesChecked')}
           </div>
         )}
+
+        {/* Every Vastu answer ends in a purchase opportunity — direct
+            match, closest match, or a generic Vastu-shopping CTA. */}
+        <div style={{ padding: '14px 18px 18px' }}>
+          <ShopPanel entryId={entry.entry_id} lang={lang} />
+        </div>
       </div>
     </div>
   )
