@@ -36,6 +36,10 @@ svg text{user-select:none;pointer-events:none;}
 .bseg input[type=number]{width:40px;border:1px solid var(--line);border-radius:7px;padding:4px 4px;font-family:var(--fm);font-size:11px;background:#FBF7EE;color:var(--ink);}
 .bseg select{border:1px solid var(--line);border-radius:7px;padding:4px 4px;font-size:10.5px;font-weight:600;background:#FBF7EE;color:var(--ink);}
 .bseg input:focus,.bseg select:focus{outline:2px solid var(--orange-dim);}
+.hbtn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#FBF7EE;color:var(--ink);font-size:13px;cursor:pointer;transition:all .13s;flex:0 0 auto;display:grid;place-items:center;}
+.hbtn:hover:not(:disabled){border-color:var(--orange);color:var(--orange-dark);}
+.hbtn:active:not(:disabled){transform:scale(.9);}
+.hbtn:disabled{opacity:.32;cursor:default;}
 .ring{position:relative;width:34px;height:34px;flex:0 0 auto;}
 .ring svg{transform:rotate(-90deg);}
 .ring .v{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:10.5px;}
@@ -115,7 +119,12 @@ svg text{user-select:none;pointer-events:none;}
 
 <div class="bar">
   <div class="logo">VG</div>
+  <div class="bseg">
+    <button class="hbtn" id="undoB" title="Undo (Ctrl+Z)" disabled>↶</button>
+    <button class="hbtn" id="redoB" title="Redo (Ctrl+Y)" disabled>↷</button>
+  </div>
   <div class="bseg"><input type="text" id="projName" value="Amb Niwas — GF"></div>
+  <div class="bseg"><button class="btn" id="addEnt">🚪 Entrance</button></div>
   <div class="bseg"><label>Plot</label>
     <input type="number" id="plotW" value="48" min="15" max="120"><span style="font-size:10px;color:var(--ink-faint)">×</span>
     <input type="number" id="plotH" value="50" min="15" max="120"><span style="font-size:9px;color:var(--ink-faint)">ft</span></div>
@@ -174,10 +183,16 @@ const ZG={
  left:[['NE','E','SE'],['N','C','S'],['NW','W','SW']],
  right:[['SW','W','NW'],['S','C','N'],['SE','E','NE']],
 };
+/* ASSUMPTION (flagged, not from a spec): main-entrance zone rules — commonly
+   cited Vastu guidance. Correct these best/avoid lists if they're wrong. */
+const ENT={best:['N','NE','E'],avoid:['S','SW','SE'],conf:{N:[88,72],NE:[92,78],E:[87,70],S:[84,64],SW:[86,66],SE:[80,60],W:[70,54],NW:[72,55],C:[60,48]},
+ note:'Beginner rule: N/NE/E shubh maane jaate hain. Advanced view: exact pada gross direction se zyada matter karta hai.',
+ rem:'Threshold (dehleez) banayein, gate clockwise khule to behtar.'};
 
 /* ================= state ================= */
 let plotW=48, plotH=50, northDir='down', outerT=0.75, innerT=0.33, showGrid=true;
 let rooms=[], selId=null, nextN={};
+let entrance=null, selEnt=false;   /* entrance:{side,t,w} — side/pos/width on the PLOT boundary */
 const FT=14;                       /* world px per ft (fixed) */
 let vb={x:0,y:0,w:1000,h:700};     /* viewBox = camera */
 const cv=document.getElementById('cv');
@@ -196,13 +211,62 @@ function fit(){
 }
 function applyVB(){cv.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
 
-function zoneOf(r){
-  const cx=(r.x+r.w/2)/plotW, cy=(r.y+r.h/2)/plotH;
-  const c=Math.min(2,Math.floor(cx*3)), ro=Math.min(2,Math.floor(cy*3));
+function zoneOfXY(px,py){
+  const cx=px/plotW, cy=py/plotH;
+  const c=clamp(Math.floor(cx*3),0,2), ro=clamp(Math.floor(cy*3),0,2);
   return ZG[northDir][ro][c];
 }
+function zoneOf(r){return zoneOfXY(r.x+r.w/2,r.y+r.h/2);}
 function vOf(r){const k=KB[r.key],z=zoneOf(r);return k.best.includes(z)?'good':k.avoid.includes(z)?'bad':'mid';}
 const VC={good:'#3D8B5F',bad:'#C24545',mid:'#C08A1E'};
+
+/* ================= entrance geometry (plot-boundary side/pos/width) ================= */
+function entMid(){
+  /* midpoint of the entrance opening, in ft, on whichever plot side it's on */
+  const e=entrance, w=e.w;
+  if(e.side==='top')return[e.t*plotW,0];
+  if(e.side==='bottom')return[e.t*plotW,plotH];
+  if(e.side==='left')return[0,e.t*plotH];
+  return[plotW,e.t*plotH];
+}
+function entZone(){const[mx,my]=entMid();return zoneOfXY(mx,my);}
+function vOfEnt(){const z=entZone();return ENT.best.includes(z)?'good':ENT.avoid.includes(z)?'bad':'mid';}
+
+/* ================= undo/redo history ================= */
+let hist=[], hi=-1;
+function snapshot(){
+  return JSON.stringify({plotW,plotH,northDir,outerT,innerT,showGrid,rooms,entrance,projName:document.getElementById('projName').value});
+}
+function pushHistory(){
+  hist.length=hi+1;                 /* drop any redo-able future */
+  hist.push(snapshot());
+  if(hist.length>50)hist.shift(); else hi++;
+  hbtns();
+}
+function restore(s){
+  const st=JSON.parse(s);
+  plotW=st.plotW;plotH=st.plotH;northDir=st.northDir;outerT=st.outerT;innerT=st.innerT;showGrid=st.showGrid;
+  rooms=st.rooms;entrance=st.entrance;
+  selId=null;selEnt=false;
+  document.getElementById('projName').value=st.projName;
+  document.getElementById('plotW').value=plotW;
+  document.getElementById('plotH').value=plotH;
+  document.getElementById('northDir').value=northDir;
+  document.getElementById('outerWall').value=String(outerT);
+  document.getElementById('innerWall').value=String(innerT);
+  document.getElementById('showGrid').value=showGrid?'1':'0';
+  render();selPanel();hbtns();
+}
+function undo(){if(hi<=0)return;hi--;restore(hist[hi]);}
+function redo(){if(hi>=hist.length-1)return;hi++;restore(hist[hi]);}
+function hbtns(){
+  document.getElementById('undoB').disabled=hi<=0;
+  document.getElementById('redoB').disabled=hi>=hist.length-1;
+}
+window.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'){e.preventDefault();undo();}
+  if(((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y')||((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='z')){e.preventDefault();redo();}
+});
 
 /* ================= render (world coords, camera separate) ================= */
 function render(){
@@ -240,7 +304,8 @@ function render(){
     const k=KB[r.key];
     const grp=el('g',{class:'roomg','data-id':r.id,style:'cursor:grab'},g);
     el('rect',{x,y,width:w,height:h,fill:k.fill},grp);
-    el('rect',{x:x+it/2,y:y+it/2,width:Math.max(0,w-it),height:Math.max(0,h*0.32),fill:'#FFFFFF',['fill-opacity']:.28},grp);
+    if(r.key==='stairs')drawStairs(grp,x,y,w,h,r.stairStyle||'straight');
+    else el('rect',{x:x+it/2,y:y+it/2,width:Math.max(0,w-it),height:Math.max(0,h*0.32),fill:'#FFFFFF',['fill-opacity']:.28},grp);
     el('rect',{x,y,width:w,height:h,fill:'none',stroke:'#2B2013',['stroke-width']:it},grp);
 
     r.doors.forEach(d=>drawDoor(grp,r,d,s,it,k.fill));
@@ -250,16 +315,17 @@ function render(){
     const mm=Math.min(w,h);
     const z=zoneOf(r), v=vOf(r);
     const nameFS=Math.max(8,Math.min(14,mm*0.14));
-    if(mm>=34){
+    const isStairs=r.key==='stairs';
+    if(mm>=34&&!isStairs){
       el('text',{x:x+w/2,y:y+h/2-(mm>=64?6:0),['text-anchor']:'middle',style:`font-family:Poppins;font-weight:700;font-size:${nameFS}px`,fill:'#2E241A'},grp).textContent=r.nm;
     }
-    if(mm>=64){
+    if(mm>=64&&!isStairs){
       el('text',{x:x+w/2,y:y+h/2+11,['text-anchor']:'middle',style:'font-family:DM Mono;font-size:9.5px',fill:'#7A6B52'},grp).textContent=`${r.w}'×${r.h}'`;
       const cw=58;
       el('rect',{x:x+w/2-cw/2,y:y+h/2+17,width:cw,height:14,rx:7,fill:VC[v],['fill-opacity']:.13},grp);
       el('circle',{cx:x+w/2-cw/2+8,cy:y+h/2+24,r:2.6,fill:VC[v]},grp);
       el('text',{x:x+w/2-cw/2+14,y:y+h/2+27.4,style:'font-family:Inter;font-weight:800;font-size:7.5px;letter-spacing:.03em',fill:VC[v]},grp).textContent=z+' '+(v==='good'?'SAHI':v==='bad'?'BACHEIN':'THEEK');
-    }else if(mm>=34){
+    }else if(mm>=34||isStairs){
       el('circle',{cx:x+w-8,cy:y+8,r:4,fill:VC[v],stroke:'#fff',['stroke-width']:1.4},grp);
     }else{
       el('circle',{cx:x+w/2,cy:y+h/2,r:4.4,fill:VC[v],stroke:'#fff',['stroke-width']:1.5},grp);
@@ -273,6 +339,8 @@ function render(){
 
   const ot=Math.max(3.5,outerT*s);
   el('rect',{x:-ot/2,y:-ot/2,width:W+ot,height:H+ot,fill:'none',stroke:'#2B2013',['stroke-width']:ot},g);
+
+  if(entrance)drawEntrance(g,s,ot);
 
   dim(g,0,-ot-14,W,-ot-14,`${plotW}'-0"`,'h');
   dim(g,-ot-14,0,-ot-14,H,`${plotH}'-0"`,'v');
@@ -300,22 +368,28 @@ function render(){
   applyVB(); wire(); updateScore();
 }
 
+/* Door leaf: hinge ('a'|'b') picks which corner of the opening the hinge
+   post sits at; swingOut (bool) picks whether the quarter-circle arc
+   swings into the room (default, false) or out of it (true) — together
+   these two independent toggles give all 4 real-world orientations. */
 function drawDoor(grp,r,d,s,it,fill){
   const dw=d.w*s;
   const [px,py,horiz]=sidePoint(r,d.side,d.t,s,dw);
   el('rect',horiz?{x:px,y:py-it/2-1,width:dw,height:it+2,fill}:{x:px-it/2-1,y:py,width:it+2,height:dw,fill},grp);
+  const inward=horiz?(d.side==='top'?1:-1):(d.side==='left'?1:-1);
+  const dir=d.swingOut?-inward:inward;
   if(horiz){
-    const dirY=d.side==='top'?1:-1;
-    const hx=d.flip?px+dw:px, ex=hx, ey=py+dirY*dw;
+    const hx=d.hinge==='b'?px+dw:px, fx=d.hinge==='b'?px:px+dw;
+    const ex=hx, ey=py+dir*dw;
     el('line',{x1:hx,y1:py,x2:ex,y2:ey,stroke:'#2B2013',['stroke-width']:2},grp);
-    const sweep=(dirY===1)===(!d.flip)?1:0;
-    el('path',{d:`M ${d.flip?px:px+dw} ${py} A ${dw} ${dw} 0 0 ${sweep} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);
+    const cross=(fx-hx)*(ey-py);
+    el('path',{d:`M ${fx} ${py} A ${dw} ${dw} 0 0 ${cross>0?1:0} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);
   }else{
-    const dirX=d.side==='left'?1:-1;
-    const hy=d.flip?py+dw:py, ex=px+dirX*dw, ey=hy;
+    const hy=d.hinge==='b'?py+dw:py, fy=d.hinge==='b'?py:py+dw;
+    const ex=px+dir*dw, ey=hy;
     el('line',{x1:px,y1:hy,x2:ex,y2:ey,stroke:'#2B2013',['stroke-width']:2},grp);
-    const sweep=(dirX===1)===(!!d.flip)?1:0;
-    el('path',{d:`M ${px} ${d.flip?py:py+dw} A ${dw} ${dw} 0 0 ${sweep} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);
+    const cross=(ex-px)*(fy-hy)*-1;
+    el('path',{d:`M ${px} ${fy} A ${dw} ${dw} 0 0 ${cross>0?1:0} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);
   }
 }
 function drawWin(grp,r,wd,s,it){
@@ -344,25 +418,108 @@ function dim(g,x1,y1,x2,y2,txt,ax){
   else el('text',{x:x1-8,y:(y1+y2)/2,['text-anchor']:'middle',style:'font-family:DM Mono;font-size:11px',fill:'#4A3D2A',transform:`rotate(-90 ${x1-8} ${(y1+y2)/2})`},g).textContent=txt;
 }
 
+/* ================= stairs — 2D-symbolic tread rendering ================= */
+function drawStairs(grp,x,y,w,h,style){
+  const long=w>=h;
+  const tread=FT;   /* ~1ft spacing */
+  const line=(x1,y1,x2,y2)=>el('line',{x1,y1,x2,y2,stroke:'#5A4A34',['stroke-width']:1},grp);
+  const arrow=(cx,cy,alongLong)=>{
+    if(alongLong){
+      el('line',{x1:x+6,y1:cy,x2:x+w-10,y2:cy,stroke:'#2B2013',['stroke-width']:1.4},grp);
+      el('path',{d:`M ${x+w-10} ${cy-4} L ${x+w-2} ${cy} L ${x+w-10} ${cy+4}`,fill:'none',stroke:'#2B2013',['stroke-width']:1.4},grp);
+    }else{
+      el('line',{x1:cx,y1:y+6,x2:cx,y2:y+h-10,stroke:'#2B2013',['stroke-width']:1.4},grp);
+      el('path',{d:`M ${cx-4} ${y+h-10} L ${cx} ${y+h-2} L ${cx+4} ${y+h-10}`,fill:'none',stroke:'#2B2013',['stroke-width']:1.4},grp);
+    }
+    el('text',{x:cx,y:cy-6,['text-anchor']:'middle',style:'font-family:DM Mono;font-weight:700;font-size:8px',fill:'#2B2013'},grp).textContent='UP';
+  };
+  if(style==='straight'){
+    if(long)for(let px=x+tread;px<x+w;px+=tread)line(px,y,px,y+h);
+    else for(let py=y+tread;py<y+h;py+=tread)line(x,py,x+w,py);
+    arrow(x+w/2,y+h/2,long);
+  }else if(style==='L'){
+    const land=Math.min(w,h)*0.45;
+    if(long){
+      for(let px=x+tread;px<x+w-land;px+=tread)line(px,y,px,y+h*0.5);
+      el('rect',{x:x+w-land,y,width:land,height:h*0.5,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);
+      for(let py=y+h*0.5+tread;py<y+h;py+=tread)line(x+w-land,py,x+w,py);
+    }else{
+      for(let py=y+tread;py<y+h-land;py+=tread)line(x,py,x+w*0.5,py);
+      el('rect',{x,y:y+h-land,width:w*0.5,height:land,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);
+      for(let px=x+w*0.5+tread;px<x+w;px+=tread)line(px,y+h-land,px,y+h);
+    }
+    el('text',{x:x+w/2,y:y+h/2,['text-anchor']:'middle',style:'font-family:DM Mono;font-weight:700;font-size:8px',fill:'#5A4A34'},grp).textContent='UP';
+  }else{ /* U-shaped */
+    if(long){
+      const half=h/2, land=Math.min(w*0.22,3*FT);
+      for(let px=x+tread;px<x+w-land;px+=tread){line(px,y,px,y+half);line(px,y+half,px,y+h);}
+      el('rect',{x:x+w-land,y,width:land,height:h,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);
+      line(x,y+half,x+w-land,y+half);
+    }else{
+      const half=w/2, land=Math.min(h*0.22,3*FT);
+      for(let py=y+tread;py<y+h-land;py+=tread){line(x,py,x+half,py);line(x+half,py,x+w,py);}
+      el('rect',{x,y:y+h-land,width:w,height:land,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);
+      line(x+half,y,x+half,y+h-land);
+    }
+    el('text',{x:x+w/2,y:y+h/2,['text-anchor']:'middle',style:'font-family:DM Mono;font-weight:700;font-size:8px',fill:'#5A4A34'},grp).textContent='UP';
+  }
+}
+
+/* ================= entrance gate — double-leaf, on the plot boundary ================= */
+function drawEntrance(g,s,ot){
+  const e=entrance;
+  let ax,ay,ux,uy,elen;   /* wall-start point, unit direction along wall, wall length (ft) */
+  if(e.side==='top'){ax=0;ay=0;ux=1;uy=0;elen=plotW;}
+  else if(e.side==='bottom'){ax=0;ay=plotH;ux=1;uy=0;elen=plotW;}
+  else if(e.side==='left'){ax=0;ay=0;ux=0;uy=1;elen=plotH;}
+  else{ax=plotW;ay=0;ux=0;uy=1;elen=plotH;}
+  const gw=Math.min(e.w,elen*0.9);
+  const startFt=clamp(e.t*elen-gw/2,0,elen-gw);
+  const sx=(ax+ux*startFt)*s, sy=(ay+uy*startFt)*s;
+  const ex=(ax+ux*(startFt+gw))*s, ey=(ay+uy*(startFt+gw))*s;
+  /* outward normal (away from plot interior) */
+  let nx=uy,ny=-ux;
+  const cx=(sx+ex)/2, cy=(sy+ey)/2, ctrX=plotW*s/2, ctrY=plotH*s/2;
+  if((ctrX-cx)*nx+(ctrY-cy)*ny>0){nx=-nx;ny=-ny;}   /* nx,ny points OUTWARD */
+  const half=(gw*s)/2;
+  /* gap in the boundary wall */
+  el('line',{x1:sx,y1:sy,x2:ex,y2:ey,stroke:'#FCF8F0',['stroke-width']:ot+2},g);
+  /* two leaves swinging outward (gate opens away from the house) */
+  const mx=(sx+ex)/2, my=(sy+ey)/2;
+  el('line',{x1:sx,y1:sy,x2:sx-nx*half,y2:sy-ny*half,stroke:'#2B2013',['stroke-width']:2.2},g);
+  el('line',{x1:ex,y1:ey,x2:ex-nx*half,y2:ey-ny*half,stroke:'#2B2013',['stroke-width']:2.2},g);
+  el('path',{d:`M ${sx} ${sy} A ${half} ${half} 0 0 1 ${sx-nx*half} ${sy-ny*half}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},g);
+  el('path',{d:`M ${ex} ${ey} A ${half} ${half} 0 0 0 ${ex-nx*half} ${ey-ny*half}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},g);
+  /* label, placed straight out from the wall (perpendicular to it) */
+  const lx=mx+nx*(ot+16), ly=my+ny*(ot+16);
+  const v=vOfEnt();
+  el('rect',{x:lx-34,y:ly-9,width:68,height:18,rx:9,fill:VC[v]},g);
+  el('text',{x:lx,y:ly+3.5,['text-anchor']:'middle',style:'font-family:Poppins;font-weight:800;font-size:8.5px;letter-spacing:.08em',fill:'#FFF'},g).textContent='ENTRANCE';
+  /* clickable hotspot to select it */
+  el('circle',{cx:mx,cy:my,r:14,fill:'transparent',class:'entHot',style:'cursor:pointer;pointer-events:all'},g);
+}
+
 /* ================= camera + interactions ================= */
 let drag=null;
 function wire(){
   cv.querySelectorAll('.roomg').forEach(gr=>{
     gr.addEventListener('pointerdown',e=>{
       if(e.target.classList.contains('rsz'))return;
-      const id=gr.dataset.id;select(id);
+      const id=gr.dataset.id;selEnt=false;select(id);
       const r=rooms.find(r=>r.id===id);const p=wpt(e);
-      drag={type:'move',id,ox:r.x,oy:r.y,px:p.x,py:p.y};
+      drag={type:'move',id,ox:r.x,oy:r.y,px:p.x,py:p.y,moved:false};
       e.stopPropagation();e.preventDefault();
     });
   });
   cv.querySelectorAll('.rsz').forEach(hd=>{
     hd.addEventListener('pointerdown',e=>{
       const id=hd.dataset.id;const r=rooms.find(r=>r.id===id);const p=wpt(e);
-      drag={type:'size',id,ow:r.w,oh:r.h,px:p.x,py:p.y};
+      drag={type:'size',id,ow:r.w,oh:r.h,px:p.x,py:p.y,moved:false};
       e.stopPropagation();e.preventDefault();
     });
   });
+  const hot=cv.querySelector('.entHot');
+  if(hot)hot.addEventListener('pointerdown',e=>{selEnt=true;selId=null;render();selPanel();e.stopPropagation();});
 }
 cv.addEventListener('pointerdown',e=>{ /* pan on empty */
   const p=wpt(e);
@@ -386,9 +543,13 @@ window.addEventListener('pointermove',e=>{
     r.w=clamp(Math.round((drag.ow+(p.x-drag.px)/s)*2)/2,3,plotW-r.x);
     r.h=clamp(Math.round((drag.oh+(p.y-drag.py)/s)*2)/2,3,plotH-r.y);
   }
+  drag.moved=true;
   render();selPanel();
 });
-window.addEventListener('pointerup',()=>{drag=null;cv.classList.remove('panning');});
+window.addEventListener('pointerup',()=>{
+  if(drag&&drag.moved)pushHistory();   /* ONE history entry per drag, not per frame */
+  drag=null;cv.classList.remove('panning');
+});
 cv.addEventListener('wheel',e=>{
   e.preventDefault();
   const f=e.deltaY>0?1.1:1/1.1;
@@ -418,12 +579,45 @@ function addRoom(key){
   const w=Math.min(12,plotW-2),h=Math.min(10,plotH-2);
   const sp=freeSpot(w,h);
   const id='r'+Date.now()+Math.random().toString(36).slice(2,5);
-  rooms.push({id,key,nm:k.nm+(n>1?' '+n:''),x:sp.x,y:sp.y,w,h,doors:[{side:'bottom',t:.5,w:3,flip:false}],wins:[]});
-  select(id);toast(k.nm+(n>1?' '+n:'')+' add ho gaya');
+  rooms.push({id,key,nm:k.nm+(n>1?' '+n:''),x:sp.x,y:sp.y,w,h,stairStyle:'straight',doors:[{side:'bottom',t:.5,w:3,hinge:'a',swingOut:false}],wins:[]});
+  selEnt=false;select(id);pushHistory();toast(k.nm+(n>1?' '+n:'')+' add ho gaya');
 }
 function select(id){selId=id;render();selPanel();}
 function selPanel(){
   const card=document.getElementById('selCard');
+
+  if(selEnt&&entrance){
+    const z=entZone(),v=vOfEnt(),conf=ENT.conf[z]||[65,50];
+    const badge=v==='good'?`<span class="vbadge good">✓ ${z} (${DEITY[z]}) — SAHI zone</span>`
+      :v==='bad'?`<span class="vbadge bad">✕ ${z} (${DEITY[z]}) — BACHEIN</span>`
+      :`<span class="vbadge mid">◐ ${z} (${DEITY[z]}) — mila-jula</span>`;
+    card.classList.add('open');
+    card.innerHTML=`<h3>🚪 Main Entrance<button class="close" id="selClose">✕</button></h3>
+      <div class="frow"><label>Side</label><select id="eSide">
+        <option value="top" ${entrance.side==='top'?'selected':''}>top</option>
+        <option value="bottom" ${entrance.side==='bottom'?'selected':''}>bottom</option>
+        <option value="left" ${entrance.side==='left'?'selected':''}>left</option>
+        <option value="right" ${entrance.side==='right'?'selected':''}>right</option></select></div>
+      <div class="frow"><label>Position</label><input type="range" id="ePos" min="0.05" max="0.95" step="0.05" value="${entrance.t}" style="flex:1;accent-color:var(--orange)"></div>
+      <div class="frow"><label>Width ft</label><input type="number" id="eW" value="${entrance.w}" min="2.5" max="12" step="0.5"></div>
+      <div class="btnrow"><button class="btn danger" id="eDel">Delete Entrance</button></div>
+      <div class="verd">${badge}
+        <div class="confrow"><span>Jagah par consensus</span><b>${conf[0]}%</b></div>
+        <div class="cbar"><i style="width:${conf[0]}%"></i></div>
+        <div class="confrow"><span>Asar par consensus</span><b>${conf[1]}%</b></div>
+        <div class="cbar"><i style="width:${conf[1]}%"></i></div>
+        <div class="vnote">${ENT.note}</div>
+        <div class="vrem"><b>UPAAY</b>${ENT.rem}</div>
+      </div>`;
+    document.getElementById('selClose').onclick=()=>{selEnt=false;render();selPanel();};
+    document.getElementById('eSide').onchange=e=>{entrance.side=e.target.value;pushHistory();render();};
+    document.getElementById('ePos').oninput=e=>{entrance.t=+e.target.value;render();};
+    document.getElementById('ePos').onchange=()=>pushHistory();
+    document.getElementById('eW').onchange=e=>{entrance.w=clamp(+e.target.value,2.5,12);pushHistory();render();};
+    document.getElementById('eDel').onclick=()=>{entrance=null;selEnt=false;pushHistory();render();selPanel();};
+    return;
+  }
+
   const r=rooms.find(r=>r.id===selId);
   if(!r){card.classList.remove('open');return;}
   const k=KB[r.key],z=zoneOf(r),v=vOf(r),conf=k.conf[z]||[65,50];
@@ -436,6 +630,10 @@ function selPanel(){
     <div class="frow"><label>Size ft</label>
       <input type="number" id="rW" value="${r.w}" min="3" step="0.5"> <span style="color:var(--ink-faint);font-size:10px">×</span>
       <input type="number" id="rH" value="${r.h}" min="3" step="0.5"></div>
+    ${r.key==='stairs'?`<div class="frow"><label>Style</label><select id="rStyle">
+      <option value="straight" ${r.stairStyle==='straight'?'selected':''}>Straight</option>
+      <option value="L" ${r.stairStyle==='L'?'selected':''}>L-shaped</option>
+      <option value="U" ${r.stairStyle==='U'?'selected':''}>U-shaped</option></select></div>`:''}
     <div class="btnrow">
       <button class="btn" id="rRot">⟳ Rotate</button>
       <button class="btn" id="rDoor">+ Door</button>
@@ -452,20 +650,24 @@ function selPanel(){
       <div class="vrem"><b>UPAAY</b>${k.rem}</div>
     </div>`;
   document.getElementById('selClose').onclick=()=>{selId=null;render();selPanel();};
-  document.getElementById('rNm').onchange=e=>{r.nm=e.target.value;render();};
-  document.getElementById('rW').onchange=e=>{r.w=clamp(+e.target.value,3,plotW-r.x);render();selPanel();};
-  document.getElementById('rH').onchange=e=>{r.h=clamp(+e.target.value,3,plotH-r.y);render();selPanel();};
-  document.getElementById('rRot').onclick=()=>{const t=r.w;r.w=clamp(r.h,3,plotW-r.x);r.h=clamp(t,3,plotH-r.y);render();selPanel();};
-  document.getElementById('rDel').onclick=()=>{rooms=rooms.filter(q=>q.id!==r.id);selId=null;render();selPanel();};
-  document.getElementById('rDoor').onclick=()=>{r.doors.push({side:'bottom',t:.5,w:3,flip:false});render();selPanel();};
-  document.getElementById('rWin').onclick=()=>{r.wins.push({side:'top',t:.5,w:4});render();selPanel();};
+  document.getElementById('rNm').onchange=e=>{r.nm=e.target.value;pushHistory();render();};
+  document.getElementById('rW').onchange=e=>{r.w=clamp(+e.target.value,3,plotW-r.x);pushHistory();render();selPanel();};
+  document.getElementById('rH').onchange=e=>{r.h=clamp(+e.target.value,3,plotH-r.y);pushHistory();render();selPanel();};
+  if(r.key==='stairs')document.getElementById('rStyle').onchange=e=>{r.stairStyle=e.target.value;pushHistory();render();};
+  document.getElementById('rRot').onclick=()=>{const t=r.w;r.w=clamp(r.h,3,plotW-r.x);r.h=clamp(t,3,plotH-r.y);pushHistory();render();selPanel();};
+  document.getElementById('rDel').onclick=()=>{rooms=rooms.filter(q=>q.id!==r.id);selId=null;pushHistory();render();selPanel();};
+  document.getElementById('rDoor').onclick=()=>{r.doors.push({side:'bottom',t:.5,w:3,hinge:'a',swingOut:false});pushHistory();render();selPanel();};
+  document.getElementById('rWin').onclick=()=>{r.wins.push({side:'top',t:.5,w:4});pushHistory();render();selPanel();};
   const op=document.getElementById('opList');
   r.doors.forEach((d,i)=>{
     const row=document.createElement('div');row.className='openrow';
     row.innerHTML=`<b>🚪D${i+1}</b>
       <select data-i="${i}" class="dside"><option ${d.side==='top'?'selected':''}>top</option><option ${d.side==='bottom'?'selected':''}>bottom</option><option ${d.side==='left'?'selected':''}>left</option><option ${d.side==='right'?'selected':''}>right</option></select>
       <input type="range" class="dpos" data-i="${i}" min="0" max="1" step="0.05" value="${d.t}">
-      <button class="dflip" data-i="${i}">⇄</button><button class="del ddel" data-i="${i}">✕</button>`;
+      <input type="number" class="dw" data-i="${i}" value="${d.w}" min="2" max="6" step="0.5" title="chaudai (ft)" style="width:40px">
+      <button class="dhinge" data-i="${i}" title="hinge kis corner par">⇄</button>
+      <button class="dswing" data-i="${i}" title="andar/bahar khule">↕</button>
+      <button class="del ddel" data-i="${i}">✕</button>`;
     op.appendChild(row);
   });
   r.wins.forEach((wd,i)=>{
@@ -473,24 +675,30 @@ function selPanel(){
     row.innerHTML=`<b>🪟W${i+1}</b>
       <select data-i="${i}" class="wside"><option ${wd.side==='top'?'selected':''}>top</option><option ${wd.side==='bottom'?'selected':''}>bottom</option><option ${wd.side==='left'?'selected':''}>left</option><option ${wd.side==='right'?'selected':''}>right</option></select>
       <input type="range" class="wpos" data-i="${i}" min="0" max="1" step="0.05" value="${wd.t}">
+      <input type="number" class="ww" data-i="${i}" value="${wd.w}" min="1.5" max="10" step="0.5" title="chaudai (ft)" style="width:40px">
       <button class="del wdel" data-i="${i}">✕</button>`;
     op.appendChild(row);
   });
-  op.querySelectorAll('.dside').forEach(sl=>sl.onchange=e=>{r.doors[+e.target.dataset.i].side=e.target.value;render();});
-  op.querySelectorAll('.dpos').forEach(sl=>sl.oninput=e=>{r.doors[+e.target.dataset.i].t=+e.target.value;render();});
-  op.querySelectorAll('.dflip').forEach(b=>b.onclick=e=>{const d=r.doors[+e.target.dataset.i];d.flip=!d.flip;render();});
-  op.querySelectorAll('.ddel').forEach(b=>b.onclick=e=>{r.doors.splice(+e.target.dataset.i,1);render();selPanel();});
-  op.querySelectorAll('.wside').forEach(sl=>sl.onchange=e=>{r.wins[+e.target.dataset.i].side=e.target.value;render();});
-  op.querySelectorAll('.wpos').forEach(sl=>sl.oninput=e=>{r.wins[+e.target.dataset.i].t=+e.target.value;render();});
-  op.querySelectorAll('.wdel').forEach(b=>b.onclick=e=>{r.wins.splice(+e.target.dataset.i,1);render();selPanel();});
+  const re=()=>{render();selPanel();};
+  op.querySelectorAll('.dside').forEach(sl=>sl.onchange=e=>{r.doors[+e.target.dataset.i].side=e.target.value;pushHistory();render();});
+  op.querySelectorAll('.dpos').forEach(sl=>{sl.oninput=e=>{r.doors[+e.target.dataset.i].t=+e.target.value;render();};sl.onchange=()=>pushHistory();});
+  op.querySelectorAll('.dw').forEach(sl=>sl.onchange=e=>{r.doors[+e.target.dataset.i].w=clamp(+e.target.value,2,6);pushHistory();render();});
+  op.querySelectorAll('.dhinge').forEach(b=>b.onclick=e=>{const d=r.doors[+e.currentTarget.dataset.i];d.hinge=d.hinge==='a'?'b':'a';pushHistory();re();});
+  op.querySelectorAll('.dswing').forEach(b=>b.onclick=e=>{const d=r.doors[+e.currentTarget.dataset.i];d.swingOut=!d.swingOut;pushHistory();re();});
+  op.querySelectorAll('.ddel').forEach(b=>b.onclick=e=>{r.doors.splice(+e.currentTarget.dataset.i,1);pushHistory();re();});
+  op.querySelectorAll('.wside').forEach(sl=>sl.onchange=e=>{r.wins[+e.target.dataset.i].side=e.target.value;pushHistory();render();});
+  op.querySelectorAll('.wpos').forEach(sl=>{sl.oninput=e=>{r.wins[+e.target.dataset.i].t=+e.target.value;render();};sl.onchange=()=>pushHistory();});
+  op.querySelectorAll('.ww').forEach(sl=>sl.onchange=e=>{r.wins[+e.target.dataset.i].w=clamp(+e.target.value,1.5,10);pushHistory();render();});
+  op.querySelectorAll('.wdel').forEach(b=>b.onclick=e=>{r.wins.splice(+e.currentTarget.dataset.i,1);pushHistory();re();});
 }
 
 /* ================= score ================= */
 function updateScore(){
   const ring=document.getElementById('ringFill'),val=document.getElementById('scoreVal');
-  if(!rooms.length){ring.style.strokeDashoffset=84.8;val.textContent='—';return;}
-  let s=0;rooms.forEach(r=>{const v=vOf(r);s+=v==='good'?100:v==='mid'?62:18;});
-  const sc=Math.round(s/rooms.length),C=84.8;
+  const verdicts=[...rooms.map(vOf),...(entrance?[vOfEnt()]:[])];
+  if(!verdicts.length){ring.style.strokeDashoffset=84.8;val.textContent='—';return;}
+  let s=0;verdicts.forEach(v=>{s+=v==='good'?100:v==='mid'?62:18;});
+  const sc=Math.round(s/verdicts.length),C=84.8;
   ring.style.strokeDashoffset=C-(C*sc/100);
   ring.style.stroke=sc>=75?'#3D8B5F':sc>=45?'#C08A1E':'#C24545';
   val.textContent=sc;
@@ -503,13 +711,20 @@ Object.entries(KB).forEach(([key,k])=>{
   c.innerHTML=`<span class="e">${k.ic}</span><span>${k.nm}</span>`;
   c.onclick=()=>addRoom(key);chipsEl.appendChild(c);
 });
-document.getElementById('plotW').onchange=e=>{plotW=clamp(+e.target.value,15,120);rooms.forEach(r=>{r.w=Math.min(r.w,plotW);r.x=clamp(r.x,0,plotW-r.w);});render();fit();};
-document.getElementById('plotH').onchange=e=>{plotH=clamp(+e.target.value,15,120);rooms.forEach(r=>{r.h=Math.min(r.h,plotH);r.y=clamp(r.y,0,plotH-r.h);});render();fit();};
-document.getElementById('northDir').onchange=e=>{northDir=e.target.value;render();selPanel();toast('North badla — verdicts recalc');};
-document.getElementById('outerWall').onchange=e=>{outerT=+e.target.value;render();};
-document.getElementById('innerWall').onchange=e=>{innerT=+e.target.value;render();};
-document.getElementById('showGrid').onchange=e=>{showGrid=e.target.value==='1';render();};
-document.getElementById('projName').onchange=()=>render();
+document.getElementById('plotW').onchange=e=>{plotW=clamp(+e.target.value,15,120);rooms.forEach(r=>{r.w=Math.min(r.w,plotW);r.x=clamp(r.x,0,plotW-r.w);});pushHistory();render();fit();};
+document.getElementById('plotH').onchange=e=>{plotH=clamp(+e.target.value,15,120);rooms.forEach(r=>{r.h=Math.min(r.h,plotH);r.y=clamp(r.y,0,plotH-r.h);});pushHistory();render();fit();};
+document.getElementById('northDir').onchange=e=>{northDir=e.target.value;pushHistory();render();selPanel();toast('North badla — verdicts recalc');};
+document.getElementById('outerWall').onchange=e=>{outerT=+e.target.value;pushHistory();render();};
+document.getElementById('innerWall').onchange=e=>{innerT=+e.target.value;pushHistory();render();};
+document.getElementById('showGrid').onchange=e=>{showGrid=e.target.value==='1';pushHistory();render();};
+document.getElementById('projName').onchange=()=>{pushHistory();render();};
+document.getElementById('addEnt').onclick=()=>{
+  if(!entrance)entrance={side:'bottom',t:.5,w:4};
+  selEnt=true;selId=null;pushHistory();render();selPanel();
+  toast('Entrance boundary par lag gaya — side/position badal sakte ho');
+};
+document.getElementById('undoB').onclick=undo;
+document.getElementById('redoB').onclick=redo;
 document.getElementById('zIn').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2};const k=1/1.2;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w*=k;vb.h*=k;applyVB();};
 document.getElementById('zOut').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2};const k=1.2;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w*=k;vb.h*=k;applyVB();};
 document.getElementById('zFit').onclick=fit;
@@ -518,11 +733,12 @@ window.addEventListener('resize',fit);
 let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000);}
 
 /* seed — Amb Niwas, N=down, NON-overlapping */
-[['store',1,1,10,20],['bedroom',12.5,1,15,10],['toilet',29,1,3,3],['bath',33.5,1,5,6],['guest',1,23,10,10]].forEach(([k,x,y,w,h],i)=>{
+[['store',1,1,10,20],['bedroom',12.5,1,15,10],['toilet',29,1,3,3],['bath',33.5,1,5,6],['guest',1,23,10,10],['stairs',30,12,4,10]].forEach(([k,x,y,w,h],i)=>{
   nextN[k]=(nextN[k]||0)+1;const n=nextN[k];
-  rooms.push({id:'seed'+i,key:k,nm:KB[k].nm+(n>1?' '+n:''),x,y,w,h,doors:[{side:'bottom',t:.5,w:3,flip:false}],wins:[]});
+  rooms.push({id:'seed'+i,key:k,nm:KB[k].nm+(n>1?' '+n:''),x,y,w,h,stairStyle:'straight',doors:[{side:'bottom',t:.5,w:3,hinge:'a',swingOut:false}],wins:[]});
 });
-render();fit();
+entrance={side:'bottom',t:.4,w:4};
+render();fit();pushHistory();
 </script>
 </body>
 </html>
