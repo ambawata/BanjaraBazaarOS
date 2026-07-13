@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vastu Griha — Studio v4</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 :root{
   --orange:#E08A3C; --orange-dark:#C96F24; --orange-dim:rgba(224,138,60,.14);
@@ -23,12 +24,14 @@ body{font-family:var(--fb);color:var(--ink);
 #cv.panning{cursor:grabbing;}
 svg text{user-select:none;pointer-events:none;}
 
-/* ============ floating top bar ============ */
+/* ============ floating top bar — draggable, can be parked anywhere ============ */
 .bar{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;
   padding:7px 10px;box-shadow:0 10px 34px rgba(58,46,34,.14);z-index:40;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none;}
 .bar::-webkit-scrollbar{display:none;}
-.logo{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#D97B26);display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:11px;color:#fff;flex:0 0 auto;}
+.bar.dragging{opacity:.92;box-shadow:0 16px 44px rgba(58,46,34,.26);transition:none;}
+.logo{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#D97B26);display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:11px;color:#fff;flex:0 0 auto;cursor:grab;touch-action:none;}
+.logo:active{cursor:grabbing;}
 .bseg{display:flex;align-items:center;gap:5px;padding:0 7px;border-left:1px solid var(--line);flex:0 0 auto;}
 .bseg:first-of-type{border-left:none;}
 .bseg label{font-size:8.5px;font-weight:800;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase;}
@@ -118,19 +121,19 @@ svg text{user-select:none;pointer-events:none;}
 
 <svg id="cv"></svg>
 
-<div class="bar">
-  <div class="logo">VG</div>
+<div class="bar" id="topBar">
+  <div class="logo" id="dragHandle" title="Drag karke kahin bhi rakho">VG</div>
   <div class="bseg">
-    <button class="hbtn" id="undoB" title="Undo (Ctrl+Z)" disabled>↶</button>
-    <button class="hbtn" id="redoB" title="Redo (Ctrl+Y)" disabled>↷</button>
+    <button class="hbtn" id="undoB" title="Undo (Ctrl+Z)" disabled><i class="ti ti-arrow-back-up"></i></button>
+    <button class="hbtn" id="redoB" title="Redo (Ctrl+Y)" disabled><i class="ti ti-arrow-forward-up"></i></button>
   </div>
   <div class="bseg"><input type="text" id="projName" value="Amb Niwas — GF"></div>
-  <div class="bseg"><button class="btn" id="addEnt">🚪 Entrance</button></div>
-  <div class="bseg"><button class="btn" id="editBndBtn">✏️ Edit boundary</button></div>
+  <div class="bseg"><button class="btn" id="addEnt"><i class="ti ti-door-enter"></i> Entrance</button></div>
+  <div class="bseg"><button class="btn" id="editBndBtn"><i class="ti ti-pencil"></i> Edit boundary</button></div>
   <div class="bseg"><label>Plot</label>
     <input type="number" id="plotW" value="48" min="15" max="120"><span style="font-size:10px;color:var(--ink-faint)">×</span>
     <input type="number" id="plotH" value="50" min="15" max="120"><span style="font-size:9px;color:var(--ink-faint)">ft</span>
-    <button class="btn" id="resetBnd" title="Boundary ko seedha rectangle bana do">↺ Rect</button></div>
+    <button class="btn" id="resetBnd" title="Boundary ko seedha rectangle bana do"><i class="ti ti-rotate"></i> Rect</button></div>
   <div class="bseg"><label>North</label>
     <select id="northDir"><option value="up">↑</option><option value="down" selected>↓</option><option value="left">←</option><option value="right">→</option></select></div>
   <div class="bseg hideS"><label>Wall</label>
@@ -149,12 +152,12 @@ svg text{user-select:none;pointer-events:none;}
 </div>
 
 <div class="zoomer">
-  <button class="zbtn" id="zIn">+</button>
-  <button class="zbtn" id="zOut">−</button>
-  <button class="zbtn" id="zFit" title="Fit" style="font-size:12px">⌂</button>
+  <button class="zbtn" id="zIn"><i class="ti ti-plus"></i></button>
+  <button class="zbtn" id="zOut"><i class="ti ti-minus"></i></button>
+  <button class="zbtn" id="zFit" title="Fit" style="font-size:14px"><i class="ti ti-focus-2"></i></button>
 </div>
 
-<div class="hint" id="hint"><button class="close" onclick="this.parentElement.remove()">✕</button>
+<div class="hint" id="hint"><button class="close" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>
   <b>Drag</b> kamra = move · <b>corner dot</b> = resize<br><b>Khali jagah drag</b> = pan · <b>scroll</b> = zoom<br>Neeche dock se naye kamre jodein.<br><b>Edit boundary</b> ON karke corners drag/add/remove karein — irregular plot ke liye.<br>Vastu zones plot ke <b>bounding-box</b> par based hain (irregular plots ke liye approximation).</div>
 
 <div class="dock"><div class="chips" id="chips"></div></div>
@@ -690,7 +693,7 @@ function selPanel(){
       :v==='bad'?`<span class="vbadge bad">✕ ${z} (${DEITY[z]}) — BACHEIN</span>`
       :`<span class="vbadge mid">◐ ${z} (${DEITY[z]}) — mila-jula</span>`;
     card.classList.add('open');
-    card.innerHTML=`<h3>🚪 Main Entrance<button class="close" id="selClose">✕</button></h3>
+    card.innerHTML=`<h3>🚪 Main Entrance<button class="close" id="selClose"><i class="ti ti-x"></i></button></h3>
       <div class="frow"><label>Edge #</label><input type="number" id="eEdge" value="${entrance.edge+1}" min="1" max="${pts.length}"></div>
       <div class="frow"><label>Position</label><input type="range" id="ePos" min="0.05" max="0.95" step="0.05" value="${entrance.t}" style="flex:1;accent-color:var(--orange)"></div>
       <div class="frow"><label>Width ft</label><input type="number" id="eW" value="${entrance.w}" min="2.5" max="12" step="0.5"></div>
@@ -719,7 +722,7 @@ function selPanel(){
     :v==='bad'?`<span class="vbadge bad">✕ ${z} (${DEITY[z]}) — BACHEIN</span>`
     :`<span class="vbadge mid">◐ ${z} (${DEITY[z]}) — mila-jula</span>`;
   card.classList.add('open');
-  card.innerHTML=`<h3>${k.ic} ${r.nm}<button class="close" id="selClose">✕</button></h3>
+  card.innerHTML=`<h3>${k.ic} ${r.nm}<button class="close" id="selClose"><i class="ti ti-x"></i></button></h3>
     <div class="frow"><label>Naam</label><input type="text" id="rNm" value="${r.nm}"></div>
     <div class="frow"><label>Size ft</label>
       <input type="number" id="rW" value="${r.w}" min="3" step="0.5"> <span style="color:var(--ink-faint);font-size:10px">×</span>
@@ -729,7 +732,7 @@ function selPanel(){
       <option value="L" ${r.stairStyle==='L'?'selected':''}>L-shaped</option>
       <option value="U" ${r.stairStyle==='U'?'selected':''}>U-shaped</option></select></div>`:''}
     <div class="btnrow">
-      <button class="btn" id="rRot">⟳ Rotate</button>
+      <button class="btn" id="rRot"><i class="ti ti-rotate"></i> Rotate</button>
       <button class="btn" id="rDoor">+ Door</button>
       <button class="btn" id="rWin">+ Window</button>
       <button class="btn danger" id="rDel">Delete</button>
@@ -759,9 +762,9 @@ function selPanel(){
       <select data-i="${i}" class="dside"><option ${d.side==='top'?'selected':''}>top</option><option ${d.side==='bottom'?'selected':''}>bottom</option><option ${d.side==='left'?'selected':''}>left</option><option ${d.side==='right'?'selected':''}>right</option></select>
       <input type="range" class="dpos" data-i="${i}" min="0" max="1" step="0.05" value="${d.t}">
       <input type="number" class="dw" data-i="${i}" value="${d.w}" min="2" max="6" step="0.5" title="chaudai (ft)" style="width:40px">
-      <button class="dhinge" data-i="${i}" title="hinge kis corner par">⇄</button>
-      <button class="dswing" data-i="${i}" title="andar/bahar khule">↕</button>
-      <button class="del ddel" data-i="${i}">✕</button>`;
+      <button class="dhinge" data-i="${i}" title="hinge kis corner par"><i class="ti ti-arrows-horizontal"></i></button>
+      <button class="dswing" data-i="${i}" title="andar/bahar khule"><i class="ti ti-arrows-vertical"></i></button>
+      <button class="del ddel" data-i="${i}"><i class="ti ti-x"></i></button>`;
     op.appendChild(row);
   });
   r.wins.forEach((wd,i)=>{
@@ -770,7 +773,7 @@ function selPanel(){
       <select data-i="${i}" class="wside"><option ${wd.side==='top'?'selected':''}>top</option><option ${wd.side==='bottom'?'selected':''}>bottom</option><option ${wd.side==='left'?'selected':''}>left</option><option ${wd.side==='right'?'selected':''}>right</option></select>
       <input type="range" class="wpos" data-i="${i}" min="0" max="1" step="0.05" value="${wd.t}">
       <input type="number" class="ww" data-i="${i}" value="${wd.w}" min="1.5" max="10" step="0.5" title="chaudai (ft)" style="width:40px">
-      <button class="del wdel" data-i="${i}">✕</button>`;
+      <button class="del wdel" data-i="${i}"><i class="ti ti-x"></i></button>`;
     op.appendChild(row);
   });
   const re=()=>{render();selPanel();};
@@ -838,6 +841,34 @@ document.getElementById('zIn').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2
 document.getElementById('zOut').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2};const k=1.2;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w*=k;vb.h*=k;applyVB();};
 document.getElementById('zFit').onclick=fit;
 window.addEventListener('resize',fit);
+
+/* ================= draggable top bar — grab the logo, park it anywhere ================= */
+(function(){
+  const bar=document.getElementById('topBar'), handle=document.getElementById('dragHandle');
+  let dg=null;
+  handle.addEventListener('pointerdown',e=>{
+    const r=bar.getBoundingClientRect();
+    /* first drag: switch from the centered left:50%/transform positioning
+       to an explicit left/top so it can actually be moved and parked. */
+    bar.style.left=r.left+'px';
+    bar.style.top=r.top+'px';
+    bar.style.transform='none';
+    dg={ox:r.left,oy:r.top,px:e.clientX,py:e.clientY};
+    bar.classList.add('dragging');
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();e.stopPropagation();
+  });
+  handle.addEventListener('pointermove',e=>{
+    if(!dg)return;
+    const nx=clamp(dg.ox+(e.clientX-dg.px),0,innerWidth-bar.offsetWidth);
+    const ny=clamp(dg.oy+(e.clientY-dg.py),0,innerHeight-bar.offsetHeight);
+    bar.style.left=nx+'px';
+    bar.style.top=ny+'px';
+  });
+  const endDrag=()=>{dg=null;bar.classList.remove('dragging');};
+  handle.addEventListener('pointerup',endDrag);
+  handle.addEventListener('pointercancel',endDrag);
+})();
 
 let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000);}
 
