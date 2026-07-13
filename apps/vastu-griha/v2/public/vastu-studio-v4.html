@@ -9,107 +9,70 @@
 :root{
   --orange:#E08A3C; --orange-dark:#C96F24; --orange-dim:rgba(224,138,60,.14);
   --ink:#3A2E22; --ink-soft:#8A7A5C; --ink-faint:#B3A78F;
-  --card:#FFFFFF; --line:#EEE4D2; --bgpanel:#FDFAF3;
+  --card:#FFFFFF; --line:#EEE4D2;
   --danger:#C24545; --success:#3D8B5F; --amber:#C08A1E;
   --fh:'Poppins',sans-serif; --fb:'Inter',sans-serif; --fm:'DM Mono',monospace;
-  --hdr:46px; --rail:54px; --tabs:56px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:var(--fb);color:var(--ink);
   background:radial-gradient(circle at 1px 1px, #E3D8C2 1px, transparent 0) 0 0/24px 24px, #EFE8D8;}
 
-/* ============ full-bleed canvas (chrome floats/overlays above it) ============ */
+/* ============ full-bleed canvas ============ */
 #cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;user-select:none;cursor:grab;}
 #cv.panning{cursor:grabbing;}
 svg text{user-select:none;pointer-events:none;}
 
-/* ============ slim fixed header ============ */
-.hdr{position:fixed;top:0;left:0;right:0;height:var(--hdr);z-index:60;display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 10px;}
-.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#D97B26);display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:11px;color:#fff;flex:0 0 auto;}
-.hdr .pname{border:none;background:none;font-family:var(--fh);font-weight:700;font-size:13px;color:var(--ink);width:150px;min-width:0;}
-.hdr .pname:focus{outline:2px solid var(--orange-dim);border-radius:6px;}
-.hspace{flex:1;}
-.printbtn{border:none;background:var(--orange);color:#fff;font-family:var(--fb);font-weight:700;font-size:11px;border-radius:10px;padding:8px 13px;cursor:pointer;flex:0 0 auto;}
-.printbtn:hover{background:var(--orange-dark);}
+/* ============ floating top bar ============ */
+.bar{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;
+  padding:7px 10px;box-shadow:0 10px 34px rgba(58,46,34,.14);z-index:40;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none;}
+.bar::-webkit-scrollbar{display:none;}
+.logo{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#D97B26);display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:11px;color:#fff;flex:0 0 auto;}
+.bseg{display:flex;align-items:center;gap:5px;padding:0 7px;border-left:1px solid var(--line);flex:0 0 auto;}
+.bseg:first-of-type{border-left:none;}
+.bseg label{font-size:8.5px;font-weight:800;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase;}
+.bseg input[type=text]{width:104px;border:none;background:none;font-size:12px;font-weight:700;font-family:var(--fh);color:var(--ink);}
+.bseg input[type=number]{width:40px;border:1px solid var(--line);border-radius:7px;padding:4px 4px;font-family:var(--fm);font-size:11px;background:#FBF7EE;color:var(--ink);}
+.bseg select{border:1px solid var(--line);border-radius:7px;padding:4px 4px;font-size:10.5px;font-weight:600;background:#FBF7EE;color:var(--ink);}
+.bseg input:focus,.bseg select:focus{outline:2px solid var(--orange-dim);}
 .hbtn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#FBF7EE;color:var(--ink);font-size:13px;cursor:pointer;transition:all .13s;flex:0 0 auto;display:grid;place-items:center;}
 .hbtn:hover:not(:disabled){border-color:var(--orange);color:var(--orange-dark);}
 .hbtn:active:not(:disabled){transform:scale(.9);}
 .hbtn:disabled{opacity:.32;cursor:default;}
-.ring{position:relative;width:32px;height:32px;flex:0 0 auto;}
+.ring{position:relative;width:34px;height:34px;flex:0 0 auto;}
 .ring svg{transform:rotate(-90deg);}
-.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:9.5px;}
-
-/* ============ left rail (desktop) / bottom tab bar (mobile) ============ */
-.rail{position:fixed;z-index:58;display:flex;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);}
-.rbtn{border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-soft);font-family:var(--fb);}
-.rbtn .i{font-size:17px;line-height:1;}
-.rbtn span{font-size:8px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
-.rbtn.on{color:var(--orange-dark);}
-.rbtn.on .i{transform:scale(1.1);}
-@media(min-width:768px){
-  .rail{top:var(--hdr);bottom:0;left:0;width:var(--rail);flex-direction:column;align-items:center;padding-top:10px;gap:4px;border-right:1px solid var(--line);}
-  .rbtn{width:46px;height:50px;border-radius:12px;justify-content:center;}
-  .rbtn.on{background:var(--orange-dim);}
-}
-@media(max-width:767px){
-  .rail{left:0;right:0;bottom:0;height:var(--tabs);flex-direction:row;justify-content:space-around;align-items:center;border-top:1px solid var(--line);}
-  .rbtn{flex:1;height:100%;justify-content:center;}
-}
-
-/* ============ panels: desktop slide-out (overlay, never squeezes canvas) / mobile bottom-sheet ============ */
-.panel{position:fixed;z-index:59;background:var(--bgpanel);border:1px solid var(--line);box-shadow:0 18px 60px rgba(58,46,34,.22);
-  display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.22,1,.36,1);}
-.panel .ph{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);flex:0 0 auto;}
-.panel .ph b{font-family:var(--fh);font-size:12.5px;}
-.panel .ph .close{margin-left:auto;width:24px;height:24px;border-radius:8px;border:none;background:#F3ECDD;cursor:pointer;font-size:10px;font-weight:700;color:var(--ink-soft);}
-.panel .pb{padding:13px 14px;overflow-y:auto;scrollbar-width:thin;}
-@media(min-width:768px){
-  .panel{top:var(--hdr);bottom:0;left:var(--rail);width:262px;border-top:none;transform:translateX(-330px);}
-  .panel.open{transform:none;}
-  .panel .grab{display:none;}
-}
-@media(max-width:767px){
-  .panel{left:0;right:0;bottom:var(--tabs);max-height:46vh;border-radius:18px 18px 0 0;transform:translateY(120%);}
-  .panel.open{transform:none;}
-  .panel .grab{width:38px;height:4px;border-radius:99px;background:#D8CCB4;margin:8px auto 0;flex:0 0 auto;}
-}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.roomchip{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:8px 10px;cursor:pointer;transition:all .13s;font-size:10.5px;font-weight:700;font-family:var(--fh);}
-.roomchip:hover{border-color:var(--orange);}
-.roomchip:active{transform:scale(.94);}
-.roomchip .e{font-size:15px;}
-.note{font-size:9.5px;color:var(--ink-soft);line-height:1.6;background:#fff;border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin-top:8px;}
-.note b{color:var(--ink);}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:10.5px;}
 
 /* ============ zoom controls ============ */
-.zoomer{position:fixed;right:14px;display:flex;flex-direction:column;gap:5px;z-index:56;}
-@media(min-width:768px){.zoomer{bottom:16px;}}
-@media(max-width:767px){.zoomer{bottom:calc(var(--tabs) + 12px);}}
+.zoomer{position:fixed;right:14px;bottom:96px;display:flex;flex-direction:column;gap:5px;z-index:40;}
 .zbtn{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
   color:var(--ink);font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(58,46,34,.12);transition:all .15s;}
 .zbtn:hover{border-color:var(--orange);color:var(--orange-dark);}
 .zbtn:active{transform:scale(.9);}
 
-/* ============ floating selection card: desktop panel / mobile bottom-sheet ============ */
-.sel{position:fixed;z-index:57;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border:1px solid var(--line);
-  box-shadow:0 16px 50px rgba(58,46,34,.2);display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.22,1,.36,1);}
-@media(min-width:768px){
-  .sel{right:14px;top:calc(var(--hdr) + 10px);width:246px;max-height:calc(100vh - var(--hdr) - 24px);border-radius:18px;transform:translateX(280px);}
-  .sel.open{transform:none;}
-  .sel .grab{display:none;}
-}
-@media(max-width:767px){
-  .sel{left:0;right:0;bottom:var(--tabs);max-height:48vh;border-radius:18px 18px 0 0;transform:translateY(130%);}
-  .sel.open{transform:none;}
-  .sel .grab{width:38px;height:4px;border-radius:99px;background:#D8CCB4;margin:8px auto 0;flex:0 0 auto;}
-}
-.sel .sh{display:flex;align-items:center;gap:6px;padding:11px 14px 8px;flex:0 0 auto;}
-.sel .sh b{font-family:var(--fh);font-size:12px;}
-.sel .sh .close{margin-left:auto;width:22px;height:22px;border-radius:7px;border:none;background:#F3ECDD;cursor:pointer;font-size:10px;font-weight:700;color:var(--ink-soft);}
-.sel .sb{padding:0 14px 14px;overflow-y:auto;scrollbar-width:thin;}
-.frow{display:flex;gap:6px;margin-bottom:8px;align-items:center;flex-wrap:wrap;}
+/* ============ bottom dock ============ */
+.dock{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:40;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:18px;
+  padding:8px;box-shadow:0 12px 40px rgba(58,46,34,.16);max-width:calc(100vw - 24px);}
+.dock .chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;}
+.dock .chips::-webkit-scrollbar{display:none;}
+.chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;background:#FBF7EE;border:1.5px solid transparent;
+  border-radius:12px;padding:7px 11px;cursor:pointer;transition:all .15s;min-width:58px;}
+.chip:hover{border-color:var(--orange);background:#FFF;}
+.chip:active{transform:scale(.9);}
+.chip .e{font-size:17px;line-height:1;}
+.chip span{font-size:8.5px;font-weight:700;font-family:var(--fh);color:var(--ink);white-space:nowrap;}
+
+/* ============ floating selection card ============ */
+.sel{position:fixed;right:14px;top:64px;width:246px;max-height:calc(100vh - 180px);overflow-y:auto;z-index:45;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;
+  padding:14px;box-shadow:0 16px 50px rgba(58,46,34,.2);transform:translateX(280px);transition:transform .3s cubic-bezier(.22,1,.36,1);scrollbar-width:thin;}
+.sel.open{transform:none;}
+.sel h3{font-family:var(--fh);font-size:12.5px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.sel h3 .close{margin-left:auto;width:22px;height:22px;border-radius:7px;border:none;background:#F3ECDD;cursor:pointer;font-size:10px;font-weight:700;color:var(--ink-soft);}
+.sel h3 .close:hover{background:var(--orange-dim);color:var(--orange-dark);}
+.frow{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
 .frow label{font-size:8.5px;font-weight:800;color:var(--ink-faint);width:50px;flex:0 0 auto;text-transform:uppercase;letter-spacing:.06em;}
 .frow input[type=number]{width:56px;border:1px solid var(--line);border-radius:7px;padding:5px;font-family:var(--fm);font-size:11px;background:#FBF7EE;}
 .frow input[type=text]{flex:1;border:1px solid var(--line);border-radius:7px;padding:5px 7px;font-size:11px;font-weight:600;background:#FBF7EE;}
@@ -138,92 +101,65 @@ svg text{user-select:none;pointer-events:none;}
 .vrem{font-size:9px;line-height:1.55;background:var(--orange-dim);border-radius:7px;padding:7px 9px;}
 .vrem b{color:var(--orange-dark);font-family:var(--fh);font-size:7.5px;letter-spacing:.1em;display:block;margin-bottom:1px;}
 
-.toast{position:fixed;top:calc(var(--hdr) + 10px);left:50%;transform:translateX(-50%) translateY(-100px);background:var(--ink);color:#fff;font-size:11px;font-weight:700;padding:8px 15px;border-radius:99px;z-index:99;transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 12px 34px rgba(0,0,0,.3);max-width:88vw;text-align:center;}
-.toast.show{transform:translateX(-50%) translateY(0);}
+.hint{position:fixed;left:14px;bottom:96px;z-index:38;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:13px;padding:9px 12px;font-size:10px;color:var(--ink-soft);line-height:1.6;max-width:190px;box-shadow:0 8px 24px rgba(58,46,34,.12);}
+.hint b{color:var(--ink);}
+.hint .close{float:right;border:none;background:none;cursor:pointer;font-weight:700;color:var(--ink-faint);margin-left:6px;}
 
-@media print{.hdr,.rail,.panel,.sel,.zoomer,.toast{display:none!important;}#cv{position:static;width:100vw;height:100vh;}}
+.toast{position:fixed;top:58px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--ink);color:#fff;font-size:11.5px;font-weight:700;padding:9px 16px;border-radius:99px;z-index:99;transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 12px 34px rgba(0,0,0,.3);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:760px){
+  .bseg.hideS{display:none;}
+  .sel{width:calc(100vw - 28px);right:14px;}
+}
 </style>
 </head>
 <body>
 
 <svg id="cv"></svg>
 
-<header class="hdr">
+<div class="bar">
   <div class="logo">VG</div>
-  <input class="pname" id="projName" value="Amb Niwas — GF">
-  <button class="hbtn" id="undoB" title="Undo (Ctrl+Z)" disabled>↶</button>
-  <button class="hbtn" id="redoB" title="Redo (Ctrl+Y)" disabled>↷</button>
-  <div class="hspace"></div>
-  <div class="ring">
-    <svg width="32" height="32" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="12.5" fill="none" stroke="#F0E8D8" stroke-width="3.2"/>
-      <circle id="ringFill" cx="16" cy="16" r="12.5" fill="none" stroke="#E08A3C" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="78.5" stroke-dashoffset="78.5" style="transition:stroke-dashoffset .7s, stroke .4s;"/>
-    </svg>
-    <div class="v" id="scoreVal">—</div>
+  <div class="bseg">
+    <button class="hbtn" id="undoB" title="Undo (Ctrl+Z)" disabled>↶</button>
+    <button class="hbtn" id="redoB" title="Redo (Ctrl+Y)" disabled>↷</button>
   </div>
-  <button class="printbtn" onclick="window.print()">Print</button>
-</header>
-
-<nav class="rail">
-  <button class="rbtn" data-p="rooms"><span class="i">➕</span><span>Rooms</span></button>
-  <button class="rbtn" data-p="boundary"><span class="i">⬠</span><span>Plot</span></button>
-  <button class="rbtn" data-p="settings"><span class="i">⚙️</span><span>Setup</span></button>
-  <button class="rbtn" data-p="help"><span class="i">❓</span><span>Help</span></button>
-</nav>
-
-<div class="panel" id="pn-rooms"><div class="grab"></div>
-  <div class="ph"><b>Kamra jodein</b><button class="close" data-c>✕</button></div>
-  <div class="pb"><div class="grid2" id="chips"></div>
-  <div class="note">Jitne chahein utne — Toilet 2, Bedroom 3… naya kamra khud khaali jagah dhoondh ke girta hai.</div></div>
-</div>
-
-<div class="panel" id="pn-boundary"><div class="grab"></div>
-  <div class="ph"><b>Plot boundary</b><button class="close" data-c>✕</button></div>
-  <div class="pb">
-    <div class="frow"><button class="btn" id="addEnt">🚪 Entrance</button>
-      <button class="btn" id="editBndBtn">✏️ Edit boundary</button></div>
-    <div class="frow"><label>Reset</label>
-      <input type="number" id="plotW" value="48" min="15" max="120"> <span style="font-size:10px;color:var(--ink-faint)">×</span>
-      <input type="number" id="plotH" value="50" min="15" max="120">
-      <button class="btn" id="resetBnd">↺ Rect</button></div>
-    <div class="note"><b>Edit mode ON:</b> corner dots ko drag karo (slanted wall ke liye ek corner khiskao) · kisi <b>edge par double-tap</b> = naya corner (zig-zag ke liye) · kisi <b>corner par double-tap</b> = corner delete (min 4). Har edge apni lambai khud dikhata hai.</div>
-    <div class="note">Vastu zones plot ke <b>bounding-box</b> par based hain (irregular plots ke liye approximation).</div>
+  <div class="bseg"><input type="text" id="projName" value="Amb Niwas — GF"></div>
+  <div class="bseg"><button class="btn" id="addEnt">🚪 Entrance</button></div>
+  <div class="bseg"><button class="btn" id="editBndBtn">✏️ Edit boundary</button></div>
+  <div class="bseg"><label>Plot</label>
+    <input type="number" id="plotW" value="48" min="15" max="120"><span style="font-size:10px;color:var(--ink-faint)">×</span>
+    <input type="number" id="plotH" value="50" min="15" max="120"><span style="font-size:9px;color:var(--ink-faint)">ft</span>
+    <button class="btn" id="resetBnd" title="Boundary ko seedha rectangle bana do">↺ Rect</button></div>
+  <div class="bseg"><label>North</label>
+    <select id="northDir"><option value="up">↑</option><option value="down" selected>↓</option><option value="left">←</option><option value="right">→</option></select></div>
+  <div class="bseg hideS"><label>Wall</label>
+    <select id="outerWall"><option value="0.75">9"</option><option value="1">12"</option><option value="0.5">6"</option></select>
+    <select id="innerWall"><option value="0.33">4"</option><option value="0.5">6"</option><option value="0.75">9"</option></select></div>
+  <div class="bseg hideS"><label>Grid</label><select id="showGrid"><option value="1">On</option><option value="0">Off</option></select></div>
+  <div class="bseg">
+    <div class="ring">
+      <svg width="34" height="34" viewBox="0 0 34 34">
+        <circle cx="17" cy="17" r="13.5" fill="none" stroke="#F0E8D8" stroke-width="3.5"/>
+        <circle id="ringFill" cx="17" cy="17" r="13.5" fill="none" stroke="#E08A3C" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="84.8" stroke-dashoffset="84.8" style="transition:stroke-dashoffset .7s cubic-bezier(.22,1,.36,1), stroke .4s;"/>
+      </svg>
+      <div class="v" id="scoreVal">—</div>
+    </div>
   </div>
 </div>
-
-<div class="panel" id="pn-settings"><div class="grab"></div>
-  <div class="ph"><b>Setup</b><button class="close" data-c>✕</button></div>
-  <div class="pb">
-    <div class="frow"><label>North</label>
-      <select id="northDir"><option value="up">Upar ↑</option><option value="down" selected>Neeche ↓</option><option value="left">Baayein ←</option><option value="right">Daayein →</option></select></div>
-    <div class="frow"><label>Outer wall</label>
-      <select id="outerWall"><option value="0.75">9"</option><option value="1">12"</option><option value="0.5">6"</option></select></div>
-    <div class="frow"><label>Inner wall</label>
-      <select id="innerWall"><option value="0.33">4"</option><option value="0.5">6"</option><option value="0.75">9"</option></select></div>
-    <div class="frow"><label>Vastu grid</label>
-      <select id="showGrid"><option value="1">On</option><option value="0">Off</option></select></div>
-  </div>
-</div>
-
-<div class="panel" id="pn-help"><div class="grab"></div>
-  <div class="ph"><b>Help</b><button class="close" data-c>✕</button></div>
-  <div class="pb"><div class="note">
-    <b>Move:</b> kamra drag karo · <b>Resize:</b> corner dot kheeencho<br>
-    <b>Pan:</b> khali jagah drag · <b>Zoom:</b> scroll / pinch / +− buttons<br>
-    <b>Undo/Redo:</b> ↶ ↷ ya Ctrl+Z / Ctrl+Y<br>
-    <b>Door:</b> room select karke +Door — side, jagah, chaudai (ft), hinge ⇄ (kis corner par kabja), swing ↕ (andar/bahar khule)<br>
-    <b>Entrance gate:</b> Plot panel → 🚪 Entrance — boundary par double-leaf gate<br>
-    <b>Stairs:</b> stairs room select karke style badlo (straight / L / U)
-  </div></div>
-</div>
-
-<div class="sel" id="selCard"><div class="grab"></div><div class="sh" id="selH"></div><div class="sb" id="selB"></div></div>
 
 <div class="zoomer">
   <button class="zbtn" id="zIn">+</button>
   <button class="zbtn" id="zOut">−</button>
-  <button class="zbtn" id="zFit" style="font-size:12px">⌂</button>
+  <button class="zbtn" id="zFit" title="Fit" style="font-size:12px">⌂</button>
 </div>
+
+<div class="hint" id="hint"><button class="close" onclick="this.parentElement.remove()">✕</button>
+  <b>Drag</b> kamra = move · <b>corner dot</b> = resize<br><b>Khali jagah drag</b> = pan · <b>scroll</b> = zoom<br>Neeche dock se naye kamre jodein.<br><b>Edit boundary</b> ON karke corners drag/add/remove karein — irregular plot ke liye.<br>Vastu zones plot ke <b>bounding-box</b> par based hain (irregular plots ke liye approximation).</div>
+
+<div class="dock"><div class="chips" id="chips"></div></div>
+
+<div class="sel" id="selCard"></div>
 
 <div class="toast" id="toast"></div>
 
@@ -296,21 +232,12 @@ function roomInside(r){
 const worldW=()=>bbox().w*FT+300, worldH=()=>bbox().h*FT+140;
 function fit(){
   const vw=innerWidth,vh=innerHeight;
+  const m=1.06;
   const b=bbox();
-  const mob=vw<768;
-  /* keep the plan centered in whatever space is left after the header/
-     rail/tabs chrome, since those are fixed-position overlays that
-     otherwise cover part of the canvas edge-to-edge viewBox. */
-  const mL=mob?10:64, mT=56, mR=10, mB=mob?70:16;
-  const availW=vw-mL-mR, availH=vh-mT-mB;
-  const ww=worldW()*1.04, wh=worldH()*1.04;
-  const ar=availW/availH, war=ww/wh;
-  let fullW,fullH;
-  if(war>ar){fullW=ww;fullH=ww/ar;}else{fullH=wh;fullW=wh*ar;}
-  vb.w=fullW*vw/availW; vb.h=fullH*vh/availH;
-  const cx=b.x1*FT+ww/2-40, cy=b.y1*FT+wh/2-30;
-  vb.x=cx-vb.w*((mL+availW/2)/vw);
-  vb.y=cy-vb.h*((mT+availH/2)/vh);
+  const ww=worldW()*m, wh=worldH()*m;
+  const ar=vw/vh, war=ww/wh;
+  if(war>ar){vb.w=ww;vb.h=ww/ar;}else{vb.h=wh;vb.w=wh*ar;}
+  vb.x=b.x1*FT-(vb.w-worldW())/2 - 40; vb.y=b.y1*FT-(vb.h-worldH())/2 - 30;
   applyVB();
 }
 function applyVB(){cv.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
@@ -659,8 +586,8 @@ function wire(){
     });
   });
 }
-cv.addEventListener('pointerdown',e=>{ /* pan on empty (single finger/mouse only — see pinch tracking below) */
-  if(e.isPrimary===false)return;
+cv.addEventListener('pointerdown',e=>{ /* pan on empty */
+  const p=wpt(e);
   drag={type:'pan',px:e.clientX,py:e.clientY,vx:vb.x,vy:vb.y};
   cv.classList.add('panning');
 });
@@ -720,40 +647,13 @@ window.addEventListener('pointerup',()=>{
 cv.addEventListener('wheel',e=>{
   e.preventDefault();
   const f=e.deltaY>0?1.1:1/1.1;
-  zoomAt(wpt(e),f);
-},{passive:false});
-/* pinch-to-zoom — tracks up to 2 active pointers; when a second one joins,
-   any single-pointer drag/pan in progress is cancelled and zoom follows
-   the change in distance between the two fingers instead. */
-const ptrs=new Map();
-let pinch=null;
-cv.addEventListener('pointerdown',e=>{
-  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(ptrs.size===2){
-    drag=null;cv.classList.remove('panning');
-    const a=[...ptrs.values()];
-    pinch={d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
-  }
-});
-cv.addEventListener('pointermove',e=>{
-  if(!ptrs.has(e.pointerId))return;
-  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pinch&&ptrs.size===2){
-    const a=[...ptrs.values()];
-    const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
-    const mid={clientX:(a[0].x+a[1].x)/2,clientY:(a[0].y+a[1].y)/2};
-    zoomAt(wpt(mid),pinch.d/d);
-    pinch.d=d;
-  }
-});
-window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;});
-function zoomAt(p,f){
+  const p=wpt(e);
   const nw=clamp(vb.w*f,worldW()*0.18,worldW()*4);
   const k=nw/vb.w;
   vb.x=p.x-(p.x-vb.x)*k; vb.y=p.y-(p.y-vb.y)*k;
   vb.w=nw; vb.h*=k;
   applyVB();
-}
+},{passive:false});
 function wpt(e){
   const pt=cv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
   return pt.matrixTransform(cv.getScreenCTM().inverse());
@@ -782,7 +682,7 @@ function addRoom(key){
 }
 function select(id){selId=id;render();selPanel();}
 function selPanel(){
-  const card=document.getElementById('selCard'),H=document.getElementById('selH'),B=document.getElementById('selB');
+  const card=document.getElementById('selCard');
 
   if(selEnt&&entrance){
     const z=entZone(),v=vOfEnt(),conf=ENT.conf[z]||[65,50];
@@ -790,15 +690,16 @@ function selPanel(){
       :v==='bad'?`<span class="vbadge bad">✕ ${z} (${DEITY[z]}) — BACHEIN</span>`
       :`<span class="vbadge mid">◐ ${z} (${DEITY[z]}) — mila-jula</span>`;
     card.classList.add('open');
-    H.innerHTML=`<b>🚪 Main Entrance</b><button class="close" id="selClose">✕</button>`;
-    B.innerHTML=`
+    card.innerHTML=`<h3>🚪 Main Entrance<button class="close" id="selClose">✕</button></h3>
       <div class="frow"><label>Edge #</label><input type="number" id="eEdge" value="${entrance.edge+1}" min="1" max="${pts.length}"></div>
       <div class="frow"><label>Position</label><input type="range" id="ePos" min="0.05" max="0.95" step="0.05" value="${entrance.t}" style="flex:1;accent-color:var(--orange)"></div>
-      <div class="frow"><label>Width ft</label><input type="number" id="eW" value="${entrance.w}" min="2.5" max="12" step="0.5">
-        <button class="btn danger" id="eDel">Delete</button></div>
+      <div class="frow"><label>Width ft</label><input type="number" id="eW" value="${entrance.w}" min="2.5" max="12" step="0.5"></div>
+      <div class="btnrow"><button class="btn danger" id="eDel">Delete Entrance</button></div>
       <div class="verd">${badge}
-        <div class="confrow"><span>Jagah par consensus</span><b>${conf[0]}%</b></div><div class="cbar"><i style="width:${conf[0]}%"></i></div>
-        <div class="confrow"><span>Asar par consensus</span><b>${conf[1]}%</b></div><div class="cbar"><i style="width:${conf[1]}%"></i></div>
+        <div class="confrow"><span>Jagah par consensus</span><b>${conf[0]}%</b></div>
+        <div class="cbar"><i style="width:${conf[0]}%"></i></div>
+        <div class="confrow"><span>Asar par consensus</span><b>${conf[1]}%</b></div>
+        <div class="cbar"><i style="width:${conf[1]}%"></i></div>
         <div class="vnote">${ENT.note}</div>
         <div class="vrem"><b>UPAAY</b>${ENT.rem}</div>
       </div>`;
@@ -818,25 +719,27 @@ function selPanel(){
     :v==='bad'?`<span class="vbadge bad">✕ ${z} (${DEITY[z]}) — BACHEIN</span>`
     :`<span class="vbadge mid">◐ ${z} (${DEITY[z]}) — mila-jula</span>`;
   card.classList.add('open');
-  H.innerHTML=`<b>${k.ic} ${r.nm}</b><button class="close" id="selClose">✕</button>`;
-  B.innerHTML=`
+  card.innerHTML=`<h3>${k.ic} ${r.nm}<button class="close" id="selClose">✕</button></h3>
     <div class="frow"><label>Naam</label><input type="text" id="rNm" value="${r.nm}"></div>
     <div class="frow"><label>Size ft</label>
-      <input type="number" id="rW" value="${r.w}" min="3" step="0.5"><span style="color:var(--ink-faint);font-size:10px">×</span>
+      <input type="number" id="rW" value="${r.w}" min="3" step="0.5"> <span style="color:var(--ink-faint);font-size:10px">×</span>
       <input type="number" id="rH" value="${r.h}" min="3" step="0.5"></div>
     ${r.key==='stairs'?`<div class="frow"><label>Style</label><select id="rStyle">
       <option value="straight" ${r.stairStyle==='straight'?'selected':''}>Straight</option>
       <option value="L" ${r.stairStyle==='L'?'selected':''}>L-shaped</option>
       <option value="U" ${r.stairStyle==='U'?'selected':''}>U-shaped</option></select></div>`:''}
-    <div class="frow" style="gap:5px">
+    <div class="btnrow">
       <button class="btn" id="rRot">⟳ Rotate</button>
       <button class="btn" id="rDoor">+ Door</button>
       <button class="btn" id="rWin">+ Window</button>
-      <button class="btn danger" id="rDel">Delete</button></div>
+      <button class="btn danger" id="rDel">Delete</button>
+    </div>
     <div id="opList"></div>
     <div class="verd">${badge}
-      <div class="confrow"><span>Jagah par consensus</span><b>${conf[0]}%</b></div><div class="cbar"><i style="width:${conf[0]}%"></i></div>
-      <div class="confrow"><span>Asar par consensus</span><b>${conf[1]}%</b></div><div class="cbar"><i style="width:${conf[1]}%"></i></div>
+      <div class="confrow"><span>Jagah par consensus</span><b>${conf[0]}%</b></div>
+      <div class="cbar"><i style="width:${conf[0]}%"></i></div>
+      <div class="confrow"><span>Asar par consensus</span><b>${conf[1]}%</b></div>
+      <div class="cbar"><i style="width:${conf[1]}%"></i></div>
       <div class="vnote">${k.note}</div>
       <div class="vrem"><b>UPAAY</b>${k.rem}</div>
     </div>`;
@@ -898,53 +801,10 @@ function updateScore(){
 /* ================= chips + toolbar ================= */
 const chipsEl=document.getElementById('chips');
 Object.entries(KB).forEach(([key,k])=>{
-  const c=document.createElement('div');c.className='roomchip';
-  c.innerHTML=`<span class="e">${k.ic}</span>${k.nm}`;
+  const c=document.createElement('div');c.className='chip';
+  c.innerHTML=`<span class="e">${k.ic}</span><span>${k.nm}</span>`;
   c.onclick=()=>addRoom(key);chipsEl.appendChild(c);
 });
-
-/* ================= rail + panels (Canva-style: overlay, never squeeze canvas) ================= */
-document.querySelectorAll('.rbtn').forEach(b=>{
-  b.onclick=()=>{
-    const id='pn-'+b.dataset.p;
-    const p=document.getElementById(id);
-    const was=p.classList.contains('open');
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('open'));
-    document.querySelectorAll('.rbtn').forEach(x=>x.classList.remove('on'));
-    if(!was){p.classList.add('open');b.classList.add('on');}
-  };
-});
-document.querySelectorAll('.panel .close').forEach(b=>b.onclick=()=>{
-  b.closest('.panel').classList.remove('open');
-  document.querySelectorAll('.rbtn').forEach(x=>x.classList.remove('on'));
-});
-/* swipe-down-to-dismiss on mobile bottom-sheets (panels + selection card) */
-function wireSwipeDismiss(el,onClose){
-  let sy=null,dy=0;
-  el.addEventListener('pointerdown',e=>{
-    if(innerWidth>=768)return;
-    if(e.target.closest('input,select,button,.grab')&&!e.target.closest('.grab'))return;
-    sy=e.clientY;dy=0;
-  });
-  el.addEventListener('pointermove',e=>{
-    if(sy===null)return;
-    dy=Math.max(0,e.clientY-sy);
-    el.style.transform=`translateY(${dy}px)`;
-  });
-  const end=()=>{
-    if(sy===null)return;
-    el.style.transform='';
-    if(dy>60)onClose();
-    sy=null;dy=0;
-  };
-  el.addEventListener('pointerup',end);
-  el.addEventListener('pointercancel',end);
-}
-document.querySelectorAll('.panel').forEach(p=>wireSwipeDismiss(p,()=>{
-  p.classList.remove('open');
-  document.querySelectorAll('.rbtn').forEach(x=>x.classList.remove('on'));
-}));
-wireSwipeDismiss(document.getElementById('selCard'),()=>{selId=null;selEnt=false;render();selPanel();});
 document.getElementById('plotW').onchange=e=>{plotW=clamp(+e.target.value,15,120);};
 document.getElementById('plotH').onchange=e=>{plotH=clamp(+e.target.value,15,120);};
 document.getElementById('resetBnd').onclick=()=>{
@@ -974,8 +834,8 @@ document.getElementById('editBndBtn').onclick=e=>{
 };
 document.getElementById('undoB').onclick=undo;
 document.getElementById('redoB').onclick=redo;
-document.getElementById('zIn').onclick=()=>zoomAt({x:vb.x+vb.w/2,y:vb.y+vb.h/2},1/1.2);
-document.getElementById('zOut').onclick=()=>zoomAt({x:vb.x+vb.w/2,y:vb.y+vb.h/2},1.2);
+document.getElementById('zIn').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2};const k=1/1.2;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w*=k;vb.h*=k;applyVB();};
+document.getElementById('zOut').onclick=()=>{const p={x:vb.x+vb.w/2,y:vb.y+vb.h/2};const k=1.2;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w*=k;vb.h*=k;applyVB();};
 document.getElementById('zFit').onclick=fit;
 window.addEventListener('resize',fit);
 
