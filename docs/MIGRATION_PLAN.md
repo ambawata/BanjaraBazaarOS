@@ -1,5 +1,7 @@
 # Migration Plan — Architecture-First Consolidation
 
+> **Superseded:** this plan targeted the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). The consolidation described below was never executed against v1; kept for historical record only.
+
 Audit date: 2026-07-03
 
 This plan intentionally stops before any architectural removal. It is meant to be reviewed and approved before code consolidation begins.

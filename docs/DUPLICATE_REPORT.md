@@ -1,5 +1,7 @@
 # Duplicate Report — Vastu Griha
 
+> **Superseded:** this audit describes the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). Paths below no longer exist; kept for historical record only.
+
 Audit date: 2026-07-03
 
 This report lists the duplicate or overlapping flows found in the current source tree. I have separated confirmed duplicates from areas that look similar but are not yet safe to archive.

@@ -1,5 +1,7 @@
 # Phase 2.1 Repository Inventory
 
+> **Superseded:** this audit describes the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). Paths below no longer exist; kept for historical record only.
+
 Date: 2026-07-03
 
 This is the repository cleanup inventory for Phase 2.1. Nothing moves yet.

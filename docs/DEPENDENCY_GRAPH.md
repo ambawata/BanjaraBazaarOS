@@ -1,5 +1,7 @@
 # Dependency Graph — Vastu Griha
 
+> **Superseded:** this graph describes the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). Kept for historical record only.
+
 Audit date: 2026-07-03
 
 ```mermaid

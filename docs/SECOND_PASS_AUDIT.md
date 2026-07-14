@@ -1,5 +1,7 @@
 # Second-Pass Repository Audit — Vastu Griha
 
+> **Superseded:** this audit describes the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). Paths below no longer exist; kept for historical record only.
+
 Audit date: 2026-07-03
 
 Scope: `apps/vastu-griha`

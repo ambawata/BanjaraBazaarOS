@@ -1,5 +1,7 @@
 # Ownership Map — Phase 2.2
 
+> **Superseded:** this audit describes the v1 `apps/vastu-griha` source tree, which was deleted (v1 was superseded by `apps/vastu-griha/v2`). Paths below no longer exist; kept for historical record only.
+
 Status: documentation only
 
 This document records ownership for the runtime surface used by the consolidated Vastu Griha product and its adjacent platform files. It does not change code, move files, or redefine the product architecture.
