@@ -369,12 +369,6 @@ export default function PlannerWorkspace() {
           >
             <i className="ti ti-cloud-upload"></i> Calibrate Sketch
           </div>
-          <div
-            className={`nav-item ${activeTab === 'studio2' ? 'active' : ''}`}
-            onClick={() => setActiveTab('studio2')}
-          >
-            <i className="ti ti-layout-2"></i> Canvas 2
-          </div>
 
           <div className="sidebar-section-title" style={{ marginTop: '16px' }}>Vedic Audit</div>
           <div 
@@ -434,7 +428,6 @@ export default function PlannerWorkspace() {
               <span className="page-title">
                 {activeTab === 'designer' && 'Plan Editor (Easy Mode)'}
                 {activeTab === 'upload' && 'Align Custom Sketch'}
-                {activeTab === 'studio2' && 'Canvas 2 — Vastu Studio'}
                 {activeTab === 'chat' && 'Vastu Acharya Consultant'}
                 {activeTab === 'analysis' && 'Vastu Compliance Audit'}
                 {activeTab === 'shop' && 'Vastu Remedies Shop'}
@@ -445,7 +438,6 @@ export default function PlannerWorkspace() {
               <span className="page-subtitle">
                 {activeTab === 'designer' && 'Tap elements to place, and use nudge buttons to align'}
                 {activeTab === 'upload' && 'Place existing plans behind grid lines and adjust alignment'}
-                {activeTab === 'studio2' && 'Standalone floor-plan studio — separate canvas, separate project data'}
                 {activeTab === 'chat' && 'Query paint colors, entrances, or element balance suggestions'}
                 {activeTab === 'analysis' && 'Detailed sector evaluations and graded remedies'}
                 {activeTab === 'shop' && 'Procure Vedic remedies to align home energy fields'}
@@ -883,23 +875,6 @@ export default function PlannerWorkspace() {
                 />
               )}
             </>
-          )}
-
-          {/* ─── Canvas 2 — standalone Vastu Studio, embedded exactly as-is ──
-              Self-contained tool (own SVG rendering, own vanilla-JS drag/
-              resize/zoom, own Vastu scoring, own CSS palette) served as a
-              static asset and iframed unmodified — guarantees byte-identical
-              behavior rather than risking drift from a JSX port. Its project
-              data (rooms, plot) is entirely local to the iframe, separate
-              from this app's canvasStore/projectStore. */}
-          {activeTab === 'studio2' && (
-            <div className="canvas-area" style={{ flex: 1, padding: 0 }}>
-              <iframe
-                src="/vastu-studio-v4.html"
-                title="Canvas 2 — Vastu Studio"
-                style={{ width: '100%', height: '100%', border: 'none', display: 'block', borderRadius: '12px' }}
-              />
-            </div>
           )}
 
           {/* ─── Floorplan Calibration Screen ─────────────────────────────── */}
