@@ -72,6 +72,19 @@ export default function PlannerWorkspace() {
 
   const [placementDirection, setPlacementDirection] = React.useState('North')
 
+  // Left sidebar collapse — desktop only (sidebar is hidden entirely on
+  // mobile in favor of the bottom nav, so this never applies there).
+  // Persisted so the choice survives a reload.
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(() => {
+    return typeof window !== 'undefined' ? localStorage.getItem('vg-sidebar-collapsed') === 'true' : false
+  })
+  const toggleSidebar = () => {
+    setSidebarCollapsed(c => {
+      localStorage.setItem('vg-sidebar-collapsed', String(!c))
+      return !c
+    })
+  }
+
   // ── Upload / Calibrate Sketch screen — component-level state & refs ────
   const [showPlotSheet, setShowPlotSheet] = React.useState(false)
   const [rotateDragAngle, setRotateDragAngle] = React.useState(null)
@@ -303,7 +316,7 @@ export default function PlannerWorkspace() {
     <div id="app-container">
       
       {/* Sidebar navigation */}
-      <nav id="sidebar">
+      <nav id="sidebar" className={sidebarCollapsed ? 'collapsed' : ''}>
         <div className="sidebar-brand">
           <svg className="sidebar-logo-img" viewBox="0 0 100 100" fill="none" role="img" aria-label="Vastu compass">
             <circle cx="50" cy="50" r="30" stroke="var(--accent)" strokeWidth="4.5" />
@@ -316,85 +329,104 @@ export default function PlannerWorkspace() {
             <polygon points="50,26 56,42 50,38 44,42" fill="var(--accent)" />
             <polygon points="50,74 56,58 50,62 44,58" fill="var(--accent)" opacity="0.6" />
           </svg>
-          <span>Vastu</span> Griha
+          {!sidebarCollapsed && <span className="nav-label"><span style={{ color: 'var(--accent)' }}>Vastu</span> Griha</span>}
+          <button
+            className="sidebar-collapse-btn"
+            onClick={toggleSidebar}
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <i className={`ti ti-${sidebarCollapsed ? 'chevron-right' : 'chevron-left'}`}></i>
+          </button>
         </div>
 
         <div className="sidebar-nav">
-          <div 
+          <div
             className="nav-item"
             style={{ borderBottom: '1px solid var(--border)', borderRadius: 0, paddingBottom: '12px', marginBottom: '12px', gap: '8px' }}
             onClick={() => setScreenState('dashboard')}
+            title={sidebarCollapsed ? 'Exit to Dashboard' : undefined}
           >
-            <i className="ti ti-arrow-left"></i> Exit to Dashboard
+            <i className="ti ti-arrow-left"></i>{!sidebarCollapsed && <span className="nav-label">Exit to Dashboard</span>}
           </div>
 
-          <div className="sidebar-section-title">Home Blueprint</div>
-          <div 
+          {!sidebarCollapsed && <div className="sidebar-section-title">Home Blueprint</div>}
+          <div
             className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => setActiveTab('home')}
+            title={sidebarCollapsed ? 'Workspace' : undefined}
           >
-            <i className="ti ti-home-2"></i> Workspace
+            <i className="ti ti-home-2"></i>{!sidebarCollapsed && <span className="nav-label">Workspace</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'designer' ? 'active' : ''}`}
             onClick={() => setActiveTab('designer')}
+            title={sidebarCollapsed ? 'Visual Layout' : undefined}
           >
-            <i className="ti ti-layout-grid"></i> Visual Layout
+            <i className="ti ti-layout-grid"></i>{!sidebarCollapsed && <span className="nav-label">Visual Layout</span>}
           </div>
           <div
             className={`nav-item ${activeTab === 'upload' ? 'active' : ''}`}
             onClick={() => setActiveTab('upload')}
+            title={sidebarCollapsed ? 'Calibrate Sketch' : undefined}
           >
-            <i className="ti ti-cloud-upload"></i> Calibrate Sketch
+            <i className="ti ti-cloud-upload"></i>{!sidebarCollapsed && <span className="nav-label">Calibrate Sketch</span>}
           </div>
 
-          <div className="sidebar-section-title" style={{ marginTop: '16px' }}>Vedic Audit</div>
-          <div 
+          {!sidebarCollapsed && <div className="sidebar-section-title" style={{ marginTop: '16px' }}>Vedic Audit</div>}
+          <div
             className="nav-item"
             onClick={() => setShowAcharyaModal(true)}
+            title={sidebarCollapsed ? 'Ask Acharya' : undefined}
           >
-            <i className="ti ti-message-chatbot"></i> Ask Acharya
+            <i className="ti ti-message-chatbot"></i>{!sidebarCollapsed && <span className="nav-label">Ask Acharya</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
+            title={sidebarCollapsed ? 'Vastu Audit' : undefined}
           >
-            <i className="ti ti-clipboard-check"></i> Vastu Audit
+            <i className="ti ti-clipboard-check"></i>{!sidebarCollapsed && <span className="nav-label">Vastu Audit</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'shop' ? 'active' : ''}`}
             onClick={() => setActiveTab('shop')}
+            title={sidebarCollapsed ? 'Shop Remedies' : undefined}
           >
-            <i className="ti ti-shopping-cart"></i> Shop Remedies
+            <i className="ti ti-shopping-cart"></i>{!sidebarCollapsed && <span className="nav-label">Shop Remedies</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
             onClick={() => setActiveTab('reports')}
+            title={sidebarCollapsed ? 'Print Audit' : undefined}
           >
-            <i className="ti ti-file-text"></i> Print Audit
+            <i className="ti ti-file-text"></i>{!sidebarCollapsed && <span className="nav-label">Print Audit</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'collaborate' ? 'active' : ''}`}
             onClick={() => setActiveTab('collaborate')}
+            title={sidebarCollapsed ? 'Collaborate' : undefined}
           >
-            <i className="ti ti-users"></i> Collaborate
+            <i className="ti ti-users"></i>{!sidebarCollapsed && <span className="nav-label">Collaborate</span>}
           </div>
-          <div 
+          <div
             className={`nav-item ${activeTab === 'assets' ? 'active' : ''}`}
             onClick={() => setActiveTab('assets')}
             style={{ borderTop: '1px solid var(--border)', borderRadius: 0, marginTop: '8px', paddingTop: '8px' }}
+            title={sidebarCollapsed ? 'Furniture & Decor' : undefined}
           >
-            <i className="ti ti-armchair"></i> Furniture & Decor
+            <i className="ti ti-armchair"></i>{!sidebarCollapsed && <span className="nav-label">Furniture & Decor</span>}
           </div>
         </div>
 
-        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border)' }}>
-          <Compass tilt={plot.tilt} />
-        </div>
+        {!sidebarCollapsed && (
+          <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border)' }}>
+            <Compass tilt={plot.tilt} />
+          </div>
+        )}
 
         <div className="sidebar-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>Vastu Griha v1.0</span>
-          <button className="btn btn-sm" onClick={() => setScreenState('step_prop')}><i className="ti ti-rotate"></i> Reset</button>
+          {!sidebarCollapsed && <span>Vastu Griha v1.0</span>}
+          <button className="btn btn-sm" onClick={() => setScreenState('step_prop')} title="Reset"><i className="ti ti-rotate"></i>{!sidebarCollapsed && ' Reset'}</button>
         </div>
       </nav>
 
