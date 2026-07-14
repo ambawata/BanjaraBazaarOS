@@ -1,7 +1,6 @@
 import React from 'react'
 import Canvas from '../../components/Canvas'
 import Compass from '../../components/Compass'
-import PlotBoundaryDrawer from '../../components/PlotBoundaryDrawer'
 import AnalysisPanel from '../../components/AnalysisPanel'
 import BanjaraBazaarShop from '../../components/BanjaraBazaarShop'
 import ReportGenerator from '../../components/ReportGenerator'
@@ -33,14 +32,7 @@ export default function PlannerWorkspace() {
     setSelectedIssueRoom,
     selectedRoomId,
     setSelectedRoomId,
-    showVastuGrid,
-    setShowVastuGrid,
-    showNormalGrid,
-    setShowNormalGrid,
-    renderMode,
-    setRenderMode,
     isFullscreenStudio,
-    setIsFullscreenStudio,
     showAddPopup,
     setShowAddPopup,
     customRoomName,
@@ -75,28 +67,9 @@ export default function PlannerWorkspace() {
     setImageSettings,
     addRoom,
     deleteRoom,
-    clearCanvas,
-    nudgeRoom,
-    resizeRoom,
-    undoLayout,
-    redoLayout,
-    autoAssignOpenings,
-    fixOverlaps
+    clearCanvas
   } = useCanvasStore()
 
-  const [showTip, setShowTip] = React.useState(() => {
-    return typeof window !== 'undefined' ? !localStorage.getItem('vg-dismiss-tip') : true
-  })
-  // Edit-boundary mode — swaps the live canvas for PlotBoundaryDrawer so
-  // a plot can be traced as an arbitrary polygon (zig-zag, 5+ corners),
-  // not just the 4-wall rectangle/trapezoid `plot.width/length/*Wall`
-  // describe. Stored on plot.boundaryPoints (null until a user opts in);
-  // Canvas.jsx renders that polygon instead of the derived shape once set.
-  const [editingBoundary, setEditingBoundary] = React.useState(false)
-  const dismissTip = () => {
-    localStorage.setItem('vg-dismiss-tip', 'true')
-    setShowTip(false)
-  }
   const [placementDirection, setPlacementDirection] = React.useState('North')
 
   // ── Upload / Calibrate Sketch screen — component-level state & refs ────
@@ -626,336 +599,25 @@ export default function PlannerWorkspace() {
             )
           })()}
 
-          {/* Main Visual Editor Screen */}
+          {/* Main Visual Editor Screen — standalone Vastu Studio v6, embedded
+              exactly as-is (own SVG rendering, own vanilla-JS drag/resize/
+              zoom/undo-redo, own Vastu scoring, own CSS). Its project data
+              (rooms, plot, boundary) lives entirely inside the iframe and is
+              NOT synced to this app's canvasStore/projectStore — Analysis,
+              Reports, Shop, and Chat (which all read from those stores)
+              won't reflect what's drawn here. Chosen deliberately over the
+              native Canvas.jsx editor for a closer visual/UX match to the
+              v6 reference design. */}
           {activeTab === 'designer' && (
-            <>
-              {!isMobile && (
-                <div className="designer-drawer">
-                  <div className="drawer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Elements Catalog</span>
-                    <button className="btn btn-sm btn-primary" onClick={() => setShowAddPopup(true)}>
-                      <i className="ti ti-plus"></i> Add Item
-                    </button>
-                  </div>
-                  <div className="drawer-body">
-                    <div className="sidebar-section-title">Living rooms</div>
-                    {EXPANDED_ROOMS_CATALOG.private.map((tmpl) => (
-                      <div 
-                        key={tmpl.type + tmpl.label}
-                        className="room-template-card"
-                        onClick={() => handleAddRoom(tmpl)}
-                      >
-                        <i className={tmpl.icon}></i>
-                        <span>{tmpl.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="canvas-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <div className="canvas-toolbar">
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button
-                      className={`toggle-chip ${isFullscreenStudio ? 'active' : ''}`}
-                      onClick={() => setIsFullscreenStudio(!isFullscreenStudio)}
-                      title={isFullscreenStudio ? 'Exit full-screen studio' : 'Full-screen design studio — hide the header and tips so the canvas fills the screen'}
-                    >
-                      <i className={`ti ti-${isFullscreenStudio ? 'arrows-minimize' : 'arrows-maximize'}`}></i> <span className="hidden-mobile">{isFullscreenStudio ? 'Exit Full Screen' : 'Full Screen'}</span>
-                    </button>
-                    <button className={`toggle-chip ${showNormalGrid ? 'active' : ''}`} onClick={() => setShowNormalGrid(!showNormalGrid)}>
-                      <i className="ti ti-grid-dots"></i> <span className="hidden-mobile">Grid</span>
-                    </button>
-                    <button className={`toggle-chip ${showVastuGrid ? 'active' : ''}`} onClick={() => setShowVastuGrid(!showVastuGrid)}>
-                      <i className="ti ti-compass"></i> <span className="hidden-mobile">Vastu Grid</span>
-                    </button>
-                    <button
-                      className={`toggle-chip ${renderMode === 'blueprint' ? 'active' : ''}`}
-                      onClick={() => setRenderMode(renderMode === 'blueprint' ? 'colorful' : 'blueprint')}
-                      title="Switch between the everyday view and a black & white print/contractor view"
-                    >
-                      <i className="ti ti-ruler-2"></i> <span className="hidden-mobile">Blueprint</span>
-                    </button>
-                    <button
-                      className={`toggle-chip ${editingBoundary ? 'active' : ''}`}
-                      onClick={() => setEditingBoundary(!editingBoundary)}
-                      title="Trace an irregular plot boundary (zig-zag, angled walls) instead of a plain rectangle"
-                    >
-                      <i className="ti ti-vector-triangle"></i> <span className="hidden-mobile">Edit Boundary</span>
-                    </button>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button
-                      className="btn btn-icon"
-                      onClick={() => {
-                        const added = autoAssignOpenings()
-                        if (added === 0) alert('Every room already has a door, and every exterior wall already has a window.')
-                      }}
-                      title="Add a door to any room missing one, and a window to any exterior wall missing one"
-                    >
-                      <i className="ti ti-door-enter"></i>
-                    </button>
-                    <button
-                      className="btn btn-icon"
-                      onClick={() => {
-                        const fixed = fixOverlaps()
-                        if (!fixed) alert('No overlapping rooms found — the layout is already clean.')
-                      }}
-                      title="Separate any rooms that are stacked on top of each other"
-                    >
-                      <i className="ti ti-layout-grid"></i>
-                    </button>
-                    <button className="btn btn-icon" onClick={undoLayout} title="Undo last action">
-                      <i className="ti ti-arrow-back-up"></i>
-                    </button>
-                    <button className="btn btn-icon" onClick={redoLayout} title="Redo action">
-                      <i className="ti ti-arrow-forward-up"></i>
-                    </button>
-                    <button className="btn btn-icon btn-danger" onClick={handleClearCanvas} title="Clear canvas">
-                      <i className="ti ti-trash"></i>
-                    </button>
-                  </div>
-                </div>
-
-                {showTip && !isFullscreenStudio && (
-                  <div className="guided-tips-banner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}>
-                      <i className="ti ti-bulb" style={{ color: 'var(--gold)', fontSize: '18px' }}></i>
-                      <span style={{ fontSize: '11.5px', color: 'var(--text2)' }}>
-                        <strong>Guided Tip:</strong> Tap any room on the canvas to open alignment handles. Drag corner handles to resize, or use nudge buttons below for precise Vastu alignments.
-                      </span>
-                    </div>
-                    <i className="ti ti-x" style={{ cursor: 'pointer', color: 'var(--text3)' }} onClick={dismissTip}></i>
-                  </div>
-                )}
-                
-                {editingBoundary ? (
-                  <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'auto', flex: 1 }}>
-                    <p style={{ fontSize: '12px', color: 'var(--text3)', textAlign: 'center', maxWidth: '360px', margin: '0 0 4px' }}>
-                      Tap to place each corner of the plot in order, going around the boundary. At least 3 points are needed; Undo removes the last one.
-                    </p>
-                    <PlotBoundaryDrawer
-                      points={plot.boundaryPoints || []}
-                      onChange={(points) => updatePlotField('boundaryPoints', points)}
-                    />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                      {plot.boundaryPoints?.length > 0 && (
-                        <button
-                          className="btn btn-sm"
-                          onClick={() => updatePlotField('boundaryPoints', null)}
-                          title="Go back to the plain rectangle/trapezoid derived from the plot's wall lengths"
-                        >
-                          Clear custom boundary
-                        </button>
-                      )}
-                      <button
-                        className="btn btn-primary btn-sm"
-                        disabled={plot.boundaryPoints && plot.boundaryPoints.length < 3}
-                        onClick={() => setEditingBoundary(false)}
-                      >
-                        Done
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <Canvas />
-                )}
-
-                {isMobile && (
-                  <button 
-                    className="btn btn-primary fab-add-room" 
-                    onClick={() => setShowAddPopup(true)}
-                    style={{
-                      position: 'fixed',
-                      bottom: '80px',
-                      right: '20px',
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: '50%',
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.35)',
-                      zIndex: 90,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: 0
-                    }}
-                  >
-                    <i className="ti ti-plus" style={{ fontSize: '22px' }}></i>
-                  </button>
-                )}
-
-                {/* Desktop Property Inspector panel */}
-                {!isMobile && selectedRoomId && (
-                  <div 
-                    style={{ 
-                      marginTop: '12px', 
-                      background: 'var(--bg2)', 
-                      border: '1px solid var(--border)', 
-                      borderRadius: '12px', 
-                      padding: '12px 16px',
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '10px',
-                      width: '100%'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', fontWeight: 600 }}>Easy Align Controls</span>
-                        {(() => {
-                          const selectedRoom = rooms.find(r => r.id === selectedRoomId)
-                          return selectedRoom ? (
-                            <span style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--accent)', marginTop: '2px' }}>
-                              Editing: {selectedRoom.label} ({Math.round((selectedRoom.width / 100) * plot.width)}x{Math.round((selectedRoom.height / 100) * plot.length)} ft)
-                            </span>
-                          ) : null
-                        })()}
-                      </div>
-                      <button className="btn btn-sm btn-danger" style={{ padding: '6px 12px', fontSize: '11px', borderRadius: '16px' }} onClick={handleDeleteSelected}>
-                        <i className="ti ti-trash"></i> Delete
-                      </button>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Move:</span>
-                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'left')}><i className="ti ti-arrow-left"></i></button>
-                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'up')}><i className="ti ti-arrow-up"></i></button>
-                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'down')}><i className="ti ti-arrow-down"></i></button>
-                        <button className="btn btn-sm" onClick={() => nudgeRoom(selectedRoomId, 'right')}><i className="ti ti-arrow-right"></i></button>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Resize:</span>
-                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'w', 1)}>W +</button>
-                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'w', -1)}>W -</button>
-                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', 1)}>H +</button>
-                        <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', -1)}>H -</button>
-                      </div>
-
-                      {rooms.find(r => r.id === selectedRoomId)?.type === 'staircase' && (
-                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Stairs style:</span>
-                          <select
-                            className="chat-input"
-                            style={{ padding: '4px 8px', fontSize: '11px' }}
-                            value={rooms.find(r => r.id === selectedRoomId)?.stairStyle || 'straight'}
-                            onChange={(e) => {
-                              const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, stairStyle: e.target.value } : r)
-                              setRooms(updated)
-                            }}
-                          >
-                            <option value="straight">Straight</option>
-                            <option value="L">L-shaped</option>
-                            <option value="U">U-shaped</option>
-                          </select>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Mobile Property Bottom Sheet */}
-                {isMobile && selectedRoomId && rooms.find(r => r.id === selectedRoomId) && (() => {
-                  const selectedRoom = rooms.find(r => r.id === selectedRoomId)
-                  return (
-                    <div className="mobile-bottom-sheet-overlay" onClick={() => setSelectedRoomId(null)}>
-                      <div className="mobile-bottom-sheet" onClick={(e) => e.stopPropagation()}>
-                        <div className="bottom-sheet-drag-bar"></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <h4 style={{ fontFamily: 'var(--fd)', fontWeight: 'bold', margin: 0 }}>Configure {selectedRoom.label}</h4>
-                          <button className="btn btn-sm btn-danger" onClick={handleDeleteSelected}><i className="ti ti-trash"></i> Delete</button>
-                        </div>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Room Label</span>
-                          <input 
-                            type="text" className="chat-input" style={{ width: '100%', padding: '8px' }}
-                            value={selectedRoom.label}
-                            onChange={(e) => {
-                              const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, label: e.target.value } : r)
-                              setRooms(updated)
-                            }}
-                          />
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Width (ft)</span>
-                            <input 
-                              type="number" className="chat-input" style={{ width: '100%', padding: '8px' }}
-                              value={Math.round((selectedRoom.width / 100) * plot.width)}
-                              onChange={(e) => {
-                                const wPct = Math.round((parseInt(e.target.value) / plot.width) * 100 * 10) / 10
-                                if (wPct > 5 && wPct < 95) {
-                                  const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, width: wPct } : r)
-                                  setRooms(updated)
-                                }
-                              }}
-                            />
-                          </div>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Length (ft)</span>
-                            <input 
-                              type="number" className="chat-input" style={{ width: '100%', padding: '8px' }}
-                              value={Math.round((selectedRoom.height / 100) * plot.length)}
-                              onChange={(e) => {
-                                const hPct = Math.round((parseInt(e.target.value) / plot.length) * 100 * 10) / 10
-                                if (hPct > 5 && hPct < 95) {
-                                  const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, height: hPct } : r)
-                                  setRooms(updated)
-                                }
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        {selectedRoom.type === 'staircase' && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Stairs style</span>
-                            <select
-                              className="chat-input"
-                              style={{ width: '100%', padding: '8px' }}
-                              value={selectedRoom.stairStyle || 'straight'}
-                              onChange={(e) => {
-                                const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, stairStyle: e.target.value } : r)
-                                setRooms(updated)
-                              }}
-                            >
-                              <option value="straight">Straight</option>
-                              <option value="L">L-shaped</option>
-                              <option value="U">U-shaped</option>
-                            </select>
-                          </div>
-                        )}
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--text3)', textAlign: 'left' }}>Fine-tune Position (Nudge)</span>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'left')}><i className="ti ti-arrow-left"></i> Left</button>
-                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'up')}><i className="ti ti-arrow-up"></i> Up</button>
-                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'down')}><i className="ti ti-arrow-down"></i> Down</button>
-                            <button className="btn" onClick={() => nudgeRoom(selectedRoomId, 'right')}><i className="ti ti-arrow-right"></i> Right</button>
-                          </div>
-                        </div>
-                        
-                        <button className="btn btn-primary" style={{ marginTop: '8px', padding: '12px' }} onClick={() => setSelectedRoomId(null)}>Save & Close</button>
-                      </div>
-                    </div>
-                  )
-                })()}
-              </div>
-
-              {!isMobile && (
-                <AnalysisPanel 
-                  rooms={rooms} 
-                  plot={plot} 
-                  onSwitchTab={setActiveTab}
-                  onSelectShopItem={setSelectedIssueRoom}
-                />
-              )}
-            </>
+            <div className="canvas-area" style={{ flex: 1, padding: 0 }}>
+              <iframe
+                src="/vastu-studio-v6.html"
+                title="Vastu Studio v6 — Visual Layout"
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            </div>
           )}
+
 
           {/* ─── Floorplan Calibration Screen ─────────────────────────────── */}
           {activeTab === 'upload' && (() => {
