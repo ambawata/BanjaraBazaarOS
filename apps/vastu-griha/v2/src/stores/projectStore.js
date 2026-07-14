@@ -24,7 +24,13 @@ export const useProjectStore = create((set, get) => ({
     northWall: 30,
     southWall: 30,
     eastWall: 40,
-    westWall: 40
+    westWall: 40,
+    // Arbitrary polygon override for a genuinely irregular (zig-zag, 5+
+    // sided) plot — an array of {x, y} in 0-100% plot space, edited via
+    // PlotBoundaryDrawer. null means "no custom boundary yet", so Canvas
+    // keeps deriving a rectangle/trapezoid from the wall lengths above,
+    // same as before this field existed.
+    boundaryPoints: null
   },
 
   // Project List Lifecycle States

@@ -64,14 +64,13 @@ export default function PlannerWorkspace() {
   const {
     onboarding,
     plot,
-    setPlot
+    setPlot,
+    updatePlotField
   } = useProjectStore()
 
   const {
     rooms,
     setRooms,
-    boundaryPoints,
-    setBoundaryPoints,
     imageSettings,
     setImageSettings,
     addRoom,
@@ -88,6 +87,12 @@ export default function PlannerWorkspace() {
   const [showTip, setShowTip] = React.useState(() => {
     return typeof window !== 'undefined' ? !localStorage.getItem('vg-dismiss-tip') : true
   })
+  // Edit-boundary mode — swaps the live canvas for PlotBoundaryDrawer so
+  // a plot can be traced as an arbitrary polygon (zig-zag, 5+ corners),
+  // not just the 4-wall rectangle/trapezoid `plot.width/length/*Wall`
+  // describe. Stored on plot.boundaryPoints (null until a user opts in);
+  // Canvas.jsx renders that polygon instead of the derived shape once set.
+  const [editingBoundary, setEditingBoundary] = React.useState(false)
   const dismissTip = () => {
     localStorage.setItem('vg-dismiss-tip', 'true')
     setShowTip(false)
@@ -180,12 +185,12 @@ export default function PlannerWorkspace() {
 
   // Preset vs Corner Taps shape handler
   const selectShapePreset = (shape) => {
-    setBoundaryPoints([])
+    updatePlotField('boundaryPoints', null)
     useProjectStore.getState().setOnboarding({ ...onboarding, plotShape: shape })
   }
 
   const handlePointsChange = (pts) => {
-    setBoundaryPoints(pts)
+    updatePlotField('boundaryPoints', pts)
     if (pts.length > 0) {
       useProjectStore.getState().setOnboarding({ ...onboarding, plotShape: 'Custom Shape (Tapped corners)' })
     }
@@ -671,6 +676,13 @@ export default function PlannerWorkspace() {
                     >
                       <i className="ti ti-ruler-2"></i> <span className="hidden-mobile">Blueprint</span>
                     </button>
+                    <button
+                      className={`toggle-chip ${editingBoundary ? 'active' : ''}`}
+                      onClick={() => setEditingBoundary(!editingBoundary)}
+                      title="Trace an irregular plot boundary (zig-zag, angled walls) instead of a plain rectangle"
+                    >
+                      <i className="ti ti-vector-triangle"></i> <span className="hidden-mobile">Edit Boundary</span>
+                    </button>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button
@@ -717,7 +729,37 @@ export default function PlannerWorkspace() {
                   </div>
                 )}
                 
-                <Canvas />
+                {editingBoundary ? (
+                  <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'auto', flex: 1 }}>
+                    <p style={{ fontSize: '12px', color: 'var(--text3)', textAlign: 'center', maxWidth: '360px', margin: '0 0 4px' }}>
+                      Tap to place each corner of the plot in order, going around the boundary. At least 3 points are needed; Undo removes the last one.
+                    </p>
+                    <PlotBoundaryDrawer
+                      points={plot.boundaryPoints || []}
+                      onChange={(points) => updatePlotField('boundaryPoints', points)}
+                    />
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                      {plot.boundaryPoints?.length > 0 && (
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => updatePlotField('boundaryPoints', null)}
+                          title="Go back to the plain rectangle/trapezoid derived from the plot's wall lengths"
+                        >
+                          Clear custom boundary
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-primary btn-sm"
+                        disabled={plot.boundaryPoints && plot.boundaryPoints.length < 3}
+                        onClick={() => setEditingBoundary(false)}
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Canvas />
+                )}
 
                 {isMobile && (
                   <button 
@@ -790,6 +832,25 @@ export default function PlannerWorkspace() {
                         <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', 1)}>H +</button>
                         <button className="btn btn-sm" onClick={() => resizeRoom(selectedRoomId, 'h', -1)}>H -</button>
                       </div>
+
+                      {rooms.find(r => r.id === selectedRoomId)?.type === 'staircase' && (
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text3)', marginRight: '6px' }}>Stairs style:</span>
+                          <select
+                            className="chat-input"
+                            style={{ padding: '4px 8px', fontSize: '11px' }}
+                            value={rooms.find(r => r.id === selectedRoomId)?.stairStyle || 'straight'}
+                            onChange={(e) => {
+                              const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, stairStyle: e.target.value } : r)
+                              setRooms(updated)
+                            }}
+                          >
+                            <option value="straight">Straight</option>
+                            <option value="L">L-shaped</option>
+                            <option value="U">U-shaped</option>
+                          </select>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -848,6 +909,25 @@ export default function PlannerWorkspace() {
                             />
                           </div>
                         </div>
+
+                        {selectedRoom.type === 'staircase' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--text3)' }}>Stairs style</span>
+                            <select
+                              className="chat-input"
+                              style={{ width: '100%', padding: '8px' }}
+                              value={selectedRoom.stairStyle || 'straight'}
+                              onChange={(e) => {
+                                const updated = rooms.map(r => r.id === selectedRoomId ? { ...r, stairStyle: e.target.value } : r)
+                                setRooms(updated)
+                              }}
+                            >
+                              <option value="straight">Straight</option>
+                              <option value="L">L-shaped</option>
+                              <option value="U">U-shaped</option>
+                            </select>
+                          </div>
+                        )}
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <span style={{ fontSize: '11px', color: 'var(--text3)', textAlign: 'left' }}>Fine-tune Position (Nudge)</span>

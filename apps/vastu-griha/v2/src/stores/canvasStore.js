@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { useHistoryStore } from './historyStore'
 import { useProjectStore } from './projectStore'
-import { hasRoomCollision, findOpenSpot, resolveOverlaps } from '../lib/geometry/collisionEngine'
+import { hasRoomCollision, findOpenSpot, resolveOverlaps, isRoomInsideBoundary } from '../lib/geometry/collisionEngine'
 
 let autosaveTimeout = null
 const DEBOUNCE_INTERVAL = 1500
@@ -17,7 +17,6 @@ const triggerAutosave = (rooms, plot) => {
 
 export const useCanvasStore = create((set, get) => ({
   rooms: [],
-  boundaryPoints: [],
   imageSettings: {
     url: '',
     scale: 1.0,
@@ -38,8 +37,6 @@ export const useCanvasStore = create((set, get) => ({
     triggerAutosave(rooms, plot)
   },
 
-  setBoundaryPoints: (boundaryPoints) => set({ boundaryPoints }),
-  
   setImageSettings: (imageSettings) => set({ imageSettings }),
 
   addRoom: (template) => {
@@ -58,7 +55,7 @@ export const useCanvasStore = create((set, get) => ({
     // over from there.
     const { x, y } = template.category === 'opening'
       ? { x: Math.max(2, 50 - w / 2), y: 0 }
-      : findOpenSpot(w, h, rooms)
+      : findOpenSpot(w, h, rooms, plot.boundaryPoints)
 
     const newRoom = {
       id: Date.now().toString(),
@@ -70,7 +67,8 @@ export const useCanvasStore = create((set, get) => ({
       height: h,
       category: template.category || 'room',
       rotation: template.rotation || 0,
-      icon: template.icon
+      icon: template.icon,
+      ...(template.type === 'staircase' ? { stairStyle: 'straight' } : {})
     }
 
     const nextRooms = [...rooms, newRoom]
@@ -120,8 +118,10 @@ export const useCanvasStore = create((set, get) => ({
     else if (direction === 'down') r.y = Math.min(100 - r.height, r.y + stepY)
 
     // Stop the nudge right at a neighboring room's edge instead of
-    // stepping through it.
+    // stepping through it — or, on a plot with a custom polygon boundary,
+    // right at the boundary edge instead of stepping outside it.
     if (hasRoomCollision(r, rooms, id)) return
+    if (!isRoomInsideBoundary(r, plot.boundaryPoints)) return
 
     useHistoryStore.getState().pushState(rooms, plot)
     const updated = [...rooms]
@@ -154,8 +154,9 @@ export const useCanvasStore = create((set, get) => ({
     }
 
     // Stop the resize right at a neighboring room's edge instead of
-    // growing through it.
+    // growing through it — or past a custom polygon boundary edge.
     if (hasRoomCollision(r, rooms, id)) return
+    if (!isRoomInsideBoundary(r, plot.boundaryPoints)) return
 
     useHistoryStore.getState().pushState(rooms, plot)
     const updated = [...rooms]

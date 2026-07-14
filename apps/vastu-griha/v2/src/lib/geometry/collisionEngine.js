@@ -31,14 +31,20 @@ export function hasRoomCollision(candidate, allRooms, excludeId) {
 // Scans a grid of candidate spots and returns the first one that doesn't
 // overlap any room in `existingRooms`. Shared by addRoom (placing a new
 // room) and resolveOverlaps below (relocating a room that's already
-// overlapping something).
-export function findOpenSpot(w, h, existingRooms) {
+// overlapping something). `boundaryPoints`, when the plot has a custom
+// polygon boundary, additionally rejects spots that fall outside it —
+// otherwise a new room could spawn in the "cut corner" of a non-rectangular
+// plot.
+export function findOpenSpot(w, h, existingRooms, boundaryPoints) {
   const step = 8
+  const fits = (candidate) =>
+    !hasRoomCollision(candidate, existingRooms, null) &&
+    isRoomInsideBoundary(candidate, boundaryPoints)
+
   for (let y = 2; y + h <= 100; y += step) {
     for (let x = 2; x + w <= 100; x += step) {
-      if (!hasRoomCollision({ x, y, width: w, height: h, category: 'room' }, existingRooms, null)) {
-        return { x, y }
-      }
+      const candidate = { x, y, width: w, height: h, category: 'room' }
+      if (fits(candidate)) return { x, y }
     }
   }
   const offset = (existingRooms.length * 4) % 40
@@ -46,6 +52,33 @@ export function findOpenSpot(w, h, existingRooms) {
     x: Math.min(100 - w, 10 + offset),
     y: Math.min(100 - h, 10 + offset)
   }
+}
+
+// Ray-casting point-in-polygon test, ported from the deleted standalone
+// Canvas 2 tool's inPoly() (vastu-studio-v4.html). `points` is an array of
+// {x, y} in the same 0-100% plot space rooms already use.
+export function pointInPolygon(x, y, points) {
+  let inside = false
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const xi = points[i].x, yi = points[i].y
+    const xj = points[j].x, yj = points[j].y
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside
+  }
+  return inside
+}
+
+// A room counts as "inside" a custom polygon boundary when all 4 corners
+// are inside it (same small inset Canvas 2's roomInside() used, so a room
+// flush against the boundary edge doesn't get rejected by float rounding).
+export function isRoomInsideBoundary(room, boundaryPoints) {
+  if (!boundaryPoints || boundaryPoints.length < 3) return true
+  const e = 0.1
+  return (
+    pointInPolygon(room.x + e, room.y + e, boundaryPoints) &&
+    pointInPolygon(room.x + room.width - e, room.y + e, boundaryPoints) &&
+    pointInPolygon(room.x + e, room.y + room.height - e, boundaryPoints) &&
+    pointInPolygon(room.x + room.width - e, room.y + room.height - e, boundaryPoints)
+  )
 }
 
 // One-time repair pass for layouts saved before overlap-prevention existed

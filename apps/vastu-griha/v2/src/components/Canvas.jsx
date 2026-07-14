@@ -6,7 +6,7 @@ import { useSettingsStore } from '../stores/settingsStore'
 import { useUiStore } from '../stores/uiStore'
 import { snapEngine } from '../lib/geometry/snapEngine'
 import { coordinateSystem } from '../lib/geometry/coordinateSystem'
-import { hasRoomCollision } from '../lib/geometry/collisionEngine'
+import { hasRoomCollision, isRoomInsideBoundary } from '../lib/geometry/collisionEngine'
 import { getPadasInZone } from '../lib/vastu/padaKnowledge'
 import RoomSymbol from './RoomSymbol'
 
@@ -460,6 +460,16 @@ export default function Canvas() {
         newX = snapped.x
         newY = snapped.y
         setActiveGuides(snapped.guides)
+
+        // On a plot with a custom polygon boundary, stop right at its edge
+        // instead of moving into the "cut corner" outside it — same
+        // fallback-to-previous-position approach as the collision check
+        // above. Doors/windows are exempt (they're meant to sit astride a
+        // boundary wall, same as they're exempt from room collision).
+        if (!isRoomInsideBoundary({ ...targetRoom, x: newX, y: newY }, plot.boundaryPoints)) {
+          newX = prevX
+          newY = prevY
+        }
       }
 
       targetRoom.x = Math.round(newX * 10) / 10
@@ -491,10 +501,10 @@ export default function Canvas() {
       }
 
       // Reject this frame's resize if it would grow into a neighboring
-      // room — the room stops right at the shared wall instead of
-      // overlapping it.
+      // room, or past a custom polygon boundary edge — the room stops
+      // right at the shared wall / boundary instead of overlapping it.
       const resizeCandidate = { ...targetRoom, x: newX, y: newY, width: newW, height: newH }
-      if (hasRoomCollision(resizeCandidate, rooms, targetRoom.id)) {
+      if (hasRoomCollision(resizeCandidate, rooms, targetRoom.id) || !isRoomInsideBoundary(resizeCandidate, plot.boundaryPoints)) {
         newX = targetRoom.x
         newY = targetRoom.y
         newW = targetRoom.width
@@ -661,11 +671,21 @@ export default function Canvas() {
 
   const {
     shape,
+    boundaryPoints,
     northWall = 30,
     southWall = 30,
     eastWall = 40,
     westWall = 40
   } = plot
+
+  // A user-edited polygon (PlotBoundaryDrawer, min 3 points) always wins
+  // over the derived N/S/E/W trapezoid — same "once edited into a
+  // non-rectangle, the wall-length numbers no longer describe it" rule
+  // the deleted Canvas 2 tool used. Falls back to the existing
+  // wall-length-derived shape for every plot that hasn't opted in, so
+  // nothing already saved changes appearance.
+  const hasCustomBoundary = Array.isArray(boundaryPoints) && boundaryPoints.length >= 3
+  const isNonRectPlot = hasCustomBoundary || shape === 'Irregular'
 
   const maxX = Math.max(northWall, southWall) || 30
   const maxY = Math.max(eastWall, westWall) || 40
@@ -675,9 +695,11 @@ export default function Canvas() {
   const pctBR_Y = (eastWall / maxY) * 100
   const pctBL_Y = (westWall / maxY) * 100
 
-  const clipPathVal = shape === 'Irregular'
-    ? `polygon(0% 0%, ${pctTR_X}% 0%, ${pctBR_X}% ${pctBR_Y}%, 0% ${pctBL_Y}%)`
-    : 'none'
+  const clipPathVal = hasCustomBoundary
+    ? `polygon(${boundaryPoints.map(p => `${p.x}% ${p.y}%`).join(', ')})`
+    : shape === 'Irregular'
+      ? `polygon(0% 0%, ${pctTR_X}% 0%, ${pctBR_X}% ${pctBR_Y}%, 0% ${pctBL_Y}%)`
+      : 'none'
 
   // Contractor-grade dimension lines around the outside of the plot
   // boundary — one per side, with a tick mark (✕, not an arrowhead) at
@@ -849,7 +871,7 @@ export default function Canvas() {
               border. Only for rectangle/square plots; Irregular keeps its
               existing clip-path outline since the hatch frame math below
               assumes an axis-aligned rectangle. */}
-          {shape !== 'Irregular' && (
+          {!isNonRectPlot && (
             <>
               <defs>
                 <pattern id="outerWallHatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
@@ -865,7 +887,13 @@ export default function Canvas() {
               />
             </>
           )}
-          {renderDimensionLines()}
+          {/* A custom polygon boundary (PlotBoundaryDrawer) is a set of
+              tapped 0-100% points with no assigned real-world footage per
+              edge — unlike the derived N/S/E/W trapezoid, there's no valid
+              foot measurement to show here, so skip the (now-misleading,
+              always-rectangular) dimension overlay rather than draw wrong
+              numbers around a shape that no longer matches them. */}
+          {!hasCustomBoundary && renderDimensionLines()}
         </svg>
         <div
           className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
@@ -878,15 +906,17 @@ export default function Canvas() {
             // The hatch band drawn in the SVG above is the visible outer
             // wall for rectangle/square plots now; this border stays as
             // the fallback for Irregular plots, which don't get a hatch.
-            border: shape === 'Irregular' ? `6px solid ${isBlueprint ? '#000' : 'var(--text)'}` : 'none',
+            border: isNonRectPlot ? `6px solid ${isBlueprint ? '#000' : 'var(--text)'}` : 'none',
             borderRadius: '0px',
             flexShrink: 0,
             background: isBlueprint ? '#fff' : undefined
           }}
         >
         {/* Custom Wall Outline & Length Labels overlay — only while the plot is
-            still empty; once rooms are placed these labels just clutter the canvas */}
-        {shape === 'Irregular' && rooms.length === 0 && (
+            still empty; once rooms are placed these labels just clutter the canvas.
+            N/S/E/W labels only make sense for the derived 4-wall trapezoid, not
+            an arbitrary polygon boundary, so this is skipped once one is set. */}
+        {shape === 'Irregular' && !hasCustomBoundary && rooms.length === 0 && (
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 8 }}>
             {/* Filled background with low opacity for visual reference */}
             <polygon
@@ -1305,7 +1335,13 @@ export default function Canvas() {
                       Shared with the printable professional floor plan export. */}
                   {roomPxW > 78 && roomPxH > 78 && (
                     <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', overflow: 'hidden' }}>
-                      <RoomSymbol type={room.type} label={room.label} size={Math.max(28, Math.min(50, Math.min(roomPxW, roomPxH) * 0.55))} />
+                      <RoomSymbol
+                        type={room.type}
+                        label={room.label}
+                        size={Math.max(28, Math.min(50, Math.min(roomPxW, roomPxH) * 0.55))}
+                        stairStyle={room.stairStyle}
+                        long={roomPxW >= roomPxH}
+                      />
                     </div>
                   )}
 
@@ -1664,6 +1700,21 @@ export default function Canvas() {
                     <i className="ti ti-stack-back"></i>
                   </button>
                 </div>
+                {selectedRoom.type === 'staircase' && (
+                  <div className="room-action-panel-row">
+                    <span className="room-action-panel-label">Stairs style</span>
+                    <select
+                      className="room-rename-input"
+                      style={{ flex: 1 }}
+                      value={selectedRoom.stairStyle || 'straight'}
+                      onChange={(e) => setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, stairStyle: e.target.value } : r))}
+                    >
+                      <option value="straight">Straight</option>
+                      <option value="L">L-shaped</option>
+                      <option value="U">U-shaped</option>
+                    </select>
+                  </div>
+                )}
               </div>
             )}
 

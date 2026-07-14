@@ -52,7 +52,7 @@ export default function FloorPlanDrawing({ rooms, plot, projectName }) {
               {pw > 40 && ph > 40 && (
                 <foreignObject x={px + pw / 2 - symbolSize / 2} y={py + ph * 0.32 - symbolSize / 2} width={symbolSize} height={symbolSize}>
                   <div style={{ width: '100%', height: '100%', opacity: 0.85 }}>
-                    <RoomSymbol type={room.type} label={room.label} stroke="#000" size={symbolSize} />
+                    <RoomSymbol type={room.type} label={room.label} stroke="#000" size={symbolSize} stairStyle={room.stairStyle} long={pw >= ph} />
                   </div>
                 </foreignObject>
               )}
