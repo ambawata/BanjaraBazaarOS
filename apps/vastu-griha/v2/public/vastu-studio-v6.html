@@ -93,7 +93,7 @@ svg text{user-select:none;pointer-events:none;}
 .panel .ph .x:hover{background:var(--orange-dim);color:var(--orange-dark);}
 .panel .pb{padding:2px 16px 18px;overflow-y:auto;scrollbar-width:thin;}
 @media(min-width:768px){
-  .panel{top:14px;bottom:14px;left:70px;width:280px;border-radius:20px;transform:translateX(-360px);opacity:0;}
+  .panel{top:14px;right:82px;max-height:calc(100vh - 28px);width:280px;border-radius:20px;transform:translateX(360px);opacity:0;}
   .panel.open{transform:none;opacity:1;}
   .panel .grab{display:none;}
 }
@@ -571,6 +571,13 @@ function closePanels(){document.querySelectorAll('.panel:not(#selCard)').forEach
 document.querySelectorAll('.re button').forEach(b=>b.onclick=()=>{const p=document.getElementById('pn-'+b.dataset.p),was=p.classList.contains('open');closePanels();if(!was){p.classList.add('open');b.classList.add('on');}});
 document.querySelectorAll('.panel [data-c]').forEach(b=>b.onclick=()=>closePanels());
 document.getElementById('fab').onclick=()=>{const p=document.getElementById('pn-rooms'),was=p.classList.contains('open');closePanels();if(!was){p.classList.add('open');document.querySelector('.re button[data-p=rooms]').classList.add('on');}};
+document.addEventListener('pointerdown',e=>{
+  const openPanel=document.querySelector('.panel.open:not(#selCard)');
+  if(!openPanel)return;
+  if(openPanel.contains(e.target)||e.target.closest('.re'))return;
+  closePanels();
+});
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels();});
 
 const rEl=document.getElementById('rooms');
 Object.entries(KB).forEach(([key,k])=>{const c=document.createElement('button');c.className='rc';c.innerHTML=`<span class="rci" style="background:${k.fill};color:${k.tint}"><svg class="ic" viewBox="0 0 24 24">${ICON[key]}</svg></span><span>${k.nm}</span>`;c.onclick=()=>addRoom(key);rEl.appendChild(c);});
