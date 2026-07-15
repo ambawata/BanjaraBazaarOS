@@ -71,13 +71,13 @@ export default function HomeDashboard() {
   return (
     <div className="vg-dashboard-shell" style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', overflow: 'hidden',
-      background: '#f0f0f0', color: colors.text, fontFamily: typography.familyBody,
+      background: colors.shellBg, color: colors.text, fontFamily: typography.familyBody,
     }}>
       <div className="vg-dashboard-card" style={{ // New centered container for app content
         maxWidth: isMobile ? '100%' : '1100px', margin: '0 auto',
         width: '100%',
         flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column',
-        background: '#ffffff', // App content background
+        background: colors.card, // App content background
         boxShadow: '0 0 20px rgba(0,0,0,0.05)',
         boxSizing: 'border-box',
       }}>
@@ -85,7 +85,7 @@ export default function HomeDashboard() {
         <div className="vg-topnav" style={{
           justifyContent: 'space-between', alignItems: 'center',
           padding: '16px 40px',
-          background: '#ffffff', borderBottom: `1.5px solid ${colors.border}`,
+          background: colors.card, borderBottom: `1.5px solid ${colors.border}`,
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: spacing[6] }}>
@@ -140,7 +140,7 @@ export default function HomeDashboard() {
         <div className="vg-app-bar-mobile" style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           padding: isMobile ? '14px 18px' : '18px 24px',
-          background: '#ffffff', borderBottom: `1.5px solid ${colors.border}`,
+          background: colors.card, borderBottom: `1.5px solid ${colors.border}`,
           boxShadow: '0 2px 10px rgba(0,0,0,0.02)', flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
@@ -246,7 +246,7 @@ export default function HomeDashboard() {
         <nav className="vg-bottom-nav" style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
           display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-          background: '#ffffff', borderTop: `1.5px solid ${colors.border}`,
+          background: colors.card, borderTop: `1.5px solid ${colors.border}`,
           padding: '8px 0 max(8px, env(safe-area-inset-bottom))',
           boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
         }}>

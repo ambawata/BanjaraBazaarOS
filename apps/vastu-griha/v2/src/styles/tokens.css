@@ -15,6 +15,12 @@
    ================================================ */
 
 :root {
+  /* Theme-INVARIANT constants — deliberately not overridden in body.light,
+     matching how they were already hardcoded (always white/gray regardless
+     of dark/light mode) in the Dashboard screen before this token existed. */
+  --card: #ffffff;
+  --shell-bg: #f0f0f0;
+
   /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
   --bg: #171310;
   --bg2: #201a15;

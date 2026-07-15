@@ -18,7 +18,7 @@ export const colors = {
   text2:     'var(--text2)',
   text3:     'var(--text3)',
 
-  // Accent (primary brand purple)
+  // Accent (primary brand orange)
   accent:    'var(--accent)',
   accent2:   'var(--accent2)',
   accentDim: 'var(--accent-dim)',
@@ -41,6 +41,8 @@ export const colors = {
   green:     'var(--green)',
   greenDim:  'var(--green-dim)',
 
-  // Static
-  white:     '#ffffff',
+  // Static (theme-invariant — see tokens.css)
+  white:    '#ffffff',
+  card:     'var(--card)',
+  shellBg:  'var(--shell-bg)',
 }
