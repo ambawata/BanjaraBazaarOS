@@ -152,6 +152,12 @@ body {
   transition: width 0.2s ease;
 }
 
+/* Route-scoped: fully hidden on Visual Layout (Vastu Studio v6), which
+   has its own floating-island chrome and wants the full viewport. */
+#sidebar.route-hidden {
+  display: none;
+}
+
 /* Collapsed state — icon rail only. Nav item padding/gap stay the same
    (no separate collapsed nav-item rule needed) since the label <span> is
    simply absent from the DOM when collapsed, not hidden via CSS — the

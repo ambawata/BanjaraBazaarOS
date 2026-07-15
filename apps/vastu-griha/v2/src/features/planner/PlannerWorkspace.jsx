@@ -315,8 +315,11 @@ export default function PlannerWorkspace() {
   return (
     <div id="app-container">
       
-      {/* Sidebar navigation */}
-      <nav id="sidebar" className={sidebarCollapsed ? 'collapsed' : ''}>
+      {/* Sidebar navigation — hidden entirely on the Visual Layout / Vastu
+          Studio v6 route, which uses its own floating-island chrome and
+          needs the full viewport (Exit to Dashboard relocates to a
+          floating pill for that route instead, see below). */}
+      <nav id="sidebar" className={activeTab === 'designer' ? 'route-hidden' : (sidebarCollapsed ? 'collapsed' : '')}>
         <div className="sidebar-brand">
           <svg className="sidebar-logo-img" viewBox="0 0 100 100" fill="none" role="img" aria-label="Vastu compass">
             <circle cx="50" cy="50" r="30" stroke="var(--accent)" strokeWidth="4.5" />
@@ -432,7 +435,10 @@ export default function PlannerWorkspace() {
 
       {/* Main Workspace Frame */}
       <div id="main">
-        {activeTab !== 'home' && activeTab !== 'profile' && !(isFullscreenStudio && activeTab === 'designer') && (
+        {/* Visual Layout (Vastu Studio v6) hides this outer header entirely —
+            it has its own floating-island chrome (see the designer route
+            below for the relocated Exit/Edit-Mode/Share/Print controls). */}
+        {activeTab !== 'home' && activeTab !== 'profile' && activeTab !== 'designer' && (
           <header id="topbar">
             <div className="topbar-left">
               <span className="page-title">
@@ -523,7 +529,10 @@ export default function PlannerWorkspace() {
         )}
 
         {/* Dynamic Workspace Screens */}
-        <div className="page-workspace" style={{ paddingBottom: '60px' }}>
+        {/* paddingBottom reserves space for the mobile-only global bottom
+            nav bar (60px) — was previously applied unconditionally, which
+            left a permanent dead strip below the canvas on desktop too. */}
+        <div className="page-workspace" style={{ paddingBottom: isMobile ? '60px' : 0 }}>
           
           {/* 1. Dedicated Workspace Landing Screen */}
           {activeTab === 'home' && (() => {
@@ -641,7 +650,52 @@ export default function PlannerWorkspace() {
               native Canvas.jsx editor for a closer visual/UX match to the
               v6 reference design. */}
           {activeTab === 'designer' && (
-            <div className="canvas-area" style={{ flex: 1, padding: 0 }}>
+            <div className="canvas-area" style={{ flex: 1, padding: 0, position: 'relative' }}>
+              {/* Outer floating pills — the sidebar/header are hidden on this
+                  route, so Exit/Edit-Mode/Share/Print relocate here. Stacked
+                  in the left column, starting below where the iframe's own
+                  top-left island (logo + project name) sits, so they don't
+                  overlap it. Notification bell and dark-mode toggle are
+                  deliberately NOT relocated here (deferred). */}
+              <button
+                onClick={() => setScreenState('dashboard')}
+                title="Exit to Dashboard"
+                style={{
+                  position: 'fixed', top: '68px', left: '14px', zIndex: 200,
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(255,255,255,.9)', backdropFilter: 'blur(10px)',
+                  border: '1px solid var(--border)', borderRadius: '99px',
+                  padding: '8px 14px', fontSize: '12px', fontWeight: 700,
+                  color: 'var(--text)', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.1)'
+                }}
+              >
+                <i className="ti ti-arrow-left"></i> Exit
+              </button>
+
+              <div style={{
+                position: 'fixed', top: '116px', left: '14px', zIndex: 200,
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'rgba(255,255,255,.9)', backdropFilter: 'blur(10px)',
+                border: '1px solid var(--border)', borderRadius: '16px',
+                padding: '8px', boxShadow: '0 8px 24px rgba(0,0,0,.1)'
+              }}>
+                <select
+                  className="btn"
+                  style={{ padding: '6px 10px', fontSize: '11px', cursor: 'pointer' }}
+                  value={editMode}
+                  onChange={(e) => setEditMode(e.target.value)}
+                >
+                  <option value="edit">✍️ Edit Mode</option>
+                  <option value="view">👓️ View Only</option>
+                </select>
+                <button className="btn" style={{ fontSize: '11px' }} onClick={() => setShowShareModal(true)}>
+                  <i className="ti ti-share"></i> Share
+                </button>
+                <button className="btn btn-primary" style={{ fontSize: '11px' }} onClick={() => setActiveTab('reports')}>
+                  <i className="ti ti-printer"></i> Print Report
+                </button>
+              </div>
+
               <iframe
                 src="/vastu-studio-v6.html"
                 title="Vastu Studio v6 — Visual Layout"
