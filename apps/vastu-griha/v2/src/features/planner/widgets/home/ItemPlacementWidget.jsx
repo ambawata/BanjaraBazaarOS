@@ -4,7 +4,7 @@ export function ItemPlacementWidget({ placementDirection, setPlacementDirection,
   const isCorrectDirection = ['North', 'East'].includes(placementDirection);
   
   return (
-    <div id="item-placement-widget" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#ffffff', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%' }}>
+    <div id="item-placement-widget" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '24px', padding: '18px', textAlign: 'left', width: '100%' }}>
       <div>
         <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#2B2010' }}>Where do you want to place?</h3>
         <div style={{ fontSize: '12px', marginTop: '4px' }}>
@@ -89,10 +89,10 @@ export function ItemPlacementWidget({ placementDirection, setPlacementDirection,
                 <circle cx="150" cy="24" r="2" fill="var(--accent)" />
                 
                 {/* Target points */}
-                <circle cx="110" cy="24" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                <circle cx="190" cy="24" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                <circle cx="110" cy="74" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
-                <circle cx="190" cy="74" r="3" fill="#fff" stroke="var(--accent)" strokeWidth="1.5" />
+                <circle cx="110" cy="24" r="3" fill="var(--marker-white)" stroke="var(--accent)" strokeWidth="1.5" />
+                <circle cx="190" cy="24" r="3" fill="var(--marker-white)" stroke="var(--accent)" strokeWidth="1.5" />
+                <circle cx="110" cy="74" r="3" fill="var(--marker-white)" stroke="var(--accent)" strokeWidth="1.5" />
+                <circle cx="190" cy="74" r="3" fill="var(--marker-white)" stroke="var(--accent)" strokeWidth="1.5" />
               </>
             ) : (
               <>
