@@ -52,6 +52,34 @@
      improvement, just not one to make silently under "tokenization only"). */
   --gold-gradient-end: #d48b1d;
 
+  /* Dashboard "action card" 4-color category system (ActionCards.jsx) —
+     always this light-tinted-card treatment regardless of theme, same
+     "Dashboard reads as a bright consumer app" pattern as --card/
+     --shell-bg above. Purple reuses --status-tile-utility and green
+     reuses --status-green (byte-identical values, already tokenized). */
+  --tile-purple-bg: #f3f0ff;
+  --tile-purple-border: #e7e2ff;
+  --tile-purple-icon-border: #dcd6ff;
+  --tile-purple-heading: #312e81;
+  --tile-purple-text: #6366f1;
+
+  --tile-green-bg: #f0fdf4;
+  --tile-green-border: #dcfce7;
+  --tile-green-icon-border: #d1fae5;
+  --tile-green-heading: #064e3b;
+  --tile-green-text: #16a34a;
+
+  --tile-amber: #d97706;
+  --tile-amber-accent: #fbbf24;
+  --tile-amber-bg: #fffbeb;
+  --tile-amber-border: #fef3c7;
+  --tile-amber-heading: #78350f;
+
+  --tile-blue: #2563eb;
+  --tile-blue-bg: #eff6ff;
+  --tile-blue-border: #dbeafe;
+  --tile-blue-heading: #1e3a8a;
+
   /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
   --bg: #171310;
   --bg2: #201a15;
