@@ -83,6 +83,27 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.10);
   --shadow-lg: 0 10px 40px rgba(44, 36, 23, 0.06);
+
+  /* Status/category palette (new, additive) — the SAME hex values were
+     already being repeated verbatim across compliance dots, welcome-card
+     icons, and badges in index.css; centralizing so there is one source
+     instead of six copies of each hex. Deliberately theme-independent
+     (unlike --accent/--bg etc.) since these mark severity/category, not
+     brand surface color, matching how they were already being used. */
+  --status-emerald: #10b981;
+  --status-green: #22c55e;
+  --status-teal: #14b8a6;
+  --status-amber: #f59e0b;
+  --status-orange: #f97316;
+  --status-red: #ef4444;
+  /* Flagged for brand review (not changed here — visual parity only):
+     this is a purple used to distinguish the "utility" element category
+     from "room"/"outdoor". It is NOT the RentPro/Tailwind-config purple
+     found elsewhere (different hex, different purpose — a categorical
+     tile color, not a primary/accent color) but is still worth a
+     deliberate decision on whether it stays purple or moves to an
+     orange-family hue. */
+  --status-tile-utility: #7c6ff7;
 }
 
 body.light {

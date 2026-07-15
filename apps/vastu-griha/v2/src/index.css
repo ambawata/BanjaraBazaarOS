@@ -806,10 +806,10 @@ body {
   display: block;
   z-index: 3;
 }
-.compliance-dot-excellent { background: #10b981; }
-.compliance-dot-good { background: #f59e0b; }
-.compliance-dot-warning { background: #f97316; }
-.compliance-dot-poor { background: #ef4444; }
+.compliance-dot-excellent { background: var(--status-emerald); }
+.compliance-dot-good { background: var(--status-amber); }
+.compliance-dot-warning { background: var(--status-orange); }
+.compliance-dot-poor { background: var(--status-red); }
 
 /* Sidebar Designer Drawer - Canva Room Catalog */
 .designer-drawer {
@@ -1690,9 +1690,9 @@ body {
   margin-bottom: 12px;
 }
 
-.welcome-card:nth-child(2) .welcome-card-icon { background: rgba(20, 184, 166, 0.12); color: #14b8a6; }
-.welcome-card:nth-child(3) .welcome-card-icon { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-.welcome-card:nth-child(4) .welcome-card-icon { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.welcome-card:nth-child(2) .welcome-card-icon { background: rgba(20, 184, 166, 0.12); color: var(--status-teal); }
+.welcome-card:nth-child(3) .welcome-card-icon { background: rgba(34, 197, 94, 0.12); color: var(--status-green); }
+.welcome-card:nth-child(4) .welcome-card-icon { background: rgba(245, 158, 11, 0.12); color: var(--status-amber); }
 
 .welcome-card-title {
   font-family: var(--fd);
@@ -2022,9 +2022,9 @@ body {
 }
 
 /* Element categories tile background mappings */
-.tile-room { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-.tile-utility { background: rgba(124, 111, 247, 0.12); color: #7c6ff7; }
-.tile-outdoor { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.tile-room { background: rgba(34, 197, 94, 0.12); color: var(--status-green); }
+.tile-utility { background: rgba(124, 111, 247, 0.12); color: var(--status-tile-utility); }
+.tile-outdoor { background: rgba(245, 158, 11, 0.12); color: var(--status-amber); }
 
 /* Remedies dashboard visual cards */
 .remedy-dashboard-card {
@@ -2076,9 +2076,9 @@ body {
   border-radius: 12px;
 }
 
-.badge-best-solution { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-.badge-effective { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-.badge-good { background: rgba(20,184,166,0.12); color: #14b8a6; border: 1px solid rgba(20,184,166,0.3); }
+.badge-best-solution { background: rgba(34,197,94,0.12); color: var(--status-green); border: 1px solid rgba(34,197,94,0.3); }
+.badge-effective { background: rgba(245,158,11,0.12); color: var(--status-amber); border: 1px solid rgba(245,158,11,0.3); }
+.badge-good { background: rgba(20,184,166,0.12); color: var(--status-teal); border: 1px solid rgba(20,184,166,0.3); }
 
 /* Mobile viewport overrides */
 @media (max-width: 768px) {
