@@ -99,7 +99,7 @@ export default function PlotBoundaryDrawer({ points, onChange }) {
               height: '12px',
               borderRadius: '50%',
               background: 'var(--gold)',
-              border: '2px solid #fff',
+              border: '2px solid var(--marker-white)',
               transform: 'translate(-50%, -50%)',
               pointerEvents: 'none',
               boxShadow: '0 0 5px rgba(0,0,0,0.5)'

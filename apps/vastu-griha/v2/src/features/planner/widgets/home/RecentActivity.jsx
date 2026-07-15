@@ -8,7 +8,7 @@ export function RecentActivity({ setActiveTab }) {
   ];
 
   return (
-    <div style={{ flex: '1 1 min(100%, 240px)', background: '#ffffff', borderRadius: '24px', border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
+    <div style={{ flex: '1 1 min(100%, 240px)', background: 'var(--card)', borderRadius: '24px', border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '13.5px', fontWeight: 'bold', color: 'var(--text)' }}>Recent Activity</span>
         <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }} onClick={() => setActiveTab('collaborate')}>View All</span>

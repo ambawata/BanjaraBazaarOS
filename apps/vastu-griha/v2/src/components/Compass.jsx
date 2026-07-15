@@ -37,7 +37,7 @@ export default function Compass({ tilt }) {
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: '#fff',
+            background: 'var(--marker-white)',
             boxShadow: '0 0 4px rgba(0,0,0,0.5)'
           }}
         />

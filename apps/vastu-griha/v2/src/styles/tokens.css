@@ -20,6 +20,10 @@
      of dark/light mode) in the Dashboard screen before this token existed. */
   --card: #ffffff;
   --shell-bg: #f0f0f0;
+  /* Small contrast dot/ring markers (compass center pin, plot-boundary
+     vertex handle) — always white regardless of theme, since they sit on
+     an accent-colored shape or a floor-plan image, not app chrome. */
+  --marker-white: #fff;
 
   /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
   --bg: #171310;
