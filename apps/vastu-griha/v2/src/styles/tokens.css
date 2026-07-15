@@ -45,6 +45,13 @@
   --kb-avoid-border: #e27c7c;
   --kb-star: #e0a83c;
 
+  /* Gradient endpoint paired with the reactive --gold in AnalysisPanel's
+     "best solution" badge — kept as a fixed darker shade rather than a
+     second reactive token, matching the gradient's current rendered
+     appearance exactly (a fully reactive pairing would be a legitimate
+     improvement, just not one to make silently under "tokenization only"). */
+  --gold-gradient-end: #d48b1d;
+
   /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
   --bg: #171310;
   --bg2: #201a15;

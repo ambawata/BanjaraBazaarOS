@@ -354,15 +354,15 @@ export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopIt
   const complianceExcellent = evaluatedRooms.filter(r => r.analysis.status === 'Excellent' || r.analysis.status === 'Good' || r.analysis.status === 'Neutral')
   const complianceIssues = evaluatedRooms.filter(r => r.analysis.status === 'Can Be Improved' || r.analysis.status === 'Needs Attention')
 
-  let scoreColor = '#10b981' // Emerald
+  let scoreColor = 'var(--status-emerald)' // Emerald
   let ratingText = 'EXCELLENT COMPLIANCE'
   let detailsText = 'All primary house vectors align with natural cosmic flow.'
   if (score < 50) {
-    scoreColor = '#ef4444' // Red
+    scoreColor = 'var(--status-red)' // Red
     ratingText = 'CRITICAL CORRECTIONS'
     detailsText = 'Severe elemental clashes. Pyramids or crystals needed.'
   } else if (score < 80) {
-    scoreColor = '#f59e0b' // Amber
+    scoreColor = 'var(--status-amber)' // Amber
     ratingText = 'AVERAGE ALIGNMENT'
     detailsText = 'Minor energy blockages in secondary quadrants.'
   }
@@ -470,7 +470,7 @@ export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopIt
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {evaluatedRooms.map((room) => {
               const isExcellent = room.analysis.status === 'Excellent' || room.analysis.status === 'Good' || room.analysis.status === 'Neutral'
-              const statusColor = isExcellent ? '#10b981' : (room.analysis.status === 'Can Be Improved' ? '#f59e0b' : '#ef4444')
+              const statusColor = isExcellent ? 'var(--status-emerald)' : (room.analysis.status === 'Can Be Improved' ? 'var(--status-amber)' : 'var(--status-red)')
               
               return (
                 <div 
@@ -524,13 +524,13 @@ export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopIt
                   padding: '12px',
                   background: 'rgba(16, 185, 129, 0.03)',
                   border: '1.5px solid rgba(16, 185, 129, 0.15)',
-                  borderLeft: '3px solid #10b981',
+                  borderLeft: '3px solid var(--status-emerald)',
                   borderRadius: '10px',
                   textAlign: 'left'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <i className="ti ti-circle-check-filled" style={{ color: '#10b981', fontSize: '16px', marginTop: '1px', flexShrink: 0 }} />
+                  <i className="ti ti-circle-check-filled" style={{ color: 'var(--status-emerald)', fontSize: '16px', marginTop: '1px', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text)' }}>
                       {room.label} in {room.analysis.zone}
@@ -553,7 +553,7 @@ export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopIt
         {activeSubTab === 'improvements' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {complianceIssues.map((room) => {
-              const statusColor = room.analysis.status === 'Needs Attention' ? '#ef4444' : '#f59e0b'
+              const statusColor = room.analysis.status === 'Needs Attention' ? 'var(--status-red)' : 'var(--status-amber)'
               return (
                 <div 
                   key={room.id} 
@@ -607,7 +607,7 @@ export default function AnalysisPanel({ rooms, plot, onSwitchTab, onSelectShopIt
             justifyContent: 'center',
             fontSize: '12px',
             fontWeight: '700',
-            background: 'linear-gradient(135deg, var(--gold) 0%, #d48b1d 100%)',
+            background: 'linear-gradient(135deg, var(--gold) 0%, var(--gold-gradient-end) 100%)',
             borderColor: 'var(--gold)',
             boxShadow: '0 4px 14px rgba(245, 166, 35, 0.2)'
           }}
