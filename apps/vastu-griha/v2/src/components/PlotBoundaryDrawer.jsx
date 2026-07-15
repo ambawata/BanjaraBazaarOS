@@ -67,7 +67,7 @@ export default function PlotBoundaryDrawer({ points, onChange }) {
           {points.length > 1 && (
             <polyline
               points={points.map(p => `${(p.x / 100) * dims.w}, ${(p.y / 100) * dims.h}`).join(' ')}
-              fill="rgba(124, 111, 247, 0.12)"
+              fill="var(--accent-dim)"
               stroke="var(--accent)"
               strokeWidth="2.5"
             />

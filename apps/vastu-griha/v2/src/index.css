@@ -249,7 +249,7 @@ body {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(95, 85, 229, 0.2);
+  box-shadow: 0 2px 6px var(--accent-dim);
 }
 
 .btn-primary:hover {
@@ -860,7 +860,7 @@ body {
   border-color: var(--accent);
   color: var(--accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(95, 85, 229, 0.08);
+  box-shadow: 0 4px 12px var(--accent-dim);
 }
 
 .room-template-card i {

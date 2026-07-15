@@ -172,7 +172,7 @@ function arrowStyle(side) {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)', [side]: '-4px',
     width: '32px', height: '32px', borderRadius: '999px', background: 'var(--kb-card)',
     border: '1px solid var(--border-soft)', color: 'var(--orange-dark)', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(90,31,179,0.08)',
+    justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px var(--accent-dim)',
     fontSize: '16px', zIndex: 2,
   }
 }
