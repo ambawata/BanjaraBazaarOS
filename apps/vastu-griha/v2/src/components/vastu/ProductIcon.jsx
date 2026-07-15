@@ -36,10 +36,10 @@ export default function ProductIcon({ icon, size = 44 }) {
   const glyph = GLYPHS[icon] || GLYPHS.remedy
   return (
     <div style={{
-      width: size, height: size, borderRadius: '12px', background: '#FBE6D0',
+      width: size, height: size, borderRadius: '12px', background: 'var(--kb-accent-bg)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
     }}>
-      <svg viewBox="0 0 64 64" width={size * 0.72} height={size * 0.72} fill="none" stroke="#C96F24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" color="#C96F24" dangerouslySetInnerHTML={{ __html: glyph }} />
+      <svg viewBox="0 0 64 64" width={size * 0.72} height={size * 0.72} fill="none" stroke="var(--kb-heading)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" color="var(--kb-heading)" dangerouslySetInnerHTML={{ __html: glyph }} />
     </div>
   )
 }

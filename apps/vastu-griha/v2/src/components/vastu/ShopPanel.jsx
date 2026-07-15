@@ -8,7 +8,7 @@ import { useUiStore } from '../../stores/uiStore'
 function Stars({ rating }) {
   const full = Math.round(rating)
   return (
-    <span style={{ fontSize: '11px', color: '#E0A83C', letterSpacing: '1px' }}>
+    <span style={{ fontSize: '11px', color: 'var(--kb-star)', letterSpacing: '1px' }}>
       {'★'.repeat(full)}{'☆'.repeat(5 - full)}
     </span>
   )

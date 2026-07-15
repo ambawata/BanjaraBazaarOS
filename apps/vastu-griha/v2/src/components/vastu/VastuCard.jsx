@@ -15,14 +15,14 @@ export default function VastuCard({ entry, lang, onOpen }) {
 
   return (
     <div style={{
-      background: '#ffffff', border: '1px solid #EFE3D0', borderRadius: '20px',
+      background: 'var(--kb-card)', border: '1px solid var(--kb-border)', borderRadius: '20px',
       overflow: 'hidden', display: 'flex', flexDirection: 'column',
     }}>
       <div style={{ padding: '16px 16px 0' }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: '#C96F24', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--kb-heading)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
           {categoryLabel(lang, entry.category)}
         </div>
-        <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15.5px', color: '#2B2010', marginTop: '2px' }}>
+        <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15.5px', color: 'var(--kb-title)', marginTop: '2px' }}>
           {getItemName(entry, lang)}
         </div>
       </div>
@@ -50,14 +50,14 @@ export default function VastuCard({ entry, lang, onOpen }) {
               {lowConfidence ? (
                 <span style={{
                   display: 'inline-block', width: 'fit-content', fontSize: '10.5px', fontWeight: 700,
-                  color: '#8A7A5C', background: '#F1ECE0', padding: '3px 9px', borderRadius: '999px',
+                  color: 'var(--kb-muted)', background: 'var(--kb-tint-bg)', padding: '3px 9px', borderRadius: '999px',
                 }}>
                   {t(lang, 'lowConfidenceBadge')}
                 </span>
               ) : hasPills ? (
                 <DirectionPills best={bestDirections} avoid={avoidDirections} fallback={fallbackDirections} size="sm" />
               ) : (
-                <span style={{ fontSize: '11px', color: '#8A7A5C' }}>{verdictText}</span>
+                <span style={{ fontSize: '11px', color: 'var(--kb-muted)' }}>{verdictText}</span>
               )}
             </div>
           )}
@@ -70,7 +70,7 @@ export default function VastuCard({ entry, lang, onOpen }) {
         onClick={onOpen}
         style={{
           margin: '12px 16px 16px', padding: '10px', borderRadius: '10px',
-          background: '#FBE6D0', border: 'none', color: '#C96F24',
+          background: 'var(--kb-accent-bg)', border: 'none', color: 'var(--kb-heading)',
           fontWeight: 700, fontSize: '12.5px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
         }}
       >

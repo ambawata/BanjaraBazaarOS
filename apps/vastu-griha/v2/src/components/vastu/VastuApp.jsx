@@ -170,7 +170,7 @@ export default function VastuApp() {
 function arrowStyle(side) {
   return {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)', [side]: '-4px',
-    width: '32px', height: '32px', borderRadius: '999px', background: '#ffffff',
+    width: '32px', height: '32px', borderRadius: '999px', background: 'var(--kb-card)',
     border: '1px solid var(--border-soft)', color: 'var(--orange-dark)', display: 'flex', alignItems: 'center',
     justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(90,31,179,0.08)',
     fontSize: '16px', zIndex: 2,
@@ -191,7 +191,7 @@ function Shell({ lang, setLang, children }) {
           </h2>
           <p style={{ margin: 0, fontSize: '11px', color: 'var(--ink-faint)' }}>{t(lang, 'brandSub')}</p>
         </div>
-        <div style={{ display: 'flex', gap: '3px', background: '#ffffff', borderRadius: '999px', padding: '3px', border: '1px solid var(--border-soft)' }}>
+        <div style={{ display: 'flex', gap: '3px', background: 'var(--kb-card)', borderRadius: '999px', padding: '3px', border: '1px solid var(--border-soft)' }}>
           {Object.keys(LANGS).map((code) => (
             <button
               key={code}
@@ -220,7 +220,7 @@ function CategoryChip({ label, active, onClick }) {
       style={{
         flexShrink: 0, padding: '7px 13px', borderRadius: '999px', fontSize: '12px',
         fontWeight: active ? 700 : 500, whiteSpace: 'nowrap', cursor: 'pointer',
-        background: active ? BRAND.light : '#ffffff',
+        background: active ? BRAND.light : 'var(--kb-card)',
         border: active ? `1px solid ${BRAND.primary}` : '1px solid var(--border-soft)',
         color: active ? BRAND.dark : 'var(--ink-soft)', fontFamily: 'Inter, sans-serif',
       }}

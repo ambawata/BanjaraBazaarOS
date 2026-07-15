@@ -25,6 +25,26 @@
      an accent-colored shape or a floor-plan image, not app chrome. */
   --marker-white: #fff;
 
+  /* Vastu KB UI locked palette (ProductIcon/DirectionPills/VastuApp/
+     ShopPanel/VastuCard) — per .claude/skills/vastu-griha-design, this
+     screen is authored against ONE fixed light palette, not the app's
+     dark/light toggle (several of these values are identical to the
+     light-mode --orange-dark/--orange-light/--ink-soft below, but kept
+     as separate invariant tokens rather than pointed at those reactive
+     ones, since swapping would make the KB screen dark-mode-react for
+     the first time — a real behavior change, not just tokenization).
+     Flagging for a future decision, not deciding it here. */
+  --kb-card: #ffffff;
+  --kb-border: #efe3d0;
+  --kb-heading: #c96f24;
+  --kb-title: #2b2010;
+  --kb-muted: #8a7a5c;
+  --kb-tint-bg: #f1ece0;
+  --kb-accent-bg: #fbe6d0;
+  --kb-avoid-bg: #fbeaea;
+  --kb-avoid-border: #e27c7c;
+  --kb-star: #e0a83c;
+
   /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
   --bg: #171310;
   --bg2: #201a15;

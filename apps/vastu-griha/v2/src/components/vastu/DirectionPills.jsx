@@ -30,7 +30,7 @@ export default function DirectionPills({ best = [], avoid = [], fallback = [], a
         const isActive = activeDirection === dir
         const interactive = typeof onSelect === 'function'
 
-        let background = '#ffffff'
+        let background = 'var(--kb-card)'
         let border = '1px solid var(--border-soft)'
         let color = 'var(--ink-soft)'
         if (isBest) {
@@ -38,8 +38,8 @@ export default function DirectionPills({ best = [], avoid = [], fallback = [], a
           border = '1px solid var(--orange)'
           color = '#ffffff'
         } else if (isAvoid) {
-          background = '#FBEAEA'
-          border = '1px solid #E27C7C'
+          background = 'var(--kb-avoid-bg)'
+          border = '1px solid var(--kb-avoid-border)'
           color = 'var(--danger)'
         } else if (isFallback) {
           background = 'var(--orange-light)'
