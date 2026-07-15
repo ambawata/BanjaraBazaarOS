@@ -23,6 +23,8 @@ export default function PlannerWorkspace() {
     setScreenState,
     activeTab,
     setActiveTab,
+    renderMode,
+    setRenderMode,
     showAcharyaModal,
     setShowAcharyaModal,
     isMobile,
@@ -92,6 +94,19 @@ export default function PlannerWorkspace() {
   const panRef = React.useRef(null)
   const rotRef = React.useRef(null)
   const pinchRef = React.useRef(null)
+
+  // Calibrate Sketch's <Canvas /> should read like the Plan Editor's black &
+  // white contractor drawing, not the day-to-day pastel colorful mode — but
+  // renderMode is a single global toggle in useUiStore, and Canvas.jsx is
+  // currently only ever mounted on this screen. Scope the override to this
+  // tab only and restore 'colorful' (the app's only other value, and its
+  // documented default) on the way out, so a future second use of <Canvas />
+  // elsewhere doesn't silently inherit blueprint mode from here.
+  React.useEffect(() => {
+    if (activeTab !== 'upload') return
+    setRenderMode('blueprint')
+    return () => setRenderMode('colorful')
+  }, [activeTab])
 
   const _angleBetween = (cx, cy, x, y) => Math.atan2(y - cy, x - cx) * (180 / Math.PI)
   const _touchDist = (t1, t2) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)

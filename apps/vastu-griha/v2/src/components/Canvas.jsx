@@ -894,6 +894,20 @@ export default function Canvas() {
               always-rectangular) dimension overlay rather than draw wrong
               numbers around a shape that no longer matches them. */}
           {!hasCustomBoundary && renderDimensionLines()}
+
+          {/* Compass rose — top-right of the plot bounding box, purely
+              decorative (matches the Plan Editor / vastu-studio-v6.html
+              reference look). Always points up: this app has no
+              canvas-north-rotation setting — north is fixed to the top
+              edge everywhere else (see getZoneCode's row 0 = N above), so
+              there's no live direction value to drive a rotating needle. */}
+          <g transform={`translate(${DIM_MARGIN + zoomedDims.w - 30}, ${DIM_MARGIN + 30})`}>
+            <circle cx="0" cy="0" r="18" fill={isBlueprint ? '#fff' : 'var(--card)'} stroke={isBlueprint ? '#000' : 'var(--text)'} strokeWidth="1.4" />
+            <circle cx="0" cy="0" r="13" fill="none" stroke={isBlueprint ? '#000' : 'var(--text)'} strokeWidth="0.5" strokeDasharray="2 3" />
+            <path d="M0,-12 L3.5,3 L0,1.2 L-3.5,3 Z" fill="var(--danger)" />
+            <path d="M0,12 L3.5,-3 L0,-1.2 L-3.5,-3 Z" fill={isBlueprint ? '#000' : 'var(--text)'} fillOpacity="0.26" />
+            <text x="0" y="-22" textAnchor="middle" style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: '9px' }} fill="var(--danger)">N</text>
+          </g>
         </svg>
         <div
           className={`plot-wrapper ${showNormalGrid ? 'show-normal-grid' : ''}`}
@@ -1161,13 +1175,13 @@ export default function Canvas() {
                       line at the hinge, plus a quarter-circle swing arc to
                       the fully-open position — the same convention used on
                       real blueprints (matches the reference style Vinod
-                      pointed to). Solid ink-black lines, not a colored or
-                      dashed decoration. */}
+                      pointed to). Solid ink-black door leaf; the swing arc
+                      itself is dashed, matching the Plan Editor reference. */}
                   {room.type === 'door' && (
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                       <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="2" />
                       <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="2" />
-                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.2" />
+                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.2" strokeDasharray="3 3" />
                     </svg>
                   )}
                   {/* Main entrance — same swing-arc convention as a room
@@ -1179,7 +1193,7 @@ export default function Canvas() {
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                       <line x1="0" y1="95" x2="100" y2="95" stroke="var(--text)" strokeWidth="3" />
                       <line x1="0" y1="95" x2="0" y2="5" stroke="var(--text)" strokeWidth="3" />
-                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.5" />
+                      <path d="M 0 5 A 90 90 0 0 1 90 95" fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="3 3" />
                       <path d="M 30 78 L 55 78 L 55 68 L 70 85 L 55 102 L 55 92 L 30 92 Z" fill="var(--text)" transform="translate(0,-15)" />
                     </svg>
                   )}
