@@ -570,4 +570,26 @@ return function (Router $r): void {
             return \Backend\Helpers\JsonResponse::error('vastu_plot_fetch_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    // ---- Vastu Verdict Layer --------------------------------------------
+    // RAG consumer layer on top of the geometry engine (above) and the
+    // Vastu Knowledge Engine (vastu_kb_* tables) — see
+    // backend/services/VastuVerdictService.php for the full matching
+    // design and the schema-inspection trail it was built against. This
+    // endpoint never modifies geometry or KB data; read-only aggregation.
+    $r->get('/api/v1/vastu-geometry/plots/{id}/verdicts', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuVerdictService();
+            $result = $service->getVerdicts($plotId);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            return \Backend\Helpers\JsonResponse::error('vastu_verdict_fetch_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
 };

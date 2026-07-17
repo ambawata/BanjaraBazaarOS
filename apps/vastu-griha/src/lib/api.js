@@ -52,3 +52,11 @@ export const vastuGeometryApi = {
   calibrate: (plotId, payload) => request('POST', `/api/v1/vastu-geometry/plots/${plotId}/calibrate`, payload),
   getFull: (plotId) => request('GET', `/api/v1/vastu-geometry/plots/${plotId}/full`),
 }
+
+// Verdict Layer — RAG consumer on top of geometry + the Vastu Knowledge
+// Engine (backend/services/VastuVerdictService.php). Kept as a separate
+// export rather than folded into vastuGeometryApi so the geometry/verdict
+// separation (spec Section 10) is visible here too, not just server-side.
+export const vastuVerdictApi = {
+  getVerdicts: (plotId) => request('GET', `/api/v1/vastu-geometry/plots/${plotId}/verdicts`),
+}

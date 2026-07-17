@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { AMBNIWAS_FIXTURE } from '../data/ambniwasFixture'
 import PlotSetupPanel from '../components/PlotSetupPanel_v1_20260717'
@@ -82,9 +83,21 @@ export default function GeometryToolPage() {
                 {' '}{geometry.plot.confidence_tier}
               </p>
             </div>
-            <button onClick={reset} className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2">
-              Start a new plot
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Pure navigation link, no verdict content on this page —
+                  spec Section 10 keeps this tool verdict-free; the actual
+                  shubh/ashubh/severity/remedy content lives only on
+                  /vastu-griha/verdict-report. */}
+              <Link
+                to={`/vastu-griha/verdict-report?plot_id=${geometry.plot.id}`}
+                className="px-3 py-1.5 rounded-lg bg-brand-gradient text-white text-xs font-medium"
+              >
+                View Verdict Report
+              </Link>
+              <button onClick={reset} className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2">
+                Start a new plot
+              </button>
+            </div>
           </div>
 
           <FloorPlanCanvas />
