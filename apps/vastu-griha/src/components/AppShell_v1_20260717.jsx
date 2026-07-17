@@ -1,29 +1,44 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar_v1_20260717'
 import Toast from './Toast'
 import GeometryToolPage from '../pages/GeometryToolPage_v1_20260717'
 import VerdictReportPage from '../pages/VerdictReportPage'
+import MyHomeWizardPage from '../pages/MyHomeWizardPage'
 
 const titles = {
   '/vastu-griha/geometry-tool': 'Plot Geometry & True North Calibration',
   '/vastu-griha/verdict-report': 'Vastu Verdict Report',
+  '/vastu-griha/my-home': 'Mera Ghar',
 }
 
 export default function AppShell() {
   const { pathname } = useLocation()
+  // My Home wizard needs full-bleed space (the Leaflet map in particular)
+  // — conditional, so every other route's padding is untouched.
+  const isFullBleed = pathname === '/vastu-griha/my-home'
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex h-full bg-bg">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex flex-col flex-1 min-w-0">
-        <header className="h-16 bg-surface border-b border-surface3 flex items-center px-6 shrink-0">
+        <header className="h-16 bg-surface border-b border-surface3 flex items-center gap-3 px-4 md:px-6 shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Menu"
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-ink1 text-xl hover:bg-surface2"
+          >
+            ☰
+          </button>
           <h1 className="text-ink1 font-semibold text-base">{titles[pathname] || 'Vastu Griha'}</h1>
         </header>
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className={`flex-1 overflow-y-auto ${isFullBleed ? '' : 'p-6'}`}>
           <Routes>
             <Route path="/" element={<Navigate to="/vastu-griha/geometry-tool" replace />} />
             <Route path="/vastu-griha/geometry-tool" element={<GeometryToolPage />} />
             <Route path="/vastu-griha/verdict-report" element={<VerdictReportPage />} />
+            <Route path="/vastu-griha/my-home" element={<MyHomeWizardPage />} />
           </Routes>
         </main>
       </div>

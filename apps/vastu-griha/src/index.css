@@ -11,3 +11,29 @@
   ::-webkit-scrollbar-thumb { background: #E4DEF2; border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #5A1FB3; }
 }
+
+/* "My Home" wizard (consumer onboarding) — first-tap animated hint dot on
+   the Leaflet map, and the number labels on traced corner markers. Plain
+   CSS (not Tailwind utilities) since these target Leaflet-generated DOM
+   nodes that Tailwind's content scanner doesn't see. */
+.onboarding-pulse-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5A1FB3;
+  box-shadow: 0 0 0 0 rgba(90, 31, 179, 0.6);
+  animation: onboarding-pulse 1.5s infinite;
+}
+@keyframes onboarding-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(90, 31, 179, 0.6); }
+  70%  { box-shadow: 0 0 0 20px rgba(90, 31, 179, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(90, 31, 179, 0); }
+}
+.onboarding-corner-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+}

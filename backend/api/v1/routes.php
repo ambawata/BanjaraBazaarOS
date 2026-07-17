@@ -592,4 +592,47 @@ return function (Router $r): void {
             return \Backend\Helpers\JsonResponse::error('vastu_verdict_fetch_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    // ---- Consumer "My Home" onboarding wizard --------------------------
+    // Thin wrapper endpoints only — see
+    // backend/services/VastuMapOnboardingService.php. Delegates every
+    // actual computation to the existing, untouched VastuGeometryService /
+    // VastuGeometryMath / VastuVerdictMatcher. Same auth convention as the
+    // rest of this module (any authenticated user, no dedicated role yet).
+    $r->post('/api/v1/vastu-geometry/plots/from-map', function (Request $request): Response {
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+
+        try {
+            $service = new \Backend\Services\VastuMapOnboardingService();
+            $result = $service->createPlotFromMap($userId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_map_plot_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->get('/api/v1/vastu-geometry/plots/{id}/zone-grid', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuMapOnboardingService();
+            $result = $service->getZoneGrid($plotId);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            return \Backend\Helpers\JsonResponse::error('vastu_zone_grid_fetch_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
 };
