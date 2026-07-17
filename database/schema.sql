@@ -338,6 +338,124 @@ CREATE TABLE IF NOT EXISTS `product_audit_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
+-- Vastu Griha — Section: Plot Geometry & True North Calibration (geometry layer)
+--
+-- Additive module, independent of the Phase 1-5 commerce roadmap above.
+-- Implements the entities from docs/VastuGriha_Geometry_Specification_v0.1.md
+-- Section 8 (Data Model Quick Reference). Geometry only — no Vastu rule,
+-- deity-mapping, verdict, or remedy tables here (spec Section 10).
+--
+-- `created_by` is added on `vastu_plots` beyond the spec's literal field
+-- list: every other authenticated/owned resource in this schema (e.g.
+-- `settings.updated_by`) carries an owning/acting user reference, and these
+-- endpoints sit behind JWT auth, so plots need the same for basic
+-- multi-tenant scoping. `created_at` is likewise added to every child table
+-- even though the task's table list only spells it out for `vastu_plots`
+-- and `vastu_calibrations` — this repo's own schema convention (see header
+-- comment) requires created_at on every entity table for operability, and
+-- adding it is additive/non-breaking. No other fields beyond the given
+-- lists were introduced.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS `vastu_plots` (
+  `id`                     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name`                   VARCHAR(191)    NOT NULL,
+  `boundary_vertices`      JSON            NOT NULL,          -- [{x,y}, ...] in local planar feet (spec 0.1/2)
+  `centroid_x`             DECIMAL(12,4)   NOT NULL DEFAULT 0,
+  `centroid_y`             DECIMAL(12,4)   NOT NULL DEFAULT 0,
+  `true_north_rotation_r`  DECIMAL(7,4)    NOT NULL DEFAULT 0, -- signed degrees, spec Section 1
+  `confidence_tier`        ENUM('tier1_survey','tier2_satellite','tier3_compass') NOT NULL,
+  `created_by`             BIGINT UNSIGNED NULL,
+  `created_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vastu_plots_created_by` (`created_by`),
+  CONSTRAINT `fk_vastu_plots_created_by` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vastu_walls` (
+  `id`                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `plot_id`                BIGINT UNSIGNED NOT NULL,
+  `corner_start_x`         DECIMAL(12,4)   NOT NULL,
+  `corner_start_y`         DECIMAL(12,4)   NOT NULL,
+  `corner_end_x`           DECIMAL(12,4)   NOT NULL,
+  `corner_end_y`           DECIMAL(12,4)   NOT NULL,
+  `length_ft`              DECIMAL(10,4)   NOT NULL,
+  `facing_bearing_true`    DECIMAL(7,4)    NOT NULL,          -- true bearing, spec Section 3
+  `created_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vastu_walls_plot_id` (`plot_id`),
+  CONSTRAINT `fk_vastu_walls_plot_id` FOREIGN KEY (`plot_id`) REFERENCES `vastu_plots`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vastu_padas` (
+  `id`                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `wall_id`                BIGINT UNSIGNED NOT NULL,
+  `pada_index`             TINYINT UNSIGNED NOT NULL,
+  `start_ft`               DECIMAL(10,4)   NOT NULL,
+  `end_ft`                 DECIMAL(10,4)   NOT NULL,
+  `midpoint_x`             DECIMAL(12,4)   NOT NULL,
+  `midpoint_y`             DECIMAL(12,4)   NOT NULL,
+  `bearing_from_centroid`  DECIMAL(7,4)    NOT NULL,          -- plan bearing (pre true-north correction)
+  `zone_16`                VARCHAR(8)      NOT NULL,
+  `zone_32`                VARCHAR(8)      NOT NULL,
+  `created_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_vastu_padas_wall_index` (`wall_id`, `pada_index`),
+  KEY `idx_vastu_padas_wall_id` (`wall_id`),
+  CONSTRAINT `fk_vastu_padas_wall_id` FOREIGN KEY (`wall_id`) REFERENCES `vastu_walls`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vastu_rooms` (
+  `id`                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `plot_id`                BIGINT UNSIGNED NOT NULL,
+  `name`                   VARCHAR(191)    NOT NULL,
+  `polygon_vertices`       JSON            NOT NULL,          -- [{x,y}, ...] in local planar feet (spec 5)
+  `centroid_x`             DECIMAL(12,4)   NOT NULL,
+  `centroid_y`             DECIMAL(12,4)   NOT NULL,
+  `bearing_from_centroid`  DECIMAL(7,4)    NOT NULL,          -- plan bearing (pre true-north correction)
+  `zone_16`                VARCHAR(8)      NOT NULL,
+  `zone_32`                VARCHAR(8)      NOT NULL,
+  `created_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vastu_rooms_plot_id` (`plot_id`),
+  CONSTRAINT `fk_vastu_rooms_plot_id` FOREIGN KEY (`plot_id`) REFERENCES `vastu_plots`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vastu_doors` (
+  `id`                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `wall_id`                BIGINT UNSIGNED NOT NULL,
+  `position_x`             DECIMAL(12,4)   NOT NULL,
+  `position_y`             DECIMAL(12,4)   NOT NULL,
+  `pada_id`                BIGINT UNSIGNED NULL,
+  `spans_pada_ids`         JSON            NULL,              -- [pada_id, pada_id] when spanning a boundary (spec 6.4)
+  `bearing_from_centroid`  DECIMAL(7,4)    NOT NULL,          -- plan bearing (pre true-north correction)
+  `zone_16`                VARCHAR(8)      NOT NULL,
+  `zone_32`                VARCHAR(8)      NOT NULL,
+  `created_at`             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vastu_doors_wall_id` (`wall_id`),
+  KEY `idx_vastu_doors_pada_id` (`pada_id`),
+  CONSTRAINT `fk_vastu_doors_wall_id` FOREIGN KEY (`wall_id`) REFERENCES `vastu_walls`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_vastu_doors_pada_id` FOREIGN KEY (`pada_id`) REFERENCES `vastu_padas`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `vastu_calibrations` (
+  `id`                     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `plot_id`                BIGINT UNSIGNED NOT NULL,
+  `reference_wall_id`      BIGINT UNSIGNED NOT NULL,
+  `raw_reading_degrees`    DECIMAL(7,4)    NOT NULL,
+  `true_reading_degrees`   DECIMAL(7,4)    NOT NULL,
+  `offset_degrees`         DECIMAL(7,4)    NOT NULL,
+  `calibrated_at`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vastu_calibrations_plot_id` (`plot_id`),
+  KEY `idx_vastu_calibrations_reference_wall_id` (`reference_wall_id`),
+  CONSTRAINT `fk_vastu_calibrations_plot_id` FOREIGN KEY (`plot_id`) REFERENCES `vastu_plots`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_vastu_calibrations_reference_wall_id` FOREIGN KEY (`reference_wall_id`) REFERENCES `vastu_walls`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
 -- Later phases (placeholders only — do not implement until scheduled)
 -- =============================================================================
 -- TODO(phase-3): categories, product_variants

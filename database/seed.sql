@@ -134,3 +134,62 @@ ON DUPLICATE KEY UPDATE
   `value_type`  = VALUES(`value_type`),
   `group`       = VALUES(`group`),
   `is_public`   = VALUES(`is_public`);
+
+-- =============================================================================
+-- 6. Vastu Griha — Plot Geometry & True North Calibration settings
+--    Business-rule values (pada count, boundary/cross-check tolerances) live
+--    here rather than as PHP magic numbers, per the existing
+--    "business rules are database-driven" convention (see SettingsService).
+--    DECIMAL degree values are stored as value_type='string' and cast to
+--    float in code — the `settings.value_type` enum has no float variant.
+-- =============================================================================
+INSERT INTO `settings` (`key`, `value`, `value_type`, `group`, `is_public`, `description`) VALUES
+  ('vastu_geometry.pada_count',                        '9',   'int',    'vastu_geometry', 1, 'Padas per wall (classical 9x9 Vastu Purusha Mandala).'),
+  ('vastu_geometry.boundary_tolerance_degrees',         '0.5', 'string', 'vastu_geometry', 1, 'Sector-edge proximity, in degrees, that flags a bearing as a boundary_case (spec Section 3).'),
+  ('vastu_geometry.calibration_cross_check_tolerance_degrees', '2.0', 'string', 'vastu_geometry', 1, 'Max allowed deviation, in degrees, for a calibration second-wall cross-check to pass.')
+ON DUPLICATE KEY UPDATE
+  `description` = VALUES(`description`),
+  `value_type`  = VALUES(`value_type`),
+  `group`       = VALUES(`group`),
+  `is_public`   = VALUES(`is_public`);
+
+-- =============================================================================
+-- 7. Vastu Griha — Built-in test fixture (AmbNiwas)
+--
+--    Tier 2 confidence (satellite pixel-bearing measurement, cross-validated
+--    across two independent screenshots per spec Section 1) — NOT Tier 1
+--    land-survey ground truth. Labeled as such via confidence_tier below;
+--    do not treat this fixture as verified ground truth elsewhere.
+--
+--    Boundary vertices form a 200ft x 200ft square centered on the origin,
+--    chosen so the shoelace centroid is exactly (0,0) by hand-verifiable
+--    symmetry, which keeps this fixture auditable without running code.
+--    The front/gate wall is the south edge; its plan bearing (bearing from
+--    centroid to wall midpoint, before true-north correction) is exactly
+--    180.0 deg (due south) by the same symmetry, so:
+--      true_bearing = plan_bearing + R = 180.0 + 23.8 = 203.8 (SSW)
+--    matching the validated AmbNiwas front-wall reading. See
+--    scripts/test-vastu-geometry.php for the automated self-check that
+--    reproduces this number through the actual VastuGeometryMath pipeline.
+-- =============================================================================
+INSERT INTO `vastu_plots` (`name`, `boundary_vertices`, `centroid_x`, `centroid_y`, `true_north_rotation_r`, `confidence_tier`)
+SELECT
+  'AmbNiwas (fixture — Tier 2 satellite, cross-validated)',
+  JSON_ARRAY(
+    JSON_OBJECT('x', -100, 'y', -100),
+    JSON_OBJECT('x',  100, 'y', -100),
+    JSON_OBJECT('x',  100, 'y',  100),
+    JSON_OBJECT('x', -100, 'y',  100)
+  ),
+  0, 0, 23.8, 'tier2_satellite'
+WHERE NOT EXISTS (
+  SELECT 1 FROM `vastu_plots` WHERE `name` = 'AmbNiwas (fixture — Tier 2 satellite, cross-validated)'
+);
+
+INSERT INTO `vastu_walls` (`plot_id`, `corner_start_x`, `corner_start_y`, `corner_end_x`, `corner_end_y`, `length_ft`, `facing_bearing_true`)
+SELECT p.`id`, -20, -100, 20, -100, 40.0, 203.8
+FROM `vastu_plots` p
+WHERE p.`name` = 'AmbNiwas (fixture — Tier 2 satellite, cross-validated)'
+  AND NOT EXISTS (
+    SELECT 1 FROM `vastu_walls` w WHERE w.`plot_id` = p.`id` AND w.`facing_bearing_true` = 203.8
+  );
