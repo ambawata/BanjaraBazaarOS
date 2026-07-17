@@ -2,9 +2,11 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar_v1_20260717'
 import Toast from './Toast'
 import GeometryToolPage from '../pages/GeometryToolPage_v1_20260717'
+import VerdictReportPage from '../pages/VerdictReportPage'
 
 const titles = {
   '/vastu-griha/geometry-tool': 'Plot Geometry & True North Calibration',
+  '/vastu-griha/verdict-report': 'Vastu Verdict Report',
 }
 
 export default function AppShell() {
@@ -21,6 +23,7 @@ export default function AppShell() {
           <Routes>
             <Route path="/" element={<Navigate to="/vastu-griha/geometry-tool" replace />} />
             <Route path="/vastu-griha/geometry-tool" element={<GeometryToolPage />} />
+            <Route path="/vastu-griha/verdict-report" element={<VerdictReportPage />} />
           </Routes>
         </main>
       </div>
