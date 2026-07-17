@@ -1,40 +1,31 @@
+import { colors, backgroundImage, fontFamily } from '../../shared/ui/tokens.js'
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  // shared/ui/**/*.jsx added — REAL BUG FOUND DURING TESTING: without
+  // this, Tailwind's JIT content scanner never sees the shared Sidebar/
+  // AppShell source files at all (they live outside this app's own src/),
+  // so classes used ONLY there (e.g. the arbitrary w-[70px]/w-[250px]
+  // rail-width values) were silently never generated — the sidebar
+  // rendered with no width utility applied at all and fell back to
+  // content-based auto-sizing, which is what "confirm labels genuinely
+  // disappear" testing caught (computed width was neither 70px nor
+  // 250px). Any future shared/ui consumer app needs this same glob
+  // addition in its own tailwind.config.js — documented here and in
+  // shared/ui/tokens.js.
+  content: ['./index.html', './src/**/*.{js,jsx}', '../../shared/ui/**/*.{js,jsx}'],
   theme: {
     extend: {
-      colors: {
-        // Vastu Griha brand system: white/cream + purple, distinct from the
-        // dark-slate/violet theme used by admin-panel and vendor-portal —
-        // this is a new, standalone app, per the task's requested palette
-        // (#5A1FB3 primary / #5D35AE gradient end, white/cream background).
-        bg:              '#FBF8F4',
-        surface:         '#FFFFFF',
-        surface2:        '#F5F1FB',
-        surface3:        '#E4DEF2',
-        ink1:            '#241344',
-        ink2:            '#5C567A',
-        ink3:            '#9891B3',
-        brand:           '#5A1FB3',
-        brandGradientEnd:'#5D35AE',
-        brandDim:        '#EFE7FB',
-        green:           '#16A34A',
-        greenDim:        '#E7F7EE',
-        greenMuted:      '#166534',
-        amber:           '#D97706',
-        amberDim:        '#FDF3E3',
-        amberMuted:      '#92400E',
-        red:             '#DC2626',
-        redDim:          '#FCEAEA',
-        redMuted:        '#991B1B',
-      },
-      backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #5A1FB3 0%, #5D35AE 100%)',
-      },
-      fontFamily: {
-        ui:   ['DM Sans', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Mono', 'monospace'],
-      },
+      // MIGRATED to shared/ui/tokens.js — this file used to hardcode
+      // these hex values directly (see git history). vastu-griha's own
+      // config was the CANONICAL SOURCE that tokens.js was extracted
+      // from verbatim (zero value changes), and now re-imports them
+      // rather than keeping a second copy. See tokens.js's own docblock
+      // for the migration pattern future apps (admin-panel, vendor-portal
+      // — not touched by this change) should follow.
+      colors,
+      backgroundImage,
+      fontFamily,
     },
   },
   plugins: [],
