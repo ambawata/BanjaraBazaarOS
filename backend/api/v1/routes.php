@@ -434,4 +434,140 @@ return function (Router $r): void {
             return \Backend\Helpers\JsonResponse::error('product_list_failed', $e->getMessage(), $status);
         }
     }, [new \Backend\Middleware\AuthMiddleware(require: true), new \Backend\Middleware\RoleMiddleware(['admin', 'master_admin'])]);
+
+    // ---- Vastu Griha — Plot Geometry & True North Calibration (additive) ---
+    // Geometry layer only (docs/VastuGriha_Geometry_Specification_v0.1.md
+    // Section 10) — no Vastu verdicts/remedies are ever produced here.
+    // ASSUMPTION: gated by AuthMiddleware only (any authenticated user), no
+    // RoleMiddleware — the current role catalog (customer/vendor/staff/
+    // admin/master_admin) has no role specific to this module yet. Narrow
+    // to a dedicated role once product defines who may create plots.
+    $r->post('/api/v1/vastu-geometry/plots', function (Request $request): Response {
+        $auth = $request->attributes['auth'] ?? [];
+        $userId = isset($auth['user_id']) ? (int) $auth['user_id'] : null;
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->createPlot($userId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_plot_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->post('/api/v1/vastu-geometry/plots/{id}/walls', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->addWalls($plotId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_wall_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->post('/api/v1/vastu-geometry/plots/{id}/rooms', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->addRoom($plotId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_room_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->post('/api/v1/vastu-geometry/plots/{id}/doors', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->addDoor($plotId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result, 201);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_door_creation_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->post('/api/v1/vastu-geometry/plots/{id}/calibrate', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->calibrate($plotId, $request->json ?? []);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            $message = $e->getMessage();
+            if ($status === 422) {
+                $payload = json_decode($message, true);
+                if (is_array($payload) && isset($payload['errors'])) {
+                    return \Backend\Helpers\JsonResponse::validation($payload['errors']);
+                }
+            }
+            return \Backend\Helpers\JsonResponse::error('vastu_calibration_failed', $message, $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
+
+    $r->get('/api/v1/vastu-geometry/plots/{id}/full', function (Request $request, array $params): Response {
+        $plotId = (int) ($params['id'] ?? 0);
+        if ($plotId <= 0) {
+            return \Backend\Helpers\JsonResponse::validation(['id' => 'Plot id is required.']);
+        }
+
+        try {
+            $service = new \Backend\Services\VastuGeometryService();
+            $result = $service->getFullGeometry($plotId);
+            return \Backend\Helpers\JsonResponse::success($result);
+        } catch (\Throwable $e) {
+            $status = \Backend\Helpers\JsonResponse::statusFromThrowable($e, 400);
+            return \Backend\Helpers\JsonResponse::error('vastu_plot_fetch_failed', $e->getMessage(), $status);
+        }
+    }, [new \Backend\Middleware\AuthMiddleware(require: true)]);
 };
