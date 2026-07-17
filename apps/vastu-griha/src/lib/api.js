@@ -60,3 +60,11 @@ export const vastuGeometryApi = {
 export const vastuVerdictApi = {
   getVerdicts: (plotId) => request('GET', `/api/v1/vastu-geometry/plots/${plotId}/verdicts`),
 }
+
+// Consumer "My Home" onboarding wizard — thin endpoints backed by
+// backend/services/VastuMapOnboardingService.php, which delegates to the
+// same VastuGeometryService/Math used above rather than duplicating logic.
+export const vastuMapOnboardingApi = {
+  createPlotFromMap: (payload) => request('POST', '/api/v1/vastu-geometry/plots/from-map', payload),
+  getZoneGrid: (plotId) => request('GET', `/api/v1/vastu-geometry/plots/${plotId}/zone-grid`),
+}

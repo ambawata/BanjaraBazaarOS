@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom'
 // app, so the existing customer-facing Vastu Griha shopping pages (once
 // built) are entirely unaffected.
 const nav = [
+  { to: '/vastu-griha/my-home', label: 'Mera Ghar (Easy Mode)', icon: '🏠' },
   { to: '/vastu-griha/geometry-tool', label: 'Plot Geometry & Calibration', icon: '⧉' },
 ]
 
