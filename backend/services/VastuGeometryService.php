@@ -91,7 +91,7 @@ final class VastuGeometryService
             'created_by' => $userId,
         ]);
 
-        return $this->getPlotRow((int) $this->pdo->lastInsertId());
+        return $this->hydratePlot($this->getPlotRow((int) $this->pdo->lastInsertId()));
     }
 
     // ------------------------------------------------------------------
