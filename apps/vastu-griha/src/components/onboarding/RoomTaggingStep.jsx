@@ -82,19 +82,25 @@ export default function RoomTaggingStep({ plot, zoneGrid, onComplete, onSkip }) 
         <p className="text-ink3 text-sm">Tell us about your rooms (optional)</p>
       </div>
 
-      <div className="flex overflow-x-auto gap-2 pb-1 -mx-1 px-1">
+      {/* Grid, not a horizontally-scrolling row — a scrollable single row
+          silently clipped "Staircase" off-screen on narrow/mobile widths
+          with no visible affordance that more icons existed. A fixed
+          3-column grid guarantees all 6 room types are always visible
+          and reachable, at both mobile and desktop widths, with no
+          scroll interaction required. */}
+      <div className="grid grid-cols-3 gap-2">
         {ROOM_TYPES.map(rt => (
           <button
             key={rt.key}
             onClick={() => setSelectedRoomType(rt.key)}
-            className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border-2 text-xs font-medium ${
+            className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border-2 text-xs font-medium ${
               selectedRoomType === rt.key
                 ? 'border-brand bg-brandDim text-brand'
                 : 'border-surface3 bg-surface text-ink2'
             }`}
           >
             <span className="text-2xl">{rt.emoji}</span>
-            {rt.label}
+            <span className="text-center leading-tight">{rt.label}</span>
           </button>
         ))}
       </div>
