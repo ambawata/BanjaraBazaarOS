@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banjara Bazaar — Decor. Furnish. Elevate.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --yellow:#FFD939;--yellow-soft:#FFF4C2;--cream:#FFFBEE;--cream2:#FFF7DC;
+  --ink:#1C1A12;--ink2:#6B6650;--line:#F0E6C0;--white:#fff;
+  --green:#1DA851;--rad:16px;
+  --fd:'Sora',sans-serif;--fb:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.5;}
+img{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font-family:var(--fb);cursor:pointer;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px;}
+h2.sec{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:-.3px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;}
+.sec-head .see{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;}
+.sec-head .see:hover{color:var(--ink);}
+
+/* ===== HEADER ===== */
+#hdr{position:sticky;top:0;z-index:100;background:var(--cream);border-bottom:1px solid var(--line);}
+.hdr-in{display:flex;align-items:center;gap:18px;padding:12px 20px;max-width:1180px;margin:0 auto;}
+.logo{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.8px;line-height:.95;flex-shrink:0;}
+.logo em{font-style:normal;display:block;}
+.logo .bag{color:var(--yellow);-webkit-text-stroke:1.5px var(--ink);}
+.deliver{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;flex-shrink:0;}
+.deliver i{font-size:18px;color:var(--ink);}
+.deliver strong{color:var(--ink);display:block;font-size:13px;}
+.searchbar{flex:1;display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--line);border-radius:12px;padding:9px 14px;min-width:0;}
+.searchbar i{color:var(--ink2);font-size:17px;}
+.searchbar input{border:none;outline:none;flex:1;font-size:14px;font-family:var(--fb);background:transparent;min-width:0;}
+.hdr-ic{position:relative;width:40px;height:40px;border-radius:11px;border:1.5px solid var(--line);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;transition:all .15s;}
+.hdr-ic:hover{border-color:var(--yellow);background:var(--yellow-soft);}
+.hdr-ic .dot{position:absolute;top:-6px;right:-6px;background:var(--yellow);color:var(--ink);font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--cream);}
+.vendor-cta{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:0 14px;height:40px;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.vendor-cta:hover{border-color:var(--yellow);background:var(--yellow-soft);}
+.vendor-cta i{font-size:16px;}
+@media(max-width:960px){.vendor-cta span{display:none;}.vendor-cta{padding:0 12px;}}
+@media(max-width:640px){.vendor-cta{order:5;width:100%;justify-content:center;margin-top:8px;}}
+
+/* ===== HERO ===== */
+#hero{background:linear-gradient(160deg,var(--yellow-soft),var(--cream2) 70%);border-bottom:1px solid var(--line);overflow:hidden;position:relative;}
+.hero-in{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:52px 20px;max-width:1180px;margin:0 auto;}
+.hero-txt h1{font-family:var(--fd);font-size:clamp(34px,4.6vw,54px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;}
+.hero-txt h1 span{background:var(--yellow);padding:0 10px;border-radius:10px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.hero-txt p{margin:16px 0 26px;font-size:16px;color:var(--ink2);max-width:420px;}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--yellow);border:none;border-radius:999px;padding:14px 28px;font-family:var(--fd);font-weight:700;font-size:15px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 0 rgba(28,26,18,.15);}
+.cta:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(28,26,18,.15);}
+.hero-trust{margin-top:18px;font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:6px;}
+.hero-art{position:relative;height:320px;}
+.hero-art svg{position:absolute;inset:0;width:100%;height:100%;}
+
+/* ===== CATEGORIES ===== */
+.cats{display:grid;grid-template-columns:repeat(8,1fr);gap:14px;padding:30px 0 6px;}
+.cat{background:var(--white);border:1.5px solid var(--line);border-radius:var(--rad);padding:16px 8px 12px;text-align:center;cursor:pointer;transition:all .15s;}
+.cat:hover,.cat.on{border-color:var(--yellow);background:var(--yellow-soft);transform:translateY(-2px);}
+.cat i{font-size:26px;display:block;margin-bottom:8px;}
+.cat span{font-size:12px;font-weight:600;display:block;line-height:1.25;}
+
+/* ===== PRODUCTS ===== */
+#shop{padding:34px 0 10px;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.card{background:var(--white);border:1.5px solid var(--line);border-radius:var(--rad);overflow:hidden;transition:all .15s;position:relative;display:flex;flex-direction:column;}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(180,150,30,.14);border-color:var(--yellow);}
+.thumb{aspect-ratio:1/1;background:var(--cream2);display:flex;align-items:center;justify-content:center;position:relative;}
+.thumb svg{width:70%;height:70%;}
+.wish{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:var(--white);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink2);transition:all .15s;}
+.wish.on{color:#E23D3D;border-color:#E23D3D;background:#FFF0F0;}
+.off{position:absolute;top:10px;left:10px;background:var(--yellow);font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;}
+.cbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
+.cname{font-weight:600;font-size:14px;line-height:1.3;}
+.cby{font-size:12px;color:var(--ink2);}
+.crow{display:flex;align-items:center;gap:8px;margin-top:2px;}
+.cprice{font-family:var(--fd);font-weight:700;font-size:16px;}
+.cmrp{font-size:12px;color:var(--ink2);text-decoration:line-through;}
+.crate{margin-left:auto;font-size:12px;font-weight:600;background:var(--green);color:#fff;padding:2px 7px;border-radius:6px;display:flex;align-items:center;gap:3px;}
+.cbtns{display:flex;gap:8px;margin-top:10px;}
+.bwa,.bcart{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;padding:9px 4px;font-size:12.5px;font-weight:600;border:1.5px solid var(--line);background:var(--white);transition:all .15s;}
+.bwa{color:var(--green);border-color:#CBE8D4;}
+.bwa:hover{background:#EDFAF1;border-color:var(--green);}
+.bcart{background:var(--yellow);border-color:var(--yellow);}
+.bcart:hover{filter:brightness(.96);}
+
+/* ===== DELIVERY BANNER ===== */
+.dband{margin:34px 0;background:var(--yellow);border-radius:20px;padding:22px 28px;display:flex;align-items:center;gap:18px;overflow:hidden;position:relative;}
+.dband i{font-size:40px;}
+.dband h3{font-family:var(--fd);font-size:20px;font-weight:700;}
+.dband p{font-size:13.5px;color:rgba(28,26,18,.75);}
+
+/* ===== MINI APPS ===== */
+#apps{background:var(--ink);color:var(--cream);padding:48px 0 54px;margin-top:26px;}
+#apps h2.sec{color:var(--cream);}
+#apps .sec-sub{color:rgba(255,251,238,.65);font-size:14px;margin-top:-12px;margin-bottom:22px;max-width:520px;}
+.apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.app-card{background:rgba(255,251,238,.06);border:1.5px solid rgba(255,251,238,.14);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:all .18s;position:relative;overflow:hidden;}
+.app-card:hover{border-color:var(--yellow);transform:translateY(-3px);}
+.app-ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--yellow);color:var(--ink);}
+.app-card h3{font-family:var(--fd);font-size:18px;font-weight:700;}
+.app-card p{font-size:13px;color:rgba(255,251,238,.65);flex:1;}
+.app-tag{position:absolute;top:16px;right:16px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:4px 10px;border-radius:999px;}
+.tag-live{background:var(--green);color:#fff;}
+.tag-soon{background:rgba(255,251,238,.14);color:rgba(255,251,238,.7);border:1px solid rgba(255,251,238,.2);}
+.app-go{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--yellow);margin-top:4px;}
+.app-card.soon{opacity:.75;}
+.app-card.soon .app-ic{background:rgba(255,251,238,.12);color:rgba(255,251,238,.6);}
+
+/* ===== FOOTER ===== */
+#foot{border-top:1px solid var(--line);padding:34px 0 110px;background:var(--cream2);}
+.foot-in{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start;}
+.foot-in .logo{font-size:19px;}
+.foot-col{font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:7px;min-width:150px;}
+.foot-col strong{color:var(--ink);font-size:13px;margin-bottom:3px;}
+.foot-col a:hover{color:var(--ink);}
+.foot-note{width:100%;font-size:12px;color:var(--ink2);border-top:1px solid var(--line);padding-top:16px;margin-top:8px;}
+
+/* ===== MOBILE BOTTOM NAV ===== */
+#bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1.5px solid var(--line);z-index:120;padding:8px 6px calc(8px + env(safe-area-inset-bottom));}
+.bnav-in{display:flex;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--ink2);border:none;background:none;padding:4px 0;border-radius:10px;}
+.bn i{font-size:21px;}
+.bn.on{color:var(--ink);}
+.bn.on i{background:var(--yellow);border-radius:10px;padding:2px 12px;}
+
+/* toast */
+#toastw{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.toast{background:var(--ink);color:var(--cream);font-size:13px;font-weight:500;padding:10px 18px;border-radius:999px;animation:tup .2s ease;box-shadow:0 6px 20px rgba(0,0,0,.25);}
+@keyframes tup{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:960px){
+  .grid{grid-template-columns:repeat(3,1fr);}
+  .cats{grid-template-columns:repeat(4,1fr);}
+  .hero-in{grid-template-columns:1fr;padding:40px 20px;}
+  .hero-art{display:none;}
+  .apps-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:640px){
+  .hdr-in{flex-wrap:wrap;gap:10px;padding:10px 14px;}
+  .logo{font-size:19px;}
+  .deliver{order:3;width:100%;}
+  .searchbar{order:4;width:100%;flex:none;}
+  .hdr-ic{width:36px;height:36px;margin-left:auto;}
+  .hdr-ic + .hdr-ic{margin-left:0;}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .cbtns{flex-direction:column;}
+  .apps-grid{grid-template-columns:1fr;}
+  .dband{flex-direction:column;text-align:center;padding:20px;}
+  #bnav{display:block;}
+  h2.sec{font-size:20px;}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="hdr">
+  <div class="hdr-in">
+    <a class="logo" href="#">banjara<em>bazaar<span class="bag"> </span></em></a>
+    <div class="deliver"><i class="ti ti-map-pin"></i><span>Deliver to<strong>Gurgaon, Sector 58 ▾</strong></span></div>
+    <div class="searchbar"><i class="ti ti-search"></i><input id="q" placeholder="Search decor, furniture, lighting…" oninput="filterProducts()"></div>
+    <a href="https://banjarabazaar-vendor.vercel.app/?onboard=1" target="_blank" class="vendor-cta"><i class="ti ti-building-store"></i> <span>Become a Vendor</span></a>
+    <button class="hdr-ic" onclick="toast('2 new notifications')"><i class="ti ti-bell"></i><span class="dot">2</span></button>
+    <button class="hdr-ic" onclick="toast('Cart mein '+CART+' items hain')"><i class="ti ti-shopping-bag"></i><span class="dot" id="cartn">0</span></button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-in">
+    <div class="hero-txt">
+      <h1>Decor.<br>Furnish.<br><span>Elevate.</span></h1>
+      <p>Your one-stop marketplace for home decor, furniture, furnishings & more — from 400+ artisan shops of Banjara Bazaar, Gurgaon.</p>
+      <button class="cta" onclick="document.getElementById('shop').scrollIntoView()">Start Exploring <i class="ti ti-arrow-right"></i></button>
+      <div class="hero-trust"><i class="ti ti-heart-filled" style="color:#E23D3D"></i> Trusted by 10,000+ happy homes</div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 400 320" fill="none" stroke="#C9A93A" stroke-width="2.5" stroke-linecap="round">
+        <ellipse cx="210" cy="170" rx="130" ry="130" fill="#FFE989" stroke="none" opacity=".55"/>
+        <path d="M80 60 v55 M60 115 h40 M68 60 h24"/><path d="M64 60 q16 -18 32 0" fill="none"/>
+        <path d="M300 40 q-10 30 8 44 q20 -12 8 -44 z M308 84 v20"/>
+        <path d="M120 230 q0 -30 30 -30 h20 q30 0 30 30 v30 h-80 z M120 260 v22 M200 260 v22"/>
+        <path d="M280 190 l30 -34 l30 34 z M310 156 v-16 M296 224 h28 v-34"/>
+        <rect x="60" y="270" width="46" height="34" rx="4"/><path d="M83 270 v34"/>
+        <path d="M330 250 q-14 4 -14 20 t14 20 q14 -4 14 -20 t-14 -20 z M330 290 v18"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <!-- CATEGORIES -->
+  <div class="cats" id="cats">
+    <div class="cat on" data-c="" onclick="pickCat(this)"><i class="ti ti-layout-grid"></i><span>View All</span></div>
+    <div class="cat" data-c="Wall Decor" onclick="pickCat(this)"><i class="ti ti-frame"></i><span>Wall Decor</span></div>
+    <div class="cat" data-c="Lighting" onclick="pickCat(this)"><i class="ti ti-bulb"></i><span>Lighting</span></div>
+    <div class="cat" data-c="Furniture" onclick="pickCat(this)"><i class="ti ti-sofa"></i><span>Furniture</span></div>
+    <div class="cat" data-c="Furnishings" onclick="pickCat(this)"><i class="ti ti-armchair-2"></i><span>Furnishings</span></div>
+    <div class="cat" data-c="Home Decor" onclick="pickCat(this)"><i class="ti ti-plant"></i><span>Home Decor</span></div>
+    <div class="cat" data-c="Kitchen & Dining" onclick="pickCat(this)"><i class="ti ti-tools-kitchen-2"></i><span>Kitchen & Dining</span></div>
+    <div class="cat" data-c="Storage" onclick="pickCat(this)"><i class="ti ti-box"></i><span>Storage</span></div>
+  </div>
+
+  <!-- FEATURED -->
+  <section id="shop">
+    <div class="sec-head"><h2 class="sec">Featured for you</h2><span class="see" onclick="toast('Full catalog jald aa raha hai')">See All →</span></div>
+    <div class="grid" id="pgrid"></div>
+  </section>
+
+  <!-- DELIVERY BAND -->
+  <div class="dband">
+    <i class="ti ti-truck-delivery"></i>
+    <div><h3>Free delivery</h3><p>On all orders above ₹999 — Gurgaon & Delhi NCR</p></div>
+    <i class="ti ti-package" style="margin-left:auto;opacity:.5"></i>
+  </div>
+</main>
+
+<!-- MINI APPS HUB -->
+<section id="apps">
+  <div class="wrap">
+    <div class="sec-head"><h2 class="sec">Banjara Apps</h2></div>
+    <p class="sec-sub">Shopping se aage — smart tools jo aapke ghar aur business ko behtar banate hain. Sab ek hi platform par.</p>
+    <div class="apps-grid">
+      <div class="app-card" onclick="window.location.href='https://v2-one-ruby.vercel.app'">
+        <span class="app-tag tag-live">Live</span>
+        <div class="app-ic"><i class="ti ti-compass"></i></div>
+        <h3>Vastu Griha</h3>
+        <p>Ghar ka Vastu check karo — room placement, colors, directions ke verified answers, aur har solution ke saath sahi products.</p>
+        <span class="app-go">Open App <i class="ti ti-arrow-up-right"></i></span>
+      </div>
+      <div class="app-card soon">
+        <span class="app-tag tag-soon">Coming Soon</span>
+        <div class="app-ic"><i class="ti ti-building"></i></div>
+        <h3>Rent Pro</h3>
+        <p>Commercial property aur shops ka rent management — collections, ledger, reports. Property owners ke liye.</p>
+        <span class="app-go" style="color:rgba(255,251,238,.5)">Notify Me <i class="ti ti-bell"></i></span>
+      </div>
+      <div class="app-card soon">
+        <span class="app-tag tag-soon">In the Works</span>
+        <div class="app-ic"><i class="ti ti-sparkles"></i></div>
+        <h3>More Apps</h3>
+        <p>Naye tools bante ja rahe hain — interior ideas, artisan stories, aur bahut kuch. Yahin milenge.</p>
+        <span class="app-go" style="color:rgba(255,251,238,.5)">Stay Tuned</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="foot">
+  <div class="wrap foot-in">
+    <div><a class="logo" href="#">banjara<em>bazaar</em></a><p style="font-size:12.5px;color:var(--ink2);margin-top:8px;max-width:220px">400+ artisan shops. Sector 58, Gurgaon. Decor. Furnish. Elevate.</p></div>
+    <div class="foot-col"><strong>Shop</strong><a href="#cats">Categories</a><a href="#shop">Featured</a><a href="#" onclick="toast('Jald aa raha hai');return false">New Arrivals</a></div>
+    <div class="foot-col"><strong>Apps</strong><a href="#apps">Vastu Griha</a><a href="#apps">Rent Pro</a></div>
+    <div class="foot-col"><strong>Contact</strong><a href="https://wa.me/919891112223" target="_blank">WhatsApp Us</a><a href="https://instagram.com/banjarabazaar.in" target="_blank">Instagram @banjarabazaar.in</a></div>
+    <div class="foot-note">© 2026 Banjara Bazaar · Sector 58, Gurgaon · Made with ❤️ for beautiful homes</div>
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav id="bnav"><div class="bnav-in">
+  <button class="bn on" onclick="bnav(this);window.scrollTo({top:0})"><i class="ti ti-home"></i>Home</button>
+  <button class="bn" onclick="bnav(this);document.getElementById('cats').scrollIntoView()"><i class="ti ti-layout-grid"></i>Categories</button>
+  <button class="bn" onclick="bnav(this);toast('Wishlist jald aa rahi hai')"><i class="ti ti-heart"></i>Wishlist</button>
+  <button class="bn" onclick="bnav(this);document.getElementById('apps').scrollIntoView()"><i class="ti ti-apps"></i>Apps</button>
+  <button class="bn" onclick="bnav(this);toast('Account jald aa raha hai')"><i class="ti ti-user"></i>Account</button>
+</div></nav>
+
+<div id="toastw"></div>
+
+<script>
+/* Product art: simple line-art SVGs in brand style */
+const ART={
+lamp:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><path d="M60 10 v14"/><path d="M34 62 q0 -38 26 -38 t26 38 z" fill="#FFE58A"/><path d="M60 62 v18"/><path d="M46 92 h28"/><path d="M42 62 v6 M78 62 v6 M60 68 v4" opacity=".5"/></svg>`,
+chair:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><path d="M34 30 q26 -16 52 0 v34 h-52 z" fill="#FFE58A"/><path d="M34 64 h52 M38 64 v34 M82 64 v34 M34 80 h52" /><path d="M44 40 q16 -8 32 0 M44 50 q16 -8 32 0" opacity=".5"/></svg>`,
+macrame:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><path d="M30 24 h60"/><path d="M36 24 q24 26 48 0" fill="#FFE58A"/><path d="M40 40 v40 M50 46 v44 M60 48 v48 M70 46 v44 M80 40 v40" opacity=".7"/></svg>`,
+mirror:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><rect x="34" y="18" width="52" height="76" rx="26" fill="#FFE58A"/><rect x="42" y="26" width="36" height="60" rx="18" fill="#FFFBEE"/><path d="M52 96 v10 h16 v-10" opacity=".6"/></svg>`,
+cushion:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><path d="M28 36 q32 -14 64 0 q10 24 0 48 q-32 14 -64 0 q-10 -24 0 -48 z" fill="#FFE58A"/><path d="M40 48 l40 24 M80 48 l-40 24" opacity=".5"/></svg>`,
+pot:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><path d="M60 44 q-8 -26 8 -34 q14 10 -2 34 z M60 44 q8 -20 22 -18 q2 16 -20 22" fill="#FFE58A"/><path d="M40 52 h40 l-6 44 h-28 z"/><path d="M44 66 h32" opacity=".5"/></svg>`,
+shelf:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><rect x="30" y="20" width="60" height="80" rx="4" fill="#FFE58A"/><path d="M30 48 h60 M30 74 h60 M60 20 v80" opacity=".7"/></svg>`,
+plate:`<svg viewBox="0 0 120 120" fill="none" stroke="#B8912A" stroke-width="3" stroke-linecap="round"><circle cx="60" cy="60" r="38" fill="#FFE58A"/><circle cx="60" cy="60" r="22" fill="#FFFBEE"/><circle cx="60" cy="60" r="8" opacity=".5"/></svg>`};
+
+const PRODUCTS=[
+ {n:'Hanging Pendant Lamp – Rattan',by:'Boho Living',p:1299,m:1799,r:4.6,c:'Lighting',a:'lamp'},
+ {n:'Wooden Accent Chair – Teak',by:'The Wood Story',p:6499,m:8999,r:4.5,c:'Furniture',a:'chair'},
+ {n:'Macrame Wall Hanging',by:'Knotty Tales',p:899,m:1299,r:4.4,c:'Wall Decor',a:'macrame'},
+ {n:'Brass Jharokha Mirror',by:'Kalakriti Decor',p:2499,m:3499,r:4.7,c:'Wall Decor',a:'mirror'},
+ {n:'Bandhani Cushion Set (5)',by:'Desert Weaves',p:1650,m:2200,r:4.3,c:'Furnishings',a:'cushion'},
+ {n:'Ceramic Planter Duo',by:'Mitti Studio',p:749,m:999,r:4.5,c:'Home Decor',a:'pot'},
+ {n:'Sheesham Book Shelf',by:'The Wood Story',p:5899,m:7999,r:4.6,c:'Storage',a:'shelf'},
+ {n:'Handpainted Dinner Plates (6)',by:'Rangrez Craft',p:1899,m:2599,r:4.4,c:'Kitchen & Dining',a:'plate'},
+];
+let CART=0,CAT='',WISH=new Set();
+
+function cardHTML(p,i){
+ const off=Math.round((1-p.p/p.m)*100);
+ return `<div class="card">
+  <div class="thumb">${ART[p.a]}<span class="off">${off}% OFF</span>
+   <button class="wish ${WISH.has(i)?'on':''}" onclick="wish(${i},this)"><i class="ti ti-heart${WISH.has(i)?'-filled':''}"></i></button></div>
+  <div class="cbody">
+   <div class="cname">${p.n}</div><div class="cby">By ${p.by}</div>
+   <div class="crow"><span class="cprice">₹${p.p.toLocaleString('en-IN')}</span><span class="cmrp">₹${p.m.toLocaleString('en-IN')}</span><span class="crate">${p.r} <i class="ti ti-star-filled" style="font-size:10px"></i></span></div>
+   <div class="cbtns">
+    <a class="bwa" href="https://wa.me/919891112223?text=${encodeURIComponent('Hi! Mujhe yeh chahiye: '+p.n+' (₹'+p.p+')')}" target="_blank"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>
+    <button class="bcart" onclick="addCart('${p.n.replace(/'/g,"\\'")}')"><i class="ti ti-shopping-bag-plus"></i> Add</button>
+   </div></div></div>`;
+}
+function renderProducts(){
+ const q=(document.getElementById('q').value||'').toLowerCase();
+ const list=PRODUCTS.map((p,i)=>({p,i})).filter(({p})=>(!CAT||p.c===CAT)&&(!q||p.n.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)));
+ document.getElementById('pgrid').innerHTML=list.length?list.map(({p,i})=>cardHTML(p,i)).join(''):
+  `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink2)"><i class="ti ti-search-off" style="font-size:34px;display:block;margin-bottom:8px"></i>Kuch nahi mila — dusra search try karo.</div>`;
+}
+function filterProducts(){renderProducts();}
+function pickCat(el){document.querySelectorAll('.cat').forEach(c=>c.classList.remove('on'));el.classList.add('on');CAT=el.dataset.c;renderProducts();document.getElementById('shop').scrollIntoView({block:'start'});}
+function wish(i,btn){if(WISH.has(i)){WISH.delete(i);}else{WISH.add(i);toast('Wishlist mein add ho gaya ❤️');}renderProducts();}
+function addCart(name){CART++;document.getElementById('cartn').textContent=CART;toast(name+' cart mein add ho gaya');}
+function bnav(el){document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+function toast(msg){const w=document.getElementById('toastw');const t=document.createElement('div');t.className='toast';t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),2600);}
+renderProducts();
+</script>
+</body>
+</html>
