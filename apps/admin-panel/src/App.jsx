@@ -1,6 +1,8 @@
 import { useState, useEffect, createContext } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AppShell } from '@shared/ui'
+import { getToken, getAdminName, clearSession } from './lib/api'
+import Login from './pages/Login'
 import Dashboard from './screens/Dashboard'
 import ApprovalQueue from './screens/ApprovalQueue'
 import ActiveProducts from './screens/ActiveProducts'
@@ -155,6 +157,16 @@ export default function App() {
   const navigate = useNavigate()
   const [modal, setModal] = useState({ open: false, msg: '' })
   const [editModal, setEditModal] = useState({ open: false, data: {} })
+  // Real login gate — see Login.jsx's docblock for why this needed adding.
+  // `loggedIn` is a plain boolean re-derived from localStorage rather than
+  // storing the token itself in state, since nothing here needs the token
+  // value directly (lib/api.js's apiFetch reads it straight from
+  // localStorage on every request).
+  const [loggedIn, setLoggedIn] = useState(() => !!getToken())
+
+  if (!loggedIn) {
+    return <Login onLogin={() => setLoggedIn(true)} />
+  }
 
   // Thin wrapper so all 22 screens' existing `nav('some-id')` calls (cross-
   // screen links, e.g. ActiveProducts -> 'dead-stock', VendorsScreen ->
@@ -189,7 +201,18 @@ export default function App() {
         brandSubtitle="Admin Panel"
         titles={titles}
         defaultTitle="Dashboard"
-        footerNote={<><strong className="block text-ink2 mb-0.5">BB GSTIN</strong>27AABCB1234F1ZX<div className="mt-1.5">Admin: Rajesh K.</div></>}
+        footerNote={
+          <>
+            <strong className="block text-ink2 mb-0.5">BB GSTIN</strong>27AABCB1234F1ZX
+            <div className="mt-1.5">Admin: {getAdminName() || 'Unknown'}</div>
+            <button
+              onClick={() => { clearSession(); setLoggedIn(false) }}
+              className="mt-1.5 text-red hover:underline"
+            >
+              Logout
+            </button>
+          </>
+        }
         headerActions={headerActions}
       >
         <Routes>

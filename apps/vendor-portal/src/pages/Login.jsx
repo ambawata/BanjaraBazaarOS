@@ -1,22 +1,27 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { vendorApi, setSession } from '../lib/api'
 
-export default function Login() {
-  const { login, addToast } = useStore()
-  const [email, setEmail] = useState('riya@riyacrafts.com')
+export default function Login({ onShowRegister }) {
+  const setVendorSession = useStore(s => s.setVendorSession)
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setTimeout(() => {
-      const ok = login(email, password)
-      if (!ok) setError('Invalid credentials')
+    try {
+      const result = await vendorApi.login(email, password)
+      setSession(result.access_token, result.refresh_token, result.user?.name)
+      setVendorSession(result.user)
+    } catch (err) {
+      setError(err.message || 'Login failed')
+    } finally {
       setLoading(false)
-    }, 400)
+    }
   }
 
   return (
@@ -67,7 +72,12 @@ export default function Login() {
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
-          <p className="text-ink3 text-xs text-center mt-5">Demo: riya@riyacrafts.com / vendor123</p>
+          <p className="text-ink3 text-xs text-center mt-5">
+            New vendor?{' '}
+            <button type="button" onClick={onShowRegister} className="text-brand hover:underline">
+              Apply for onboarding
+            </button>
+          </p>
         </div>
       </div>
     </div>

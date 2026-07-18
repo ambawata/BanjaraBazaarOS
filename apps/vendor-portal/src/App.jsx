@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from '@shared/ui'
 import { useStore } from './store/useStore'
 import Toast from './components/Toast'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import MyProducts from './pages/MyProducts'
 import AddProduct from './pages/AddProduct'
@@ -37,11 +39,23 @@ const titles = {
 export default function App() {
   const vendor = useStore(s => s.vendor)
   const logout = useStore(s => s.logout)
+  // Deep-link support documented in
+  // docs/LEGACY_VANILLA_HTML_REFERENCE.md: a "Become a Vendor" marketing
+  // link with ?onboard=1 should land straight on Registration instead of
+  // Login. Only checked once on initial mount (matches the vanilla
+  // behavior — a one-time boot-time routing decision, not a live URL sync).
+  const [showRegister, setShowRegister] = useState(
+    () => new URLSearchParams(window.location.search).get('onboard') === '1'
+  )
 
   // Toast was only ever mounted inside the authenticated shell (the old
   // components/AppShell.jsx rendered it as a sibling of Sidebar+content) —
-  // Login has no toasts of its own, matches that exactly.
-  if (!vendor) return <Login />
+  // Login/Register have no toasts of their own, matches that exactly.
+  if (!vendor) {
+    return showRegister
+      ? <Register onBack={() => setShowRegister(false)} />
+      : <Login onShowRegister={() => setShowRegister(true)} />
+  }
 
   return (
     <>

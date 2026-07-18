@@ -1,26 +1,33 @@
 import { useState } from 'react'
-import { useStore } from '../store/useStore'
+import { adminApi, setSession } from '../lib/api'
 
-export default function Login() {
-  const login = useStore(s => s.login)
-  const addToast = useStore(s => s.addToast)
-  const [email, setEmail] = useState('admin@bb.com')
+// Real login gate — admin-panel had none at all before this (this file
+// existed but was dead code, part of an unused pages/+store/useStore.js
+// tree never imported by the live App.jsx — see
+// docs/LEGACY_VANILLA_HTML_REFERENCE.md). Without a way to obtain a token,
+// Vendor Directory/Approval Queue's real API wiring could never succeed
+// (every request would 401), so this had to be added even though the task
+// scope only named the two data screens — flagged in the PR description as
+// a necessary addition, not scope creep for its own sake.
+export default function Login({ onLogin }) {
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setTimeout(() => {
-      const ok = login(email, password)
-      if (!ok) {
-        setError('Invalid credentials')
-        addToast('Invalid email or password', 'error')
-      }
+    try {
+      const result = await adminApi.login(email, password)
+      setSession(result.access_token, result.refresh_token, result.user?.name)
+      onLogin()
+    } catch (err) {
+      setError(err.message || 'Login failed')
+    } finally {
       setLoading(false)
-    }, 400)
+    }
   }
 
   return (
@@ -50,7 +57,6 @@ export default function Login() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-surface2 border border-surface3 rounded-lg px-3 py-2.5 text-ink1 text-sm placeholder-ink3 focus:outline-none focus:border-brand transition-colors"
-                placeholder="admin@bb.com"
                 required
               />
             </div>
@@ -78,10 +84,6 @@ export default function Login() {
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
-
-          <p className="text-ink3 text-xs text-center mt-5">
-            Demo: admin@bb.com / admin123
-          </p>
         </div>
       </div>
     </div>

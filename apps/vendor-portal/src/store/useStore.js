@@ -1,17 +1,25 @@
 import { create } from 'zustand'
 import { mockVendor, mockProducts, mockSettlements } from '../data/mockData'
+import { clearSession } from '../lib/api'
 
 export const useStore = create((set, get) => ({
   // Auth
   vendor: null,
-  login: (email, password) => {
-    if (email === 'riya@riyacrafts.com' && password === 'vendor123') {
-      set({ vendor: mockVendor })
-      return true
-    }
-    return false
-  },
-  logout: () => set({ vendor: null }),
+  // Real login now happens in pages/Login.jsx (calls vendorApi.login
+  // directly, same as apps/admin-panel's Login.jsx) — this action only
+  // sets the resulting session, it doesn't call the API itself. Per
+  // docs/LEGACY_VANILLA_HTML_REFERENCE.md, only login/registration are
+  // real; the rest of the app (dashboard stats, products, settlements)
+  // stays on mock data — so `vendor` is the existing mockVendor object
+  // with just the identity fields (name, email) overwritten with the real
+  // logged-in user's actual values, rather than replaced outright. This is
+  // a deliberate, disclosed compromise: real name/email display, mock
+  // business data everywhere else, since no "get my vendor profile"
+  // endpoint is part of this task's documented scope.
+  setVendorSession: (user) => set({
+    vendor: { ...mockVendor, ownerName: user.name, email: user.email },
+  }),
+  logout: () => { clearSession(); set({ vendor: null }) },
 
   // Toast
   toasts: [],
