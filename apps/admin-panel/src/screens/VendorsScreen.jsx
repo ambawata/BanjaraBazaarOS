@@ -1,47 +1,148 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AppCtx } from '../App'
+import { adminApi } from '../lib/api'
+
+const statusBadge = {
+  active: 'bp-active',
+  pending: 'bp-pending',
+  rejected: 'bp-red',
+  suspended: 'bp-red',
+}
+
+// One row's Reject/Suspend reason input — matches the existing
+// counter-form inline-reveal pattern from ApprovalQueue.jsx (click an
+// action -> a small form opens beneath, Confirm/Cancel) rather than the
+// shared confirmAction modal (which has no text-input slot) or a native
+// window.prompt().
+function ReasonRow({ label, placeholder, onSubmit, onCancel, busy }) {
+  const [reason, setReason] = useState('')
+  return (
+    <div className="counter-form open">
+      <div style={{ fontSize: '11px', color: 'var(--text3)', fontFamily: 'var(--fm)', marginBottom: '6px' }}>
+        {label.toUpperCase()}
+      </div>
+      <div className="form-group">
+        <label>Reason</label>
+        <input
+          className="form-input"
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          placeholder={placeholder}
+        />
+      </div>
+      <div className="form-row" style={{ marginTop: '10px' }}>
+        <button className="btn btn-primary" style={{ flex: 1 }} disabled={busy || !reason.trim()} onClick={() => onSubmit(reason.trim())}>
+          {busy ? 'Sending…' : `Confirm ${label}`}
+        </button>
+        <button className="btn" onClick={onCancel} disabled={busy}>Cancel</button>
+      </div>
+    </div>
+  )
+}
 
 export default function VendorsScreen() {
-  const { confirmAction, nav } = useContext(AppCtx)
+  const { confirmAction } = useContext(AppCtx)
+  const [vendors, setVendors] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [busyId, setBusyId] = useState(null)
+  const [reasonRowFor, setReasonRowFor] = useState(null) // { id, action: 'reject'|'suspend' }
+
+  const load = () => {
+    setLoading(true)
+    setError(null)
+    adminApi.listVendors()
+      .then(data => setVendors(data))
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(load, [])
+
+  const runAction = (id, action, ...args) => {
+    setBusyId(id)
+    action(id, ...args)
+      .then(() => {
+        setReasonRowFor(null)
+        load()
+      })
+      .catch(e => confirmAction(`Action failed: ${e.message}`))
+      .finally(() => setBusyId(null))
+  }
+
+  if (loading) {
+    return <p className="text-ink3 text-sm">Loading vendors…</p>
+  }
+
+  if (error) {
+    return (
+      <div className="panel" style={{ padding: '20px' }}>
+        <p className="text-red text-sm mb-3">{error}</p>
+        <button className="btn btn-primary" onClick={load}>Retry</button>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="filter-row">
         <div className="search-wrap"><i className="ti ti-search"></i><input type="text" className="search-input" placeholder="Search vendor..." /></div>
-        <select className="fsel"><option>All Status</option><option>Active</option><option>Suspended</option><option>Onboarding</option></select>
-        <select className="fsel"><option>All GST Types</option><option>Regular</option><option>Composition 1%</option><option>Unregistered</option></select>
         <button className="btn btn-primary ml-auto" onClick={() => confirmAction('Add new vendor — you will need: vendor name, GST type, GSTIN (if applicable), phone, email, bank/UPI details, and security deposit amount.')}><i className="ti ti-user-plus"></i> Add Vendor</button>
       </div>
-      <div className="panel" style={{margin:0}}>
-        <table className="dt"><thead><tr><th>Vendor</th><th>BB Code</th><th>GST Type</th><th>Security Dep.</th><th>Advance Paid</th><th>Advance Remaining</th><th>Products</th><th>Score</th><th>Status</th><th>Action</th></tr></thead><tbody>
-          <tr>
-            <td><div style={{fontWeight:500}}>Raj Handicrafts</div><div style={{fontSize:'11px',color:'var(--text3)'}}>rajendra.k@gmail.com</div></td>
-            <td className="mono">RH-001</td><td><span className="comp-flag">COMP 1%</span></td><td className="mono">₹10,000</td>
-            <td className="mono" style={{color:'var(--amber)'}}>₹5,000</td><td className="mono" style={{color:'var(--red)'}}>₹2,600 left</td>
-            <td>18</td><td style={{color:'var(--green)'}}>★ 4.8</td><td><span className="bp bp-active">Active</span></td>
-            <td><button className="btn btn-sm" onClick={() => nav('settlements')}>Settle</button></td>
-          </tr>
-          <tr>
-            <td><div style={{fontWeight:500}}>Sharma Decors</div><div style={{fontSize:'11px',color:'var(--text3)'}}>sharma.decors@gmail.com</div></td>
-            <td className="mono">SD-002</td><td><span className="bp bp-active" style={{fontSize:'10px'}}>Regular</span></td><td className="mono">₹15,000</td>
-            <td className="mono" style={{color:'var(--amber)'}}>₹8,500</td><td className="mono" style={{color:'var(--green)'}}>Fully recovered</td>
-            <td>12</td><td style={{color:'var(--green)'}}>★ 4.6</td><td><span className="bp bp-active">Active</span></td>
-            <td><button className="btn btn-sm" onClick={() => nav('settlements')}>Settle</button></td>
-          </tr>
-          <tr>
-            <td><div style={{fontWeight:500}}>Devi Arts</div><div style={{fontSize:'11px',color:'var(--text3)'}}>deviarts@yahoo.com</div></td>
-            <td className="mono">DA-003</td><td><span className="comp-flag">COMP 1%</span></td><td className="mono">₹10,000</td>
-            <td className="mono" style={{color:'var(--amber)'}}>₹4,000</td><td className="mono" style={{color:'var(--green)'}}>Fully recovered</td>
-            <td>9</td><td style={{color:'var(--amber)'}}>★ 3.9</td><td><span className="bp bp-active">Active</span></td>
-            <td><button className="btn btn-sm" onClick={() => nav('settlements')}>Settle</button></td>
-          </tr>
-          <tr>
-            <td><div style={{fontWeight:500}}>Nature Craft</div><div style={{fontSize:'11px',color:'var(--text3)'}}>naturecraft@gmail.com</div></td>
-            <td className="mono">NC-004</td><td><span className="bp bp-gray" style={{fontSize:'10px'}}>Unregistered</span></td><td className="mono">₹5,000</td>
-            <td className="mono">₹0</td><td className="mono" style={{color:'var(--green)'}}>No advance</td>
-            <td>7</td><td style={{color:'var(--amber)'}}>★ 3.5</td><td><span className="bp bp-pending">Review</span></td>
-            <td><button className="btn btn-sm" onClick={() => confirmAction('View full profile for Nature Craft (NC-004)? Vendor is under review — 2 dead stock items, score 3.5.')}>View</button></td>
-          </tr>
-        </tbody></table>
+      <div className="panel" style={{ margin: 0 }}>
+        <table className="dt">
+          <thead>
+            <tr><th>Vendor</th><th>GSTIN</th><th>Business Type</th><th>Applied</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            {vendors.length === 0 && (
+              <tr><td colSpan={6} className="text-ink3" style={{ padding: '20px', textAlign: 'center' }}>No vendor applications yet.</td></tr>
+            )}
+            {vendors.map(v => (
+              <tr key={v.id}>
+                <td>
+                  <div style={{ fontWeight: 500 }}>{v.profile.business_name || v.user.full_name}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text3)' }}>{v.user.email}</div>
+                </td>
+                <td className="mono">{v.profile.gst_number || '—'}</td>
+                <td>{v.profile.business_type || '—'}</td>
+                <td className="mono">{v.created_at ? v.created_at.slice(0, 10) : '—'}</td>
+                <td><span className={`bp ${statusBadge[v.status] || 'bp-gray'}`}>{v.status}</span></td>
+                <td>
+                  {reasonRowFor?.id === v.id ? (
+                    <ReasonRow
+                      label={reasonRowFor.action}
+                      placeholder={reasonRowFor.action === 'reject' ? 'Why is this application rejected?' : 'Why is this vendor being suspended?'}
+                      busy={busyId === v.id}
+                      onCancel={() => setReasonRowFor(null)}
+                      onSubmit={(reason) =>
+                        runAction(v.id, reasonRowFor.action === 'reject' ? adminApi.rejectVendor : adminApi.suspendVendor, reason)
+                      }
+                    />
+                  ) : (
+                    <div className="card-actions" style={{ display: 'inline-flex' }}>
+                      {v.status !== 'active' && (
+                        <button className="btn btn-sm btn-success" disabled={busyId === v.id} onClick={() => runAction(v.id, adminApi.approveVendor)}>
+                          <i className="ti ti-check"></i> Approve
+                        </button>
+                      )}
+                      {v.status !== 'rejected' && (
+                        <button className="btn btn-sm btn-danger" disabled={busyId === v.id} onClick={() => setReasonRowFor({ id: v.id, action: 'reject' })}>
+                          Reject
+                        </button>
+                      )}
+                      {v.status === 'active' && (
+                        <button className="btn btn-sm" disabled={busyId === v.id} onClick={() => setReasonRowFor({ id: v.id, action: 'suspend' })}>
+                          Suspend
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
