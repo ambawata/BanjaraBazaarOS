@@ -16,6 +16,20 @@ export default defineConfig({
       // apps adopting this shared Sidebar/AppShell later should add the
       // same alias to their own vite.config.js.
       '@shared': path.resolve(repoRoot, 'shared'),
+      // REAL BUG FOUND DURING TESTING (pre-existing since this app first
+      // consumed shared/ui/ — only `npm run dev` had ever been tested,
+      // never `npm run build`): Vite's dev server resolves
+      // shared/ui/AppShell.jsx's bare `react-router-dom` import fine (its
+      // optimizeDeps prebundling rewrites all bare imports to its own
+      // cache regardless of the importing file's location), but a
+      // production `vite build` uses Rollup's per-file Node resolution,
+      // which only walks UP from the importing file's own directory
+      // (shared/ui/) — never sideways into a sibling app's node_modules —
+      // so it can't find react-router-dom at all and the build fails
+      // outright. Same fix already applied to admin-panel's
+      // vite.config.js (PR #7) when the second shared/ui/ consumer hit
+      // this same issue; reproduced and confirmed identical here.
+      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
     },
   },
   server: {
