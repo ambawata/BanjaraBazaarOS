@@ -1,4 +1,6 @@
-import { useState, useEffect, createContext, useContext, useRef } from 'react'
+import { useState, useEffect, createContext } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { AppShell } from '@shared/ui'
 import Dashboard from './screens/Dashboard'
 import ApprovalQueue from './screens/ApprovalQueue'
 import ActiveProducts from './screens/ActiveProducts'
@@ -29,34 +31,43 @@ import Settings from './screens/Settings'
 
 export const AppCtx = createContext(null)
 
+// Migrated to the shared shared/ui/ AppShell+Sidebar (PR #5) — replaces the
+// hand-rolled #sidebar/#topbar markup this file used to render inline
+// (there was never a dedicated local Sidebar.jsx/AppShell.jsx actually in
+// use for this app; those files existed in src/components/Layout/ but were
+// dead code — see docs/LEGACY_VANILLA_HTML_REFERENCE.md and this branch's
+// PR description for the full discovery). `pages` keeps its page-title
+// strings (now `titles`, keyed by /admin/<id> route path instead of a bare
+// id) but drops the old breadcrumb sub-line — the shared AppShell's header
+// only supports a single title line, same as vastu-griha's.
 const pages = {
-  'dashboard':['Dashboard','Admin / Overview'],
-  'approval':['Approval Queue','Products / Approval Queue'],
-  'active-products':['Active Products','Products / Active Products'],
-  'negotiations':['Negotiations','Products / Negotiations'],
-  'dead-stock':['Dead Stock','Products / Dead Stock'],
-  'pickup':['Pickup Requests','Products / Pickup Requests'],
-  'inventory':['Live Inventory','Inventory / Live Inventory'],
-  'damage':['Damage Register','Inventory / Damage Register'],
-  'floor':['Floor Sections','Inventory / Floor Sections'],
-  'vendors':['Vendor Directory','Vendors / Directory'],
-  'settlements':['Settlements','Vendors / Settlements'],
-  'advances':['Advance Payments','Vendors / Advance Payments'],
-  'sales':['Live Sales & POS','Sales / Live Sales'],
-  'invoices':['Invoices','Sales / Invoices'],
-  'expenses':['Expenses','Finance / Expenses'],
-  'gst':['GST & Accounting','Finance / GST'],
-  'cashflow':['Cash Flow','Finance / Cash Flow'],
-  'staff':['Staff Directory','Staff / Directory'],
-  'attendance':['Attendance','Staff / Attendance'],
-  'customers':['Customers','CRM / Customers'],
-  'whatsapp':['WhatsApp Campaigns','CRM / WhatsApp'],
-  'analytics':['Analytics Center','Analytics'],
-  'notifications':['Notifications','System / Notifications'],
-  'roles':['Roles & Permissions','System / Roles'],
-  'audit':['Audit Logs','System / Audit Logs'],
-  'backup':['Backup & Export','System / Backup'],
-  'settings':['System Settings','System / Settings'],
+  'dashboard': 'Dashboard',
+  'approval': 'Approval Queue',
+  'active-products': 'Active Products',
+  'negotiations': 'Negotiations',
+  'dead-stock': 'Dead Stock',
+  'pickup': 'Pickup Requests',
+  'inventory': 'Live Inventory',
+  'damage': 'Damage Register',
+  'floor': 'Floor Sections',
+  'vendors': 'Vendor Directory',
+  'settlements': 'Settlements',
+  'advances': 'Advance Payments',
+  'sales': 'Live Sales & POS',
+  'invoices': 'Invoices',
+  'expenses': 'Expenses',
+  'gst': 'GST & Accounting',
+  'cashflow': 'Cash Flow',
+  'staff': 'Staff Directory',
+  'attendance': 'Attendance',
+  'customers': 'Customers',
+  'whatsapp': 'WhatsApp Campaigns',
+  'analytics': 'Analytics Center',
+  'notifications': 'Notifications',
+  'roles': 'Roles & Permissions',
+  'audit': 'Audit Logs',
+  'backup': 'Backup & Export',
+  'settings': 'System Settings',
 }
 
 const screenMap = {
@@ -89,28 +100,68 @@ const screenMap = {
   'settings': Settings,
 }
 
-const NavItem = ({ id, icon, label, badge, badgeType, current, onNav }) => (
-  <div className={`nav-item${current === id ? ' active' : ''}`} onClick={() => onNav(id)}>
-    <i className={`ti ti-${icon}`}></i> {label}
-    {badge && <span className={`nbadge nbadge-${badgeType}`}>{badge}</span>}
-  </div>
+const titles = Object.fromEntries(
+  Object.entries(pages).map(([id, label]) => ['/admin/' + id, label])
 )
 
+// Same 26 items / 9 sections / 4 badges as the old inline sidebar markup —
+// see this branch's PR description for the exact before/after mapping.
+// Icons stay as the `ti ti-<name>` webfont classes this app already loads
+// via a CDN <link> in index.html (NOT @tabler/icons-react — that package
+// is only used by the dead components/Layout/ + pages/ tree, never by this
+// live App.jsx/screens/ tree). The shared Sidebar's `icon` slot accepts any
+// node, so this needs no changes there.
+const navItems = [
+  { section: 'Main' },
+  { to: '/admin/dashboard', label: 'Dashboard', icon: <i className="ti ti-layout-dashboard" /> },
+  { section: 'Products' },
+  { to: '/admin/approval', label: 'Approval Queue', icon: <i className="ti ti-checks" />, badge: '7', badgeColor: 'red' },
+  { to: '/admin/active-products', label: 'Active Products', icon: <i className="ti ti-package" /> },
+  { to: '/admin/negotiations', label: 'Negotiations', icon: <i className="ti ti-arrows-exchange" />, badge: '4', badgeColor: 'amber' },
+  { to: '/admin/dead-stock', label: 'Dead Stock', icon: <i className="ti ti-clock-exclamation" />, badge: '12', badgeColor: 'red' },
+  { to: '/admin/pickup', label: 'Pickup Requests', icon: <i className="ti ti-truck" /> },
+  { section: 'Inventory' },
+  { to: '/admin/inventory', label: 'Live Inventory', icon: <i className="ti ti-box" /> },
+  { to: '/admin/damage', label: 'Damage Register', icon: <i className="ti ti-alert-triangle" /> },
+  { to: '/admin/floor', label: 'Floor Sections', icon: <i className="ti ti-layout-2" /> },
+  { section: 'Vendors' },
+  { to: '/admin/vendors', label: 'Vendor Directory', icon: <i className="ti ti-users" /> },
+  { to: '/admin/settlements', label: 'Settlements', icon: <i className="ti ti-credit-card" /> },
+  { to: '/admin/advances', label: 'Advance Payments', icon: <i className="ti ti-coin" /> },
+  { section: 'Sales' },
+  { to: '/admin/sales', label: 'Live Sales & POS', icon: <i className="ti ti-receipt" /> },
+  { to: '/admin/invoices', label: 'Invoices', icon: <i className="ti ti-file-invoice" /> },
+  { section: 'Finance' },
+  { to: '/admin/expenses', label: 'Expenses', icon: <i className="ti ti-wallet" /> },
+  { to: '/admin/gst', label: 'GST & Accounting', icon: <i className="ti ti-report-money" /> },
+  { to: '/admin/cashflow', label: 'Cash Flow', icon: <i className="ti ti-arrows-right-left" /> },
+  { section: 'Staff' },
+  { to: '/admin/staff', label: 'Staff Directory', icon: <i className="ti ti-id-badge" /> },
+  { to: '/admin/attendance', label: 'Attendance', icon: <i className="ti ti-calendar-check" /> },
+  { section: 'CRM' },
+  { to: '/admin/customers', label: 'Customers', icon: <i className="ti ti-heart" /> },
+  { to: '/admin/whatsapp', label: 'WhatsApp Campaigns', icon: <i className="ti ti-brand-whatsapp" /> },
+  { section: 'Analytics' },
+  { to: '/admin/analytics', label: 'Analytics Center', icon: <i className="ti ti-chart-bar" /> },
+  { section: 'System' },
+  { to: '/admin/notifications', label: 'Notifications', icon: <i className="ti ti-bell" />, badge: '5', badgeColor: 'red' },
+  { to: '/admin/roles', label: 'Roles & Permissions', icon: <i className="ti ti-lock" /> },
+  { to: '/admin/audit', label: 'Audit Logs', icon: <i className="ti ti-list-search" /> },
+  { to: '/admin/backup', label: 'Backup & Export', icon: <i className="ti ti-database-export" /> },
+  { to: '/admin/settings', label: 'System Settings', icon: <i className="ti ti-settings" /> },
+]
+
 export default function App() {
-  const [current, setCurrent] = useState('dashboard')
-  const [theme, setTheme] = useState(() => localStorage.getItem('bb-theme') || 'dark')
+  const navigate = useNavigate()
   const [modal, setModal] = useState({ open: false, msg: '' })
   const [editModal, setEditModal] = useState({ open: false, data: {} })
-  const contentRef = useRef(null)
 
-  useEffect(() => {
-    document.body.className = theme === 'light' ? 'light' : ''
-  }, [theme])
-
-  const nav = (id) => {
-    setCurrent(id)
-    if (contentRef.current) contentRef.current.scrollTop = 0
-  }
+  // Thin wrapper so all 22 screens' existing `nav('some-id')` calls (cross-
+  // screen links, e.g. ActiveProducts -> 'dead-stock', VendorsScreen ->
+  // 'settlements') keep working unchanged against the same string ids,
+  // just routed through react-router now instead of a local `current`
+  // state switch.
+  const nav = (id) => navigate('/admin/' + id)
 
   const confirmAction = (msg) => setModal({ open: true, msg })
   const closeModal = () => setModal({ open: false, msg: '' })
@@ -119,84 +170,35 @@ export default function App() {
     setEditModal({ open: true, data: { sku, name, vendor, base, sell, margin, stock, section, status } })
   const closeEditModal = () => setEditModal({ open: false, data: {} })
 
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    localStorage.setItem('bb-theme', next)
-  }
-
   const ctx = { confirmAction, nav, openEditProduct }
-  const pageInfo = pages[current] || ['Dashboard', 'Admin / Overview']
-  const Screen = screenMap[current] || Dashboard
+
+  const headerActions = (
+    <>
+      <button className="btn" onClick={() => nav('notifications')}><i className="ti ti-bell"></i></button>
+      <button className="btn" onClick={() => nav('backup')}><i className="ti ti-database-export"></i> Backup</button>
+      <button className="btn btn-primary" onClick={() => confirmAction('Sync triggered — pulling latest data from all connected systems. This may take a few seconds.')}><i className="ti ti-refresh"></i> Sync</button>
+    </>
+  )
 
   return (
     <AppCtx.Provider value={ctx}>
-      <nav id="sidebar">
-        <div className="sidebar-logo">BanjaraBazaar<span>Admin Panel v3.0</span></div>
-        <div className="sidebar-nav">
-          <div className="sidebar-section">Main</div>
-          <NavItem id="dashboard" icon="layout-dashboard" label="Dashboard" current={current} onNav={nav} />
-          <div className="sidebar-section">Products</div>
-          <NavItem id="approval" icon="checks" label="Approval Queue" badge="7" badgeType="red" current={current} onNav={nav} />
-          <NavItem id="active-products" icon="package" label="Active Products" current={current} onNav={nav} />
-          <NavItem id="negotiations" icon="arrows-exchange" label="Negotiations" badge="4" badgeType="amber" current={current} onNav={nav} />
-          <NavItem id="dead-stock" icon="clock-exclamation" label="Dead Stock" badge="12" badgeType="red" current={current} onNav={nav} />
-          <NavItem id="pickup" icon="truck" label="Pickup Requests" current={current} onNav={nav} />
-          <div className="sidebar-section">Inventory</div>
-          <NavItem id="inventory" icon="box" label="Live Inventory" current={current} onNav={nav} />
-          <NavItem id="damage" icon="alert-triangle" label="Damage Register" current={current} onNav={nav} />
-          <NavItem id="floor" icon="layout-2" label="Floor Sections" current={current} onNav={nav} />
-          <div className="sidebar-section">Vendors</div>
-          <NavItem id="vendors" icon="users" label="Vendor Directory" current={current} onNav={nav} />
-          <NavItem id="settlements" icon="credit-card" label="Settlements" current={current} onNav={nav} />
-          <NavItem id="advances" icon="coin" label="Advance Payments" current={current} onNav={nav} />
-          <div className="sidebar-section">Sales</div>
-          <NavItem id="sales" icon="receipt" label="Live Sales & POS" current={current} onNav={nav} />
-          <NavItem id="invoices" icon="file-invoice" label="Invoices" current={current} onNav={nav} />
-          <div className="sidebar-section">Finance</div>
-          <NavItem id="expenses" icon="wallet" label="Expenses" current={current} onNav={nav} />
-          <NavItem id="gst" icon="report-money" label="GST & Accounting" current={current} onNav={nav} />
-          <NavItem id="cashflow" icon="arrows-right-left" label="Cash Flow" current={current} onNav={nav} />
-          <div className="sidebar-section">Staff</div>
-          <NavItem id="staff" icon="id-badge" label="Staff Directory" current={current} onNav={nav} />
-          <NavItem id="attendance" icon="calendar-check" label="Attendance" current={current} onNav={nav} />
-          <div className="sidebar-section">CRM</div>
-          <NavItem id="customers" icon="heart" label="Customers" current={current} onNav={nav} />
-          <NavItem id="whatsapp" icon="brand-whatsapp" label="WhatsApp Campaigns" current={current} onNav={nav} />
-          <div className="sidebar-section">Analytics</div>
-          <NavItem id="analytics" icon="chart-bar" label="Analytics Center" current={current} onNav={nav} />
-          <div className="sidebar-section">System</div>
-          <NavItem id="notifications" icon="bell" label="Notifications" badge="5" badgeType="red" current={current} onNav={nav} />
-          <NavItem id="roles" icon="lock" label="Roles & Permissions" current={current} onNav={nav} />
-          <NavItem id="audit" icon="list-search" label="Audit Logs" current={current} onNav={nav} />
-          <NavItem id="backup" icon="database-export" label="Backup & Export" current={current} onNav={nav} />
-          <NavItem id="settings" icon="settings" label="System Settings" current={current} onNav={nav} />
-        </div>
-        <div className="sidebar-footer">
-          <strong>BB GSTIN</strong>27AABCB1234F1ZX
-          <div style={{marginTop:'6px'}}>Admin: Rajesh K.</div>
-        </div>
-      </nav>
-
-      <div id="main">
-        <div id="topbar">
-          <div>
-            <div className="page-title">{pageInfo[0]}</div>
-            <div className="breadcrumb">{pageInfo[1]}</div>
-          </div>
-          <div className="topbar-right">
-            <button className="theme-toggle" onClick={toggleTheme} title="Toggle light/dark mode">
-              <i className={`ti ti-${theme === 'light' ? 'moon' : 'sun'}`}></i>
-            </button>
-            <button className="btn" onClick={() => nav('notifications')}><i className="ti ti-bell"></i></button>
-            <button className="btn" onClick={() => nav('backup')}><i className="ti ti-database-export"></i> Backup</button>
-            <button className="btn btn-primary" onClick={() => confirmAction('Sync triggered — pulling latest data from all connected systems. This may take a few seconds.')}><i className="ti ti-refresh"></i> Sync</button>
-          </div>
-        </div>
-        <div id="content" ref={contentRef}>
-          <Screen />
-        </div>
-      </div>
+      <AppShell
+        navItems={navItems}
+        brandInitials="BB"
+        brandName="BanjaraBazaar"
+        brandSubtitle="Admin Panel"
+        titles={titles}
+        defaultTitle="Dashboard"
+        footerNote={<><strong className="block text-ink2 mb-0.5">BB GSTIN</strong>27AABCB1234F1ZX<div className="mt-1.5">Admin: Rajesh K.</div></>}
+        headerActions={headerActions}
+      >
+        <Routes>
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          {Object.entries(screenMap).map(([id, Screen]) => (
+            <Route key={id} path={'/admin/' + id} element={<Screen />} />
+          ))}
+        </Routes>
+      </AppShell>
 
       {/* Confirm Modal */}
       <div className={`modal-overlay${modal.open ? ' open' : ''}`} onClick={e => e.target === e.currentTarget && closeModal()}>

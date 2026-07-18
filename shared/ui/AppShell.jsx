@@ -22,7 +22,14 @@ import Sidebar from './Sidebar'
 // persistence is wanted later.
 //
 // PROPS (the reusable contract other apps will follow):
-//   navItems      [{ to, label, icon }]      required
+//   navItems      [{ to, label, icon, badge?, badgeColor? } |
+//                  { section }]                required — see Sidebar.jsx's
+//                                               own docblock for the
+//                                               section-header / badge
+//                                               entry shapes (added for
+//                                               admin-panel, additive,
+//                                               vastu-griha's flat 2-item
+//                                               array is unaffected)
 //   brandInitials string (e.g. "VG")         required
 //   brandName     string                     required
 //   brandSubtitle string                     optional
@@ -33,6 +40,13 @@ import Sidebar from './Sidebar'
 //                                             default `p-6` main padding
 //                                             (e.g. a page with its own
 //                                             edge-to-edge map/canvas)
+//   headerActions node                       optional, right-aligned extra
+//                                             controls in the header next to
+//                                             the page title (e.g.
+//                                             admin-panel's notification
+//                                             bell / Backup / Sync buttons)
+//                                             — added for admin-panel,
+//                                             renders nothing when omitted
 //   children      node                       the routed page content
 export default function AppShell({
   navItems,
@@ -43,6 +57,7 @@ export default function AppShell({
   defaultTitle = brandName,
   footerNote,
   fullBleedPaths = [],
+  headerActions,
   children,
 }) {
   const { pathname } = useLocation()
@@ -129,6 +144,7 @@ export default function AppShell({
             ☰
           </button>
           <h1 className="text-ink1 font-semibold text-base truncate">{titles[pathname] || defaultTitle}</h1>
+          {headerActions && <div className="ml-auto flex items-center gap-2 shrink-0">{headerActions}</div>}
         </header>
 
         <main className={`flex-1 overflow-y-auto ${isFullBleed ? '' : 'p-6'}`}>
