@@ -1,0 +1,251 @@
+/* ================================================
+   Vastu Griha — Design Tokens
+   Single source of truth for all CSS custom properties.
+   Relocated verbatim from index.css (Phase 1a, sub-commit 1) — same
+   variable names, same values, zero visual change. Component files
+   already reference these via var(--accent) etc. throughout the app;
+   renaming them would touch ~800 call sites for no benefit, so this
+   phase keeps the names and just gives them one canonical home.
+
+   The @theme block below is additive: it maps the Tailwind v4 required
+   naming convention (--color-*, --radius-*, --shadow-*) onto these
+   same variables via indirection, so Tailwind utility classes
+   (bg-primary, rounded-card, etc.) become available without
+   duplicating or renaming a single existing token.
+   ================================================ */
+
+:root {
+  /* Theme-INVARIANT constants — deliberately not overridden in body.light,
+     matching how they were already hardcoded (always white/gray regardless
+     of dark/light mode) in the Dashboard screen before this token existed. */
+  --card: #ffffff;
+  --shell-bg: #f0f0f0;
+  /* Small contrast dot/ring markers (compass center pin, plot-boundary
+     vertex handle) — always white regardless of theme, since they sit on
+     an accent-colored shape or a floor-plan image, not app chrome. */
+  --marker-white: #fff;
+
+  /* Vastu KB UI locked palette (ProductIcon/DirectionPills/VastuApp/
+     ShopPanel/VastuCard) — per .claude/skills/vastu-griha-design, this
+     screen is authored against ONE fixed light palette, not the app's
+     dark/light toggle (several of these values are identical to the
+     light-mode --orange-dark/--orange-light/--ink-soft below, but kept
+     as separate invariant tokens rather than pointed at those reactive
+     ones, since swapping would make the KB screen dark-mode-react for
+     the first time — a real behavior change, not just tokenization).
+     Flagging for a future decision, not deciding it here. */
+  --kb-card: #ffffff;
+  --kb-border: #efe3d0;
+  --kb-heading: #c96f24;
+  --kb-title: #2b2010;
+  --kb-muted: #8a7a5c;
+  --kb-tint-bg: #f1ece0;
+  --kb-accent-bg: #fbe6d0;
+  --kb-avoid-bg: #fbeaea;
+  --kb-avoid-border: #e27c7c;
+  --kb-star: #e0a83c;
+
+  /* Gradient endpoint paired with the reactive --gold in AnalysisPanel's
+     "best solution" badge — kept as a fixed darker shade rather than a
+     second reactive token, matching the gradient's current rendered
+     appearance exactly (a fully reactive pairing would be a legitimate
+     improvement, just not one to make silently under "tokenization only"). */
+  --gold-gradient-end: #d48b1d;
+
+  /* Dashboard "action card" 4-color category system (ActionCards.jsx) —
+     always this light-tinted-card treatment regardless of theme, same
+     "Dashboard reads as a bright consumer app" pattern as --card/
+     --shell-bg above. Purple reuses --status-tile-utility and green
+     reuses --status-green (byte-identical values, already tokenized). */
+  --tile-purple-bg: #f3f0ff;
+  --tile-purple-border: #e7e2ff;
+  --tile-purple-icon-border: #dcd6ff;
+  --tile-purple-heading: #312e81;
+  --tile-purple-text: #6366f1;
+
+  --tile-green-bg: #f0fdf4;
+  --tile-green-border: #dcfce7;
+  --tile-green-icon-border: #d1fae5;
+  --tile-green-heading: #064e3b;
+  --tile-green-text: #16a34a;
+
+  --tile-amber: #d97706;
+  --tile-amber-accent: #fbbf24;
+  --tile-amber-bg: #fffbeb;
+  --tile-amber-border: #fef3c7;
+  --tile-amber-heading: #78350f;
+
+  --tile-blue: #2563eb;
+  --tile-blue-bg: #eff6ff;
+  --tile-blue-border: #dbeafe;
+  --tile-blue-heading: #1e3a8a;
+
+  /* "Twilight Courtyard" — dark mode: warm charcoal, not cold admin-panel black */
+  --bg: #171310;
+  --bg2: #201a15;
+  --bg3: #2a2219;
+  --bg4: #362c1f;
+  --border: #3d3226;
+  --border2: #4a3d2c;
+  --text: #f5ede0;
+  --text2: #c4b39a;
+  --text3: #8a7a63;
+  --accent: #f0a94a;
+  --accent2: #d98f2e;
+  --accent-dim: rgba(240, 169, 74, 0.16);
+  --accent-ink: #2b3a67;
+
+  /* Vastu Elements Colors mapped to the semantic palette */
+  --emerald: #4caf50;
+  --emerald-dim: rgba(76, 175, 80, 0.14);
+  --terracotta: #d9683a;
+  --terracotta-dim: rgba(217, 104, 58, 0.14);
+  --water-blue: #4a9bab;
+  --water-blue-dim: rgba(74, 155, 171, 0.14);
+  --gold: #d4af5a;
+  --gold-dim: rgba(212, 175, 90, 0.14);
+
+  --red: #e0554a;
+  --red-dim: rgba(224, 85, 74, 0.14);
+  --amber: #d4af5a;
+  --amber-dim: rgba(212, 175, 90, 0.14);
+  --green: #4caf50;
+  --green-dim: rgba(76, 175, 80, 0.14);
+
+  /* Vastu Griha locked brand tokens, from src/components/vastu,
+     per .claude/skills/vastu-griha-design — dark-mode values are brightened
+     from that single light-mode hex, since the skill was written
+     without a dark theme in mind. */
+  --orange: #f0a64a;
+  --orange-dark: #e8a056;
+  --orange-light: rgba(240, 169, 74, 0.16);
+  --cream: #2a2219;
+  --border-soft: #3d3226;
+  --danger: #e0655a;
+  --success: #4fae78;
+  --ink-soft: #b8a98a;
+  --ink-faint: #9c8c70;
+  --ink-muted: #c2b8a2;
+
+  --sidebar-w: 260px;
+  --right-panel-w: 380px;
+  --header-h: 56px;
+
+  --fd: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+  --fm: 'DM Mono', monospace;
+
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --radius: 12px;
+
+  /* Radius/shadow scale (new, additive — RentPro-pattern-inspired 4-step
+     radius / 3-step shadow, tuned to current Vastu Griha visuals so no
+     screen changes in this phase; components adopt these incrementally). */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 10px 40px rgba(44, 36, 23, 0.06);
+
+  /* Status/category palette (new, additive) — the SAME hex values were
+     already being repeated verbatim across compliance dots, welcome-card
+     icons, and badges in index.css; centralizing so there is one source
+     instead of six copies of each hex. Deliberately theme-independent
+     (unlike --accent/--bg etc.) since these mark severity/category, not
+     brand surface color, matching how they were already being used. */
+  --status-emerald: #10b981;
+  --status-green: #22c55e;
+  --status-teal: #14b8a6;
+  --status-amber: #f59e0b;
+  --status-orange: #f97316;
+  --status-red: #ef4444;
+  /* Flagged for brand review (not changed here — visual parity only):
+     this is a purple used to distinguish the "utility" element category
+     from "room"/"outdoor". It is NOT the RentPro/Tailwind-config purple
+     found elsewhere (different hex, different purpose — a categorical
+     tile color, not a primary/accent color) but is still worth a
+     deliberate decision on whether it stays purple or moves to an
+     orange-family hue. */
+  --status-tile-utility: #7c6ff7;
+}
+
+body.light {
+  /* "Golden Hour Courtyard" — default mode: warm sand, marigold accent, indigo signature */
+  --bg: #f7f1e6;
+  --bg2: #ffffff;
+  --bg3: #f1e9d8;
+  --bg4: #e9dfc9;
+  --border: #e4d9c2;
+  --border2: #d6c7a6;
+  --text: #2c2417;
+  --text2: #6b5d45;
+  --text3: #9c8f76;
+  --accent: #e0862a;
+  --accent2: #c06b1d;
+  --accent-dim: rgba(224, 134, 42, 0.12);
+  --accent-ink: #2b3a67;
+
+  /* Vastu Elements Colors (Light) Mapped to the design tokens */
+  --emerald: #3f9142;
+  --emerald-dim: rgba(63, 145, 66, 0.10);
+  --terracotta: #c1502e;
+  --terracotta-dim: rgba(193, 80, 46, 0.10);
+  --water-blue: #2f7b8c;
+  --water-blue-dim: rgba(47, 123, 140, 0.10);
+  --gold: #c89b3c;
+  --gold-dim: rgba(200, 155, 60, 0.10);
+
+  --red: #c1502e;
+  --red-dim: rgba(193, 80, 46, 0.10);
+  --amber: #c89b3c;
+  --amber-dim: rgba(200, 155, 60, 0.10);
+  --green: #3f9142;
+  --green-dim: rgba(63, 145, 66, 0.10);
+
+  /* Vastu Griha locked brand tokens — light values match
+     .claude/skills/vastu-griha-design color table exactly. */
+  --orange: #e08a3c;
+  --orange-dark: #c96f24;
+  --orange-light: #fbe6d0;
+  --cream: #faf5ec;
+  --border-soft: #efe3d0;
+  --danger: #c24545;
+  --success: #3d8b5f;
+  --ink-soft: #8a7a5c;
+  --ink-faint: #a99a80;
+  --ink-muted: #b5aa98;
+
+  --shadow: 0 10px 40px rgba(44, 36, 23, 0.06);
+  --shadow-lg: 0 10px 40px rgba(44, 36, 23, 0.06);
+}
+
+/* ================================================
+   Tailwind v4 theme bridge — additive only. Maps the Tailwind required
+   --color-, --radius-, and --shadow- naming onto the tokens above via
+   indirection, so utility classes (bg-primary, text-danger,
+   rounded-card, ...) resolve to the SAME live values as var(--accent)
+   etc. everywhere else, including the light/dark swap on <body>.
+   tailwind.config.js is dead (confirmed: no @config directive anywhere
+   in this app, so its JS theme was never actually loaded) — this
+   @theme block replaces its role. See the header comment in
+   tailwind.config.js for the dead-code flag; not deleted without approval.
+   ================================================ */
+@theme {
+  --color-primary: var(--accent);
+  --color-primary-dark: var(--accent2);
+  --color-accent: var(--orange);
+  --color-accent-secondary: var(--orange-light);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--amber);
+
+  --radius-card: var(--radius-lg);
+  --radius-3xl: 28px;
+
+  --shadow-soft: var(--shadow-sm);
+  --shadow-island: var(--shadow-lg);
+
+  --font-sans: var(--fb);
+}

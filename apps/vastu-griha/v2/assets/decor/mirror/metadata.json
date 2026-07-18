@@ -1,0 +1,35 @@
+{
+  "id": "decor-mirror",
+  "name": "Sacred Circular Mirror",
+  "category": "decor",
+  "tags": [
+    "mirror",
+    "decor",
+    "glass",
+    "reflection"
+  ],
+  "defaultWidthFt": 2,
+  "defaultDepthFt": 0.2,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Sacred round wall mirror framed in copper. Mirrors reflect energy; placement on North or East walls attracts wealth and abundance.",
+  "recommendedRooms": [
+    "Living Room",
+    "Dressing Room",
+    "Foyer"
+  ],
+  "recommendedDirections": [
+    "North",
+    "East",
+    "North-East"
+  ],
+  "material": "Copper Frame & Glass",
+  "color": "Copper & Mirror"
+}

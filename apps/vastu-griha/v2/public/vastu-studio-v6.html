@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vastu Griha — Studio v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#E08A3C; --orange-dark:#C96F24; --orange-soft:#F6D9B8; --orange-dim:rgba(224,138,60,.12);
+  --ink:#3A2E22; --ink-soft:#8A7A5C; --ink-faint:#B3A78F;
+  --card:#FFFFFF; --line:#ECE2D0;
+  --danger:#C24545; --success:#3D8B5F; --amber:#C08A1E;
+  --glass:rgba(255,255,255,.86);
+  --shadow:0 8px 30px rgba(58,46,34,.14);
+  --shadow-lg:0 16px 50px rgba(58,46,34,.2);
+  --fh:'Poppins',sans-serif; --fb:'Inter',sans-serif; --fm:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--fb);color:var(--ink);
+  background:radial-gradient(circle at 1px 1px,#E1D6BF 1px,transparent 0) 0 0/26px 26px,#EEE7D7;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+.ic{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.ic.sm{width:17px;height:17px;}
+
+/* ============ canvas ============ */
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;user-select:none;cursor:grab;}
+#cv.panning{cursor:grabbing;}
+svg text{user-select:none;pointer-events:none;}
+
+/* ============ floating islands ============ */
+.island{position:fixed;z-index:40;background:var(--glass);backdrop-filter:blur(16px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);border-radius:16px;}
+
+/* top-left: back + title chip */
+.tl{top:14px;left:14px;display:flex;align-items:center;gap:8px;padding:7px 9px;}
+.tl .logo{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--orange),#D97B26);display:grid;place-items:center;color:#fff;flex:0 0 auto;box-shadow:0 3px 10px rgba(224,138,60,.4);}
+.tl .pname{font-family:var(--fh);font-weight:700;font-size:12.5px;color:var(--ink);max-width:118px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tl .pname:focus{outline:none;}
+
+/* top-center: view modes */
+.tc{top:14px;left:50%;transform:translateX(-50%);display:flex;padding:4px;gap:2px;}
+.vm{width:38px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink-soft);transition:all .16s;}
+.vm.on{background:var(--orange);color:#fff;box-shadow:0 3px 10px rgba(224,138,60,.4);}
+.vm:not(.on):hover{background:var(--orange-dim);color:var(--orange-dark);}
+
+/* top-right: score */
+.tr{top:14px;right:14px;display:flex;align-items:center;gap:9px;padding:7px 12px 7px 13px;}
+.tr .lbl{text-align:right;line-height:1.15;}
+.tr .lbl b{display:block;font-family:var(--fh);font-size:11px;font-weight:700;}
+.tr .lbl span{font-size:8.5px;color:var(--ink-faint);letter-spacing:.04em;text-transform:uppercase;}
+.ring{position:relative;width:34px;height:34px;flex:0 0 auto;}
+.ring svg{transform:rotate(-90deg);}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fh);font-weight:800;font-size:11px;}
+
+/* right-edge: tool stack */
+.re{top:50%;right:14px;transform:translateY(-50%);display:flex;flex-direction:column;padding:5px;gap:2px;}
+.re button{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--ink-soft);transition:all .16s;position:relative;}
+.re button:hover{background:var(--orange-dim);color:var(--orange-dark);}
+.re button.on{background:var(--orange);color:#fff;box-shadow:0 3px 10px rgba(224,138,60,.4);}
+.re .divider{height:1px;background:var(--line);margin:3px 6px;}
+
+/* bottom-right: undo/redo + add */
+.br{bottom:16px;right:14px;display:flex;flex-direction:column;gap:8px;align-items:center;background:none;box-shadow:none;border:none;}
+.ur{background:var(--glass);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
+.ur button{width:42px;height:38px;display:grid;place-items:center;color:var(--ink-soft);transition:all .14s;}
+.ur button:hover:not(:disabled){background:var(--orange-dim);color:var(--orange-dark);}
+.ur button:disabled{opacity:.3;cursor:default;}
+.ur .sep{height:1px;background:var(--line);}
+.fab{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--orange),#D97B26);color:#fff;display:grid;place-items:center;box-shadow:0 8px 24px rgba(224,138,60,.5);transition:transform .16s;}
+.fab:hover{transform:translateY(-2px) scale(1.03);}
+.fab:active{transform:scale(.94);}
+.fab .ic{width:26px;height:26px;stroke-width:2;}
+
+/* bottom-left: measure/units chip */
+.bl{bottom:16px;left:14px;display:flex;padding:6px;gap:2px;}
+.bl button{height:34px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:6px;color:var(--ink-soft);font-size:11px;font-weight:700;transition:all .15s;}
+.bl button:hover{background:var(--orange-dim);color:var(--orange-dark);}
+.bl button.on{background:var(--orange);color:#fff;}
+
+/* zoom island */
+.zoom{bottom:86px;right:14px;display:flex;flex-direction:column;padding:4px;gap:2px;}
+.zoom button{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--ink-soft);transition:all .14s;}
+.zoom button:hover{background:var(--orange-dim);color:var(--orange-dark);}
+
+/* ============ panels (desktop slide / mobile sheet) ============ */
+.panel{position:fixed;z-index:50;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.22,1,.36,1);}
+.panel .ph{display:flex;align-items:center;gap:9px;padding:14px 16px 11px;flex:0 0 auto;}
+.panel .ph .pi{width:30px;height:30px;border-radius:9px;background:var(--orange-dim);display:grid;place-items:center;color:var(--orange-dark);flex:0 0 auto;}
+.panel .ph b{font-family:var(--fh);font-size:13px;flex:1;}
+.panel .ph .x{width:26px;height:26px;border-radius:8px;background:#F4EEE1;display:grid;place-items:center;color:var(--ink-soft);}
+.panel .ph .x:hover{background:var(--orange-dim);color:var(--orange-dark);}
+.panel .pb{padding:2px 16px 18px;overflow-y:auto;scrollbar-width:thin;}
+@media(min-width:768px){
+  .panel{top:14px;right:82px;max-height:calc(100vh - 28px);width:280px;border-radius:20px;transform:translateX(360px);opacity:0;}
+  .panel.open{transform:none;opacity:1;}
+  .panel .grab{display:none;}
+}
+@media(max-width:767px){
+  .panel{left:0;right:0;bottom:0;max-height:56vh;border-radius:22px 22px 0 0;transform:translateY(110%);}
+  .panel.open{transform:none;}
+  .panel .grab{width:40px;height:4px;border-radius:99px;background:#DFD4BE;margin:9px auto 2px;flex:0 0 auto;}
+}
+
+.sectn{font-size:9px;font-weight:800;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 8px;}
+.sectn:first-child{margin-top:6px;}
+.roomgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.rc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 8px;border:1px solid var(--line);border-radius:14px;background:#FDFBF6;transition:all .15s;}
+.rc:hover{border-color:var(--orange);background:#fff;transform:translateY(-1px);box-shadow:0 5px 14px rgba(224,138,60,.14);}
+.rc:active{transform:scale(.95);}
+.rc .rci{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;}
+.rc span{font-size:10px;font-weight:700;font-family:var(--fh);}
+
+.field{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.field label{font-size:9px;font-weight:800;color:var(--ink-faint);width:54px;flex:0 0 auto;text-transform:uppercase;letter-spacing:.05em;}
+.inp{border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12px;font-weight:600;background:#FDFBF6;color:var(--ink);font-family:var(--fb);width:100%;}
+.inp:focus{outline:2px solid var(--orange-dim);border-color:var(--orange);}
+.inp.num{width:62px;font-family:var(--fm);flex:0 0 auto;text-align:center;}
+.seg{display:flex;background:#F4EEE1;border-radius:10px;padding:3px;gap:2px;flex:1;}
+.seg button{flex:1;padding:6px 4px;border-radius:8px;font-size:10.5px;font-weight:700;color:var(--ink-soft);transition:all .14s;}
+.seg button.on{background:#fff;color:var(--orange-dark);box-shadow:0 1px 4px rgba(58,46,34,.12);}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 2px;}
+.abtn{display:flex;align-items:center;gap:5px;border:1px solid var(--line);background:#FDFBF6;border-radius:10px;padding:8px 11px;font-size:10.5px;font-weight:700;color:var(--ink);transition:all .14s;}
+.abtn:hover{border-color:var(--orange);color:var(--orange-dark);}
+.abtn:active{transform:scale(.94);}
+.abtn.danger:hover{border-color:var(--danger);color:var(--danger);}
+.help{font-size:10px;color:var(--ink-soft);line-height:1.6;background:#FDFBF6;border:1px dashed var(--line);border-radius:11px;padding:10px 12px;margin-top:8px;}
+.help b{color:var(--ink);}
+
+.openrow{display:flex;align-items:center;gap:5px;background:#FDFBF6;border:1px solid var(--line);border-radius:10px;padding:6px 8px;margin-top:6px;flex-wrap:wrap;}
+.openrow .oi{color:var(--orange-dark);flex:0 0 auto;}
+.openrow b{font-family:var(--fh);font-size:9.5px;flex:0 0 auto;}
+.openrow select{border:1px solid var(--line);border-radius:6px;font-size:9px;padding:3px;background:#fff;color:var(--ink);}
+.openrow input[type=range]{width:42px;accent-color:var(--orange);}
+.openrow input[type=number]{width:38px;border:1px solid var(--line);border-radius:6px;padding:3px;font-family:var(--fm);font-size:9px;text-align:center;}
+.minibtn{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--ink-soft);border:1px solid var(--line);background:#fff;transition:all .13s;}
+.minibtn:hover{border-color:var(--orange);color:var(--orange-dark);}
+.minibtn.on{background:var(--orange);color:#fff;border-color:var(--orange);}
+.minibtn.del:hover{border-color:var(--danger);color:var(--danger);}
+
+/* verdict block */
+.verd{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);}
+.vbadge{display:inline-flex;align-items:center;gap:6px;font-family:var(--fh);font-size:11px;font-weight:700;padding:7px 12px;border-radius:99px;margin-bottom:11px;}
+.vbadge.good{background:#E7F3EC;color:var(--success);}
+.vbadge.bad{background:#FBEAEA;color:var(--danger);}
+.vbadge.mid{background:#FBF3DC;color:var(--amber);}
+.confrow{display:flex;justify-content:space-between;font-size:9.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px;}
+.confrow b{color:var(--ink);font-weight:700;}
+.cbar{height:6px;border-radius:99px;background:#F0E8D8;overflow:hidden;margin-bottom:10px;}
+.cbar i{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-dark));border-radius:99px;transition:width .6s cubic-bezier(.22,1,.36,1);}
+.vnote{font-size:10px;line-height:1.6;background:#FDFBF6;border-left:2.5px solid var(--amber);border-radius:9px;padding:9px 11px;margin-bottom:8px;color:var(--ink);}
+.vnote b{font-weight:700;}
+.vrem{font-size:10px;line-height:1.6;background:var(--orange-dim);border-radius:9px;padding:9px 11px;color:var(--ink);}
+.vrem b{color:var(--orange-dark);font-family:var(--fh);font-size:8px;letter-spacing:.1em;display:block;margin-bottom:2px;}
+
+.toast{position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--ink);color:#fff;font-size:11.5px;font-weight:600;padding:10px 17px;border-radius:99px;z-index:99;transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 14px 40px rgba(0,0,0,.3);max-width:86vw;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media print{.island,.panel,.toast{display:none!important;}}
+</style>
+</head>
+<body>
+
+<svg id="cv"></svg>
+
+<!-- top-left -->
+<div class="island tl">
+  <div class="logo"><svg class="ic sm" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></div>
+  <div class="pname" id="pnameShow">Amb Niwas — GF</div>
+</div>
+
+<!-- top-center: view modes -->
+<div class="island tc">
+  <button class="vm on" title="2D Plan"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></button>
+  <button class="vm" title="3D (soon)" id="vm3d"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></button>
+  <button class="vm" title="Walkthrough (soon)" id="vmwalk"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M10 22l1.5-8L9 11V8l4-1 3 3 3 1"/><path d="M11 14l-2 4"/></svg></button>
+</div>
+
+<!-- top-right: score -->
+<div class="island tr">
+  <div class="lbl"><b id="scoreWord">Kamre jodein</b><span>Vastu Score</span></div>
+  <div class="ring">
+    <svg width="34" height="34" viewBox="0 0 34 34">
+      <circle cx="17" cy="17" r="13.5" fill="none" stroke="#EFE5D2" stroke-width="3.4"/>
+      <circle id="ringFill" cx="17" cy="17" r="13.5" fill="none" stroke="#E08A3C" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="84.8" stroke-dashoffset="84.8" style="transition:stroke-dashoffset .7s, stroke .4s;"/>
+    </svg>
+    <div class="v" id="scoreVal">—</div>
+  </div>
+</div>
+
+<!-- right-edge tool stack -->
+<div class="island re">
+  <button data-p="rooms" title="Rooms"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="11" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg></button>
+  <button data-p="boundary" title="Plot & boundary"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v10l-4 6H4z"/><circle cx="4" cy="4" r="1.4" fill="currentColor" stroke="none"/><circle cx="20" cy="4" r="1.4" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg></button>
+  <button data-p="settings" title="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+  <div class="divider"></div>
+  <button data-p="help" title="Help"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 013.5-2.3c1 .4 1.5 1.3 1.5 2.3 0 1.7-2 2-2 3.5"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></button>
+</div>
+
+<!-- zoom -->
+<div class="island zoom">
+  <button id="zIn" title="Zoom in"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button id="zOut" title="Zoom out"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+  <button id="zFit" title="Fit to screen"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 011-1h4M20 9V5a1 1 0 00-1-1h-4M4 15v4a1 1 0 001 1h4M20 15v4a1 1 0 01-1 1h-4"/></svg></button>
+</div>
+
+<!-- bottom-left: units -->
+<div class="island bl">
+  <button id="unitBtn" class="on"><svg class="ic sm" viewBox="0 0 24 24"><path d="M3 8h18M6 8v3M10 8v5M14 8v3M18 8v5M3 8l0 8h18l0-8"/></svg>ft</button>
+</div>
+
+<!-- bottom-right: undo/redo + add -->
+<div class="island br">
+  <div class="ur">
+    <button id="undoB" disabled title="Undo"><svg class="ic sm" viewBox="0 0 24 24"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 015 5v0"/></svg></button>
+    <div class="sep"></div>
+    <button id="redoB" disabled title="Redo"><svg class="ic sm" viewBox="0 0 24 24"><path d="M15 7l5 5-5 5"/><path d="M20 12H9a5 5 0 00-5 5v0"/></svg></button>
+  </div>
+  <button class="fab" id="fab" title="Add room"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+</div>
+
+<!-- panels -->
+<div class="panel" id="pn-rooms"><div class="grab"></div>
+  <div class="ph"><div class="pi"><svg class="ic sm" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg></div><b>Add a room</b><button class="x" data-c><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="pb"><div class="roomgrid" id="rooms"></div>
+  <div class="help">Add as many as you need — a second toilet becomes <b>Toilet 2</b>, and so on. Each new room drops into the first open spot.</div></div>
+</div>
+
+<div class="panel" id="pn-boundary"><div class="grab"></div>
+  <div class="ph"><div class="pi"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 4h16v10l-4 6H4z"/></svg></div><b>Plot &amp; boundary</b><button class="x" data-c><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="pb">
+    <div class="sectn">Shape</div>
+    <div class="actions">
+      <button class="abtn" id="editBnd"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Edit corners</button>
+      <button class="abtn" id="addEnt"><svg class="ic sm" viewBox="0 0 24 24"><path d="M3 21h18M6 21V7l6-4 6 4v14"/><path d="M10 21v-6h4v6"/></svg>Entrance</button>
+    </div>
+    <div class="sectn">Reset to rectangle</div>
+    <div class="field"><input class="inp num" type="number" id="plotW" value="48" min="15" max="120"><span style="color:var(--ink-faint)">×</span><input class="inp num" type="number" id="plotH" value="50" min="15" max="120"><button class="abtn" id="resetBnd">Apply</button></div>
+    <div class="help"><b>Edit corners on:</b> drag a corner to slant a wall · <b>double-tap an edge</b> to add a corner (for zig-zag plots) · <b>double-tap a corner</b> to remove it. Every edge shows its own length.</div>
+    <div class="help">Vastu zones map to the plot's bounding box — a close approximation for irregular shapes.</div>
+  </div>
+</div>
+
+<div class="panel" id="pn-settings"><div class="grab"></div>
+  <div class="ph"><div class="pi"><svg class="ic sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div><b>Settings</b><button class="x" data-c><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="pb">
+    <div class="sectn">Orientation</div>
+    <div class="field"><label>North</label>
+      <div class="seg" id="northSeg"><button data-v="up">Up</button><button data-v="down" class="on">Down</button><button data-v="left">Left</button><button data-v="right">Right</button></div></div>
+    <div class="sectn">Walls</div>
+    <div class="field"><label>Outer</label>
+      <div class="seg" id="outerSeg"><button data-v="0.5">6″</button><button data-v="0.75" class="on">9″</button><button data-v="1">12″</button></div></div>
+    <div class="field"><label>Inner</label>
+      <div class="seg" id="innerSeg"><button data-v="0.33" class="on">4″</button><button data-v="0.5">6″</button><button data-v="0.75">9″</button></div></div>
+    <div class="sectn">Display</div>
+    <div class="field"><label>Vastu grid</label>
+      <div class="seg" id="gridSeg"><button data-v="1" class="on">On</button><button data-v="0">Off</button></div></div>
+    <div class="field"><label>Snap ½ft</label>
+      <div class="seg" id="snapSeg"><button data-v="1" class="on">On</button><button data-v="0">Off</button></div></div>
+  </div>
+</div>
+
+<div class="panel" id="pn-help"><div class="grab"></div>
+  <div class="ph"><div class="pi"><svg class="ic sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 013.5-2.3"/></svg></div><b>How it works</b><button class="x" data-c><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="pb"><div class="help">
+    <b>Move</b> — drag a room · <b>Resize</b> — pull the corner dot<br>
+    <b>Pan</b> — drag empty space · <b>Zoom</b> — scroll / pinch / the +− island<br>
+    <b>Undo / Redo</b> — bottom-right, or Ctrl+Z / Ctrl+Y<br>
+    <b>Doors</b> — select a room, add a door, then set which side it sits on, how wide, which corner it hinges from, and whether it opens in or out<br>
+    <b>Entrance gate</b> — Plot panel → Entrance, placed on the boundary<br>
+    <b>Stairs</b> — pick straight, L, or U in the room's panel
+  </div></div>
+</div>
+
+<!-- selection sheet -->
+<div class="panel" id="selCard"><div class="grab"></div><div class="ph" id="selH"></div><div class="pb" id="selB"></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= KB (custom SVG icons + tints) ================= */
+const DEITY={NW:'Vayu',N:'Kubera',NE:'Ishan',W:'Varuna',C:'Brahma',E:'Indra',SW:'Pitru',S:'Yama',SE:'Agni'};
+const ICON={
+ bedroom:'<rect x="3" y="7" width="18" height="11" rx="1.5"/><path d="M3 13h18M6 7V5h5v2"/>',
+ kitchen:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><circle cx="9" cy="8" r="1.6"/><circle cx="15" cy="8" r="1.6"/><path d="M6 14h12"/>',
+ pooja:'<path d="M12 3l2 4h-4z"/><path d="M8 21v-6a4 4 0 018 0v6z"/><path d="M6 21h12"/>',
+ toilet:'<path d="M6 3v7a3 3 0 003 3h1v8"/><path d="M6 10h11a2 2 0 01-2 3H9"/>',
+ bath:'<path d="M4 12h16v3a4 4 0 01-4 4H8a4 4 0 01-4-4z"/><path d="M6 12V6a2 2 0 012-2 2 2 0 012 2"/>',
+ living:'<rect x="3" y="9" width="18" height="8" rx="2"/><path d="M5 9V7a2 2 0 012-2h10a2 2 0 012 2v2M6 17v2M18 17v2"/>',
+ dining:'<circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14"/>',
+ store:'<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 9h16M9 9v11"/>',
+ study:'<rect x="4" y="4" width="16" height="13" rx="1.5"/><path d="M8 20h8M12 17v3M8 8h8M8 12h5"/>',
+ guest:'<rect x="4" y="3" width="12" height="18" rx="1.5"/><circle cx="12.5" cy="12" r="1"/>',
+ utility:'<circle cx="12" cy="13" r="6"/><path d="M8 3h8M12 3v4M9 13a3 3 0 013-3"/>',
+ stairs:'<path d="M4 20V16h4v-4h4V8h4V4h4"/><path d="M4 20h4v-4h4v-4h4V8h4"/>',
+};
+const KB={
+ bedroom:{nm:'Bedroom',fill:'#E7EDE4',tint:'#5E8B62',best:['SW'],ok:['S','W','NW'],avoid:['NE','SE'],conf:{SW:[93,74],S:[80,62],W:[78,60],NW:[70,54],NE:[91,70],SE:[84,58]},note:'Placement (SW) has near-universal agreement; the <b>effect</b> is where sources split.',rem:'If SW isn\'t possible, put the headboard against a south wall.'},
+ kitchen:{nm:'Kitchen',fill:'#F6E3CE',tint:'#C77B3A',best:['SE'],ok:['NW'],avoid:['NE','N','C'],conf:{SE:[92,81],NW:[74,55],NE:[94,79],N:[82,60],C:[90,76]},note:'SE (Agni) has near-universal consensus; NW is contested.',rem:'If SE isn\'t possible, cook facing east.'},
+ pooja:{nm:'Pooja',fill:'#F9EFD4',tint:'#C79A2E',best:['NE'],ok:['N','E'],avoid:['S','SW'],conf:{NE:[96,86],N:[85,70],E:[84,69],S:[92,78],SW:[90,75]},note:'Ishan (NE) is the strongest consensus in all of Vastu.',rem:'If not NE, use N/E with the idol facing west.'},
+ toilet:{nm:'Toilet',fill:'#DFE8ED',tint:'#5B87A0',best:['NW'],ok:['W','S'],avoid:['NE','C','SW'],conf:{NW:[86,68],W:[76,58],S:[70,52],NE:[95,82],C:[93,80],SW:[81,63]},note:'Sources agree more on where it must NOT go (never NE/center).',rem:'In a wrong zone: keep the door shut, add a salt bowl; relocation is the real fix.'},
+ bath:{nm:'Bathroom',fill:'#DFE8ED',tint:'#5B87A0',best:['NW','E'],ok:['W'],avoid:['NE','SW','C'],conf:{NW:[82,64],E:[78,60],W:[72,55],NE:[90,74],SW:[80,62],C:[88,72]},note:'A bath without a WC is also accepted in the east.',rem:'Slope the drain toward the north or east.'},
+ living:{nm:'Living',fill:'#F2ECDD',tint:'#A98A4E',best:['N','NE','E'],ok:['NW','C'],avoid:['SW'],conf:{N:[82,64],NE:[80,62],E:[81,63],NW:[70,52],C:[66,50],SW:[72,55]},note:'A flexible category — a light lean toward the north/east side.',rem:'Heavy furniture on the S/W walls, NE kept open.'},
+ dining:{nm:'Dining',fill:'#EFE7D4',tint:'#B08A54',best:['W'],ok:['E','S'],avoid:[],conf:{W:[74,56],E:[70,52],S:[68,50]},note:'The least-agreed topic — a slight western preference.',rem:'Face east or north while eating.'},
+ store:{nm:'Store',fill:'#EAE4DA',tint:'#8A7A5C',best:['SW','W'],ok:['S','NW'],avoid:['NE','C'],conf:{SW:[84,66],W:[80,62],S:[74,56],NW:[70,52],NE:[88,72],C:[90,76]},note:'Heavy goods belong in a heavy zone — solid consensus.',rem:'Keep only light items in the NE.'},
+ study:{nm:'Study',fill:'#E7EAF2',tint:'#6B6FA0',best:['NE','E','N'],ok:['W'],avoid:['SW'],conf:{NE:[83,66],E:[82,65],N:[80,63],W:[68,50],SW:[70,54]},note:'Modern sources agree more; classical texts say little.',rem:'Face east or north, back to a wall.'},
+ guest:{nm:'Guest',fill:'#E7EDE4',tint:'#5E8B62',best:['NW'],ok:['N','W'],avoid:['SW'],conf:{NW:[85,68],N:[74,56],W:[72,55],SW:[78,60]},note:'NW (Vayu — movement) is the classic guest placement.',rem:'Don\'t put guests in the SW — that\'s the head of the household\'s zone.'},
+ utility:{nm:'Utility',fill:'#ECE8E0',tint:'#8A7A5C',best:['NW','SE'],ok:['W'],avoid:['NE'],conf:{NW:[72,54],SE:[70,52],W:[66,50],NE:[80,62]},note:'A lightly-researched topic — NW/SE both mixed.',rem:'Keep machines away from the NE.'},
+ stairs:{nm:'Stairs',fill:'#E8E1D4',tint:'#9A7B4A',best:['SW','S','W'],ok:['SE'],avoid:['NE','C'],conf:{SW:[86,68],S:[80,62],W:[78,60],SE:[68,52],NE:[92,76],C:[94,80]},note:'A strong "no" in the NE / Brahmasthan.',rem:'Climbing clockwise is considered auspicious.'},
+};
+const ENT={best:['N','NE','E'],avoid:['S','SW','SE'],conf:{N:[88,72],NE:[92,78],E:[87,70],S:[84,64],SW:[86,66],SE:[80,60],W:[70,54],NW:[72,55],C:[60,48]},
+ note:'Beginner rule: N/NE/E are auspicious. The advanced truth: the exact <b>pada</b> matters more than the gross direction — a south-facing door in the right pada can be fully auspicious.',rem:'Add a threshold; a gate that opens clockwise is preferred.'};
+const ZG={up:[['NW','N','NE'],['W','C','E'],['SW','S','SE']],down:[['SE','S','SW'],['E','C','W'],['NE','N','NW']],left:[['NE','E','SE'],['N','C','S'],['NW','W','SW']],right:[['SW','W','NW'],['S','C','N'],['SE','E','NE']]};
+
+/* ================= state ================= */
+const FT=14;
+let st={projName:'Amb Niwas — GF',northDir:'down',outerT:0.75,innerT:0.33,showGrid:true,snap:true,
+  pts:[[0,0],[48,0],[48,50],[0,50]],rooms:[],entrance:null};
+let selId=null,selEnt=false,nextN={},editBnd=false;
+let vb={x:0,y:0,w:1000,h:700};
+const cv=document.getElementById('cv');const NS='http://www.w3.org/2000/svg';
+function el(t,at,parent){const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);(parent||cv).appendChild(e);return e;}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=v=>st.snap?Math.round(v*2)/2:Math.round(v*10)/10;
+
+/* history */
+let hist=[],hi=-1;
+function snap(){hist.length=hi+1;hist.push(JSON.stringify(st));if(hist.length>50)hist.shift();else hi++;hb();}
+function undo(){if(hi<=0)return;hi--;st=JSON.parse(hist[hi]);restore();}
+function redo(){if(hi>=hist.length-1)return;hi++;st=JSON.parse(hist[hi]);restore();}
+function restore(){selId=null;selEnt=false;document.getElementById('pnameShow').textContent=st.projName;syncSegs();render();selPanel();hb();}
+function hb(){document.getElementById('undoB').disabled=hi<=0;document.getElementById('redoB').disabled=hi>=hist.length-1;}
+document.getElementById('undoB').onclick=undo;document.getElementById('redoB').onclick=redo;
+window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'){e.preventDefault();undo();}if(((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y')||((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='z')){e.preventDefault();redo();}});
+
+/* geometry */
+function bbox(){let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;st.pts.forEach(([x,y])=>{x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);});return{x1,y1,x2,y2,w:x2-x1,h:y2-y1};}
+function inPoly(x,y){let ins=false,p=st.pts;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))ins=!ins;}return ins;}
+function roomInside(r){const e=0.05;return inPoly(r.x+e,r.y+e)&&inPoly(r.x+r.w-e,r.y+e)&&inPoly(r.x+e,r.y+r.h-e)&&inPoly(r.x+r.w-e,r.y+r.h-e);}
+function zoneOfPt(px,py){const b=bbox();const c=clamp(Math.floor((px-b.x1)/b.w*3),0,2),ro=clamp(Math.floor((py-b.y1)/b.h*3),0,2);return ZG[st.northDir][ro][c];}
+const zoneOf=r=>zoneOfPt(r.x+r.w/2,r.y+r.h/2);
+function vOf(r){const k=KB[r.key],z=zoneOf(r);return k.best.includes(z)?'good':k.avoid.includes(z)?'bad':'mid';}
+function entMid(){const e=st.entrance,a=st.pts[e.edge],b=st.pts[(e.edge+1)%st.pts.length];return[a[0]+(b[0]-a[0])*e.t,a[1]+(b[1]-a[1])*e.t];}
+const entZone=()=>{const[m,n]=entMid();return zoneOfPt(m,n);};
+function vOfEnt(){const z=entZone();return ENT.best.includes(z)?'good':ENT.avoid.includes(z)?'bad':'mid';}
+const VC={good:'#3D8B5F',bad:'#C24545',mid:'#C08A1E'};
+
+const worldW=()=>bbox().w*FT+300,worldH=()=>bbox().h*FT+150;
+function fit(){const vw=innerWidth,vh=innerHeight,mob=vw<768;
+  const availW=vw-(mob?24:150),availH=vh-140;
+  const ww=worldW()*1.05,wh=worldH()*1.05,ar=availW/availH,war=ww/wh;
+  let W,H;if(war>ar){W=ww;H=ww/ar;}else{H=wh;W=wh*ar;}
+  const fullW=W*vw/availW,fullH=H*vh/availH;
+  const cx=bbox().x1*FT+ww/2-40,cy=bbox().y1*FT+wh/2-30;
+  vb.w=fullW;vb.h=fullH;vb.x=cx-fullW/2;vb.y=cy-fullH/2;applyVB();}
+function applyVB(){cv.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
+const fmtFt=v=>{const f=Math.floor(v),i=Math.round((v-f)*12);return i?`${f}'-${i}"`:`${f}'-0"`;};
+const areaFt=r=>(r.w*r.h).toFixed(0);
+
+/* ================= render ================= */
+function render(){
+  cv.innerHTML='';const s=FT,b=bbox();
+  const defs=el('defs',{});
+  const sh=el('filter',{id:'psh',x:'-12%',y:'-12%',width:'124%',height:'126%'},defs);
+  el('feDropShadow',{dx:0,dy:12,stdDeviation:18,['flood-color']:'#7A6240',['flood-opacity']:.32},sh);
+  const pat=el('pattern',{id:'grd',width:20,height:20,patternUnits:'userSpaceOnUse'},defs);
+  el('rect',{width:20,height:20,fill:'#FCF8F0'},pat);
+  el('circle',{cx:1,cy:1,r:.7,fill:'#E6DBC4'},pat);
+  el('rect',{x:b.x1*s-36,y:b.y1*s-36,width:b.w*s+72+150,height:b.h*s+72,rx:14,fill:'#FCF8F0',filter:'url(#psh)'});
+  const g=el('g',{});
+  const poly=st.pts.map(([x,y])=>`${x*s},${y*s}`).join(' ');
+  el('polygon',{points:poly,fill:'url(#grd)'},g);
+
+  if(st.showGrid){
+    const cp=el('clipPath',{id:'pc'},defs);const pp=document.createElementNS(NS,'polygon');pp.setAttribute('points',poly);cp.appendChild(pp);
+    const gg=el('g',{'clip-path':'url(#pc)'},g);const W=b.w*s,H=b.h*s,X=b.x1*s,Y=b.y1*s;
+    for(let i=1;i<3;i++){el('line',{x1:X+W*i/3,y1:Y,x2:X+W*i/3,y2:Y+H,stroke:'#D97B26',['stroke-opacity']:.17,['stroke-dasharray']:'6 5',['stroke-width']:1.1},gg);el('line',{x1:X,y1:Y+H*i/3,x2:X+W,y2:Y+H*i/3,stroke:'#D97B26',['stroke-opacity']:.17,['stroke-dasharray']:'6 5',['stroke-width']:1.1},gg);}
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)el('text',{x:X+W*(c+.5)/3,y:Y+H*(r+.5)/3+5,['text-anchor']:'middle',fill:'#D97B26',['fill-opacity']:.14,style:'font-family:Poppins;font-weight:800;font-size:13px;letter-spacing:.14em'},gg).textContent=ZG[st.northDir][r][c];
+    el('rect',{x:X+W/3,y:Y+H/3,width:W/3,height:H/3,fill:'none',stroke:'#D97B26',['stroke-opacity']:.3,['stroke-dasharray']:'5 4',rx:7},gg);
+  }
+
+  st.rooms.forEach(r=>{
+    const it=Math.max(2.5,st.innerT*s),x=r.x*s,y=r.y*s,w=r.w*s,h=r.h*s,k=KB[r.key];
+    const grp=el('g',{class:'roomg','data-id':r.id,style:'cursor:grab'},g);
+    el('rect',{x,y,width:w,height:h,fill:k.fill},grp);
+    if(r.key==='stairs')drawStairs(grp,x,y,w,h,r.stairStyle||'straight');
+    else el('rect',{x:x+it/2,y:y+it/2,width:Math.max(0,w-it),height:Math.max(0,h*.3),fill:'#FFF',['fill-opacity']:.26},grp);
+    el('rect',{x,y,width:w,height:h,fill:'none',stroke:'#2B2013',['stroke-width']:it},grp);
+    r.doors.forEach(d=>drawDoor(grp,r,d,s,it,k.fill));
+    r.wins.forEach(wd=>drawWin(grp,r,wd,s,it));
+    const mm=Math.min(w,h),z=zoneOf(r),v=vOf(r);
+    if(mm>=34&&r.key!=='stairs'){
+      const fs=Math.max(8,Math.min(13.5,mm*.13));
+      el('text',{x:x+w/2,y:y+h/2-(mm>=70?9:0),['text-anchor']:'middle',style:`font-family:Poppins;font-weight:700;font-size:${fs}px`,fill:'#2E241A'},grp).textContent=r.nm;
+    }
+    if(mm>=70&&r.key!=='stairs'){
+      el('text',{x:x+w/2,y:y+h/2+7,['text-anchor']:'middle',style:'font-family:DM Mono;font-size:9px',fill:'#7A6B52'},grp).textContent=`${r.w}'×${r.h}' · ${areaFt(r)} sqft`;
+      const cw=60;el('rect',{x:x+w/2-cw/2,y:y+h/2+15,width:cw,height:15,rx:7.5,fill:VC[v],['fill-opacity']:.13},grp);
+      el('circle',{cx:x+w/2-cw/2+9,cy:y+h/2+22.5,r:2.7,fill:VC[v]},grp);
+      el('text',{x:x+w/2-cw/2+15,y:y+h/2+26,style:'font-family:Inter;font-weight:800;font-size:7.5px',fill:VC[v]},grp).textContent=z+' '+(v==='good'?'IDEAL':v==='bad'?'AVOID':'OKAY');
+    }else if(r.key!=='stairs'){el('circle',{cx:x+w/2,cy:y+h/2,r:4.4,fill:VC[v],stroke:'#fff',['stroke-width']:1.6},grp);}
+    else{el('circle',{cx:x+w-9,cy:y+9,r:4,fill:VC[v],stroke:'#fff',['stroke-width']:1.5},grp);}
+    if(r.id===selId){el('rect',{x:x-4,y:y-4,width:w+8,height:h+8,fill:'none',stroke:'#E08A3C',['stroke-width']:2,['stroke-dasharray']:'7 5',rx:5},grp);el('circle',{cx:x+w,cy:y+h,r:8,fill:'#E08A3C',stroke:'#FCF8F0',['stroke-width']:3,class:'rsz','data-id':r.id,style:'cursor:nwse-resize'},grp);}
+  });
+
+  const ot=Math.max(3.5,st.outerT*s);
+  el('polygon',{points:poly,fill:'none',stroke:'#2B2013',['stroke-width']:ot,['stroke-linejoin']:'miter'},g);
+  if(st.entrance)drawEntrance(g,s,ot);
+
+  /* per-edge dims (dual: also draw a light inner mirror on the two main axes for that architect feel) */
+  const cen=st.pts.reduce((p,q)=>[p[0]+q[0]/st.pts.length,p[1]+q[1]/st.pts.length],[0,0]);
+  st.pts.forEach((a,i)=>{const c=st.pts[(i+1)%st.pts.length];const ax=a[0]*s,ay=a[1]*s,cx2=c[0]*s,cy2=c[1]*s,len=Math.hypot(c[0]-a[0],c[1]-a[1]);if(len<2)return;
+    const mx=(ax+cx2)/2,my=(ay+cy2)/2,nx=(cy2-ay),ny=-(cx2-ax),nl=Math.hypot(nx,ny);let ox=nx/nl,oy=ny/nl;if((mx/s-cen[0])*ox+(my/s-cen[1])*oy<0){ox=-ox;oy=-oy;}
+    const tx=mx+ox*(ot+13),ty=my+oy*(ot+13),ang=Math.atan2(cy2-ay,cx2-ax)*180/Math.PI,fl=(ang>90||ang<-90)?180:0;
+    el('text',{x:tx,y:ty,['text-anchor']:'middle',style:'font-family:DM Mono;font-size:10.5px',fill:'#4A3D2A',transform:`rotate(${ang+fl} ${tx} ${ty})`},g).textContent=fmtFt(len);});
+
+  if(editBnd)st.pts.forEach(([x,y],i)=>el('circle',{cx:x*s,cy:y*s,r:8,fill:'#FFF',stroke:'#E08A3C',['stroke-width']:2.5,class:'vtx','data-i':i,style:'cursor:move'},g));
+
+  /* compass */
+  const rot={up:0,right:90,down:180,left:270}[st.northDir];
+  const comp=el('g',{transform:`translate(${b.x2*s+78},${b.y1*s+24})`},g);
+  el('circle',{cx:0,cy:0,r:21,fill:'#FFF',stroke:'#2B2013',['stroke-width']:1.4},comp);
+  el('circle',{cx:0,cy:0,r:16,fill:'none',stroke:'#2B2013',['stroke-width']:.5,['stroke-dasharray']:'2 3'},comp);
+  const cg=el('g',{transform:`rotate(${rot})`},comp);
+  el('path',{d:'M0,-14 L4.5,4 L0,1.5 L-4.5,4 Z',fill:'#C24545'},cg);
+  el('path',{d:'M0,14 L4.5,-4 L0,-1.5 L-4.5,-4 Z',fill:'#2B2013',['fill-opacity']:.26},cg);
+  el('text',{x:0,y:-25,['text-anchor']:'middle',style:'font-family:Poppins;font-weight:800;font-size:10.5px',fill:'#C24545',transform:`rotate(${-rot} 0 -25)`},cg).textContent='N';
+  /* title block */
+  const tb=el('g',{transform:`translate(${b.x2*s+22},${b.y2*s-84})`},g);
+  el('rect',{x:0,y:0,width:114,height:84,fill:'#FFF',stroke:'#2B2013',['stroke-width']:1.1},tb);
+  el('line',{x1:0,y1:24,x2:114,y2:24,stroke:'#2B2013',['stroke-width']:.9},tb);
+  el('line',{x1:0,y1:46,x2:114,y2:46,stroke:'#2B2013',['stroke-width']:.5},tb);
+  el('line',{x1:0,y1:65,x2:114,y2:65,stroke:'#2B2013',['stroke-width']:.5},tb);
+  el('text',{x:57,y:16,['text-anchor']:'middle',style:'font-family:Poppins;font-weight:700;font-size:8.5px',fill:'#2B2013'},tb).textContent=st.projName.toUpperCase().slice(0,20);
+  el('text',{x:6,y:39,style:'font-family:DM Mono;font-size:6.5px',fill:'#7A6B52'},tb).textContent='GROUND FLOOR PLAN';
+  el('text',{x:6,y:58,style:'font-family:DM Mono;font-size:6.5px',fill:'#7A6B52'},tb).textContent='SCALE NTS · FEET';
+  el('text',{x:6,y:78,style:'font-family:DM Mono;font-size:6.5px',fill:'#7A6B52'},tb).textContent='VASTU GRIHA';
+
+  applyVB();wire();updateScore();
+}
+
+function drawStairs(grp,x,y,w,h,style){
+  const long=w>=h,t=FT,line=(a,b,c,d)=>el('line',{x1:a,y1:b,x2:c,y2:d,stroke:'#5A4A34',['stroke-width']:1},grp);
+  if(style==='straight'){if(long){for(let p=x+t;p<x+w;p+=t)line(p,y,p,y+h);}else{for(let p=y+t;p<y+h;p+=t)line(x,p,x+w,p);}
+    if(long){line(x+6,y+h/2,x+w-9,y+h/2);el('path',{d:`M${x+w-9} ${y+h/2-4}L${x+w-2} ${y+h/2}L${x+w-9} ${y+h/2+4}`,fill:'none',stroke:'#2B2013',['stroke-width']:1.3},grp);}
+    else{line(x+w/2,y+6,x+w/2,y+h-9);el('path',{d:`M${x+w/2-4} ${y+h-9}L${x+w/2} ${y+h-2}L${x+w/2+4} ${y+h-9}`,fill:'none',stroke:'#2B2013',['stroke-width']:1.3},grp);}
+  }else if(style==='L'){const l=Math.min(w,h)*.5;if(long){for(let p=x+t;p<x+w-l;p+=t)line(p,y,p,y+h*.5);el('rect',{x:x+w-l,y,width:l,height:h*.5,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);for(let p=y+h*.5+t;p<y+h;p+=t)line(x+w-l,p,x+w,p);}else{for(let p=y+t;p<y+h-l;p+=t)line(x,p,x+w*.5,p);el('rect',{x,y:y+h-l,width:w*.5,height:l,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);for(let p=x+w*.5+t;p<x+w;p+=t)line(p,y+h-l,p,y+h);}
+  }else{const half=long?h/2:w/2,l=Math.min((long?w:h)*.25,3*FT);if(long){for(let p=x+t;p<x+w-l;p+=t){line(p,y,p,y+half);line(p,y+half,p,y+h);}el('rect',{x:x+w-l,y,width:l,height:h,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);line(x,y+half,x+w-l,y+half);}else{for(let p=y+t;p<y+h-l;p+=t){line(x,p,x+half,p);line(x+half,p,x+w,p);}el('rect',{x,y:y+h-l,width:w,height:l,fill:'none',stroke:'#5A4A34',['stroke-width']:1},grp);line(x+half,y,x+half,y+h-l);}}
+  el('text',{x:x+w/2,y:y+h/2+3,['text-anchor']:'middle',style:'font-family:DM Mono;font-weight:500;font-size:8px',fill:'#5A4A34'},grp).textContent='UP';
+}
+function drawDoor(grp,r,d,s,it,fill){
+  const dw=d.w*s,[px,py,horiz]=sidePoint(r,d.side,d.t,s,dw);
+  el('rect',horiz?{x:px,y:py-it/2-1,width:dw,height:it+2,fill}:{x:px-it/2-1,y:py,width:it+2,height:dw,fill},grp);
+  const inward=horiz?(d.side==='top'?1:-1):(d.side==='left'?1:-1),dir=d.swingOut?-inward:inward;
+  if(horiz){const hx=d.hinge==='b'?px+dw:px,fx=d.hinge==='b'?px:px+dw,ex=hx,ey=py+dir*dw;el('line',{x1:hx,y1:py,x2:ex,y2:ey,stroke:'#2B2013',['stroke-width']:2},grp);const cr=(fx-hx)*(ey-py);el('path',{d:`M ${fx} ${py} A ${dw} ${dw} 0 0 ${cr>0?1:0} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);}
+  else{const hy=d.hinge==='b'?py+dw:py,fy=d.hinge==='b'?py:py+dw,ex=px+dir*dw,ey=hy;el('line',{x1:px,y1:hy,x2:ex,y2:ey,stroke:'#2B2013',['stroke-width']:2},grp);const cr=(ex-px)*(fy-hy)*-1;el('path',{d:`M ${px} ${fy} A ${dw} ${dw} 0 0 ${cr>0?1:0} ${ex} ${ey}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},grp);}
+}
+function drawWin(grp,r,wd,s,it){const ww=wd.w*s,[px,py,horiz]=sidePoint(r,wd.side,wd.t,s,ww);if(horiz){el('rect',{x:px,y:py-it/2-1,width:ww,height:it+2,fill:'#FFF'},grp);[-it/2,0,it/2].forEach(o=>el('line',{x1:px,y1:py+o,x2:px+ww,y2:py+o,stroke:'#2B2013',['stroke-width']:1},grp));}else{el('rect',{x:px-it/2-1,y:py,width:it+2,height:ww,fill:'#FFF'},grp);[-it/2,0,it/2].forEach(o=>el('line',{x1:px+o,y1:py,x2:px+o,y2:py+ww,stroke:'#2B2013',['stroke-width']:1},grp));}}
+function sidePoint(r,side,t,s,len){const x=r.x*s,y=r.y*s,w=r.w*s,h=r.h*s;if(side==='top')return[x+(w-len)*t,y,true];if(side==='bottom')return[x+(w-len)*t,y+h,true];if(side==='left')return[x,y+(h-len)*t,false];return[x+w,y+(h-len)*t,false];}
+function drawEntrance(g,s,ot){const e=st.entrance,a=st.pts[e.edge],b2=st.pts[(e.edge+1)%st.pts.length];const ax=a[0]*s,ay=a[1]*s,bx=b2[0]*s,by=b2[1]*s,elen=Math.hypot(bx-ax,by-ay),gw=e.w*s,ux=(bx-ax)/elen,uy=(by-ay)/elen;const sx=ax+ux*((elen-gw)*e.t),sy=ay+uy*((elen-gw)*e.t),ex2=sx+ux*gw,ey2=sy+uy*gw,cen=st.pts.reduce((p,q)=>[p[0]+q[0]/st.pts.length,p[1]+q[1]/st.pts.length],[0,0]);let nx=uy,ny=-ux;const mx=(sx+ex2)/2,my=(sy+ey2)/2;if((cen[0]*s-mx)*nx+(cen[1]*s-my)*ny<0){nx=-nx;ny=-ny;}
+  el('line',{x1:sx,y1:sy,x2:ex2,y2:ey2,stroke:'#FCF8F0',['stroke-width']:ot+2},g);const half=gw/2,m1x=sx+ux*half,m1y=sy+uy*half;
+  el('line',{x1:sx,y1:sy,x2:sx+nx*half,y2:sy+ny*half,stroke:'#2B2013',['stroke-width']:2.2},g);el('line',{x1:ex2,y1:ey2,x2:ex2+nx*half,y2:ey2+ny*half,stroke:'#2B2013',['stroke-width']:2.2},g);
+  el('path',{d:`M ${m1x} ${m1y} A ${half} ${half} 0 0 ${((m1x-sx)*(sy+ny*half-sy)-(m1y-sy)*(sx+nx*half-sx))>0?0:1} ${sx+nx*half} ${sy+ny*half}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},g);
+  el('path',{d:`M ${m1x} ${m1y} A ${half} ${half} 0 0 ${((m1x-ex2)*(ey2+ny*half-ey2)-(m1y-ey2)*(ex2+nx*half-ex2))>0?1:0} ${ex2+nx*half} ${ey2+ny*half}`,fill:'none',stroke:'#8A7A5C',['stroke-width']:1,['stroke-dasharray']:'3 3'},g);
+  const lx=mx-nx*(ot+15),ly=my-ny*(ot+15),v=vOfEnt();el('rect',{x:lx-32,y:ly-9,width:64,height:18,rx:9,fill:VC[v]},g);el('text',{x:lx,y:ly+3.5,['text-anchor']:'middle',style:'font-family:Poppins;font-weight:800;font-size:8px;letter-spacing:.08em',fill:'#FFF'},g).textContent='ENTRANCE';
+  el('circle',{cx:mx,cy:my,r:14,fill:'transparent',class:'entHot',style:'cursor:pointer;pointer-events:all'},g);
+}
+
+/* interactions */
+let drag=null;const ptrs=new Map();let pinch=null;
+function wire(){
+  cv.querySelectorAll('.roomg').forEach(gr=>gr.addEventListener('pointerdown',e=>{if(e.target.classList.contains('rsz'))return;const id=gr.dataset.id;selEnt=false;select(id);const r=st.rooms.find(r=>r.id===id),p=wpt(e);drag={type:'move',id,ox:r.x,oy:r.y,px:p.x,py:p.y,moved:false,lx:r.x,ly:r.y};e.stopPropagation();e.preventDefault();}));
+  cv.querySelectorAll('.rsz').forEach(hd=>hd.addEventListener('pointerdown',e=>{const id=hd.dataset.id,r=st.rooms.find(r=>r.id===id),p=wpt(e);drag={type:'size',id,ow:r.w,oh:r.h,px:p.x,py:p.y,moved:false,lw:r.w,lh:r.h};e.stopPropagation();e.preventDefault();}));
+  cv.querySelectorAll('.vtx').forEach(v=>{v.addEventListener('pointerdown',e=>{drag={type:'vtx',i:+v.dataset.i,moved:false};e.stopPropagation();e.preventDefault();});v.addEventListener('dblclick',e=>{if(st.pts.length<=4){toast('A plot needs at least 4 corners');return;}st.pts.splice(+v.dataset.i,1);if(st.entrance)st.entrance.edge=Math.min(st.entrance.edge,st.pts.length-1);snap();render();e.stopPropagation();});});
+  const hot=cv.querySelector('.entHot');if(hot)hot.addEventListener('pointerdown',e=>{selEnt=true;selId=null;render();selPanel();e.stopPropagation();});
+}
+cv.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===2){drag=null;const a=[...ptrs.values()];pinch={d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};return;}if(!drag){drag={type:'pan',px:e.clientX,py:e.clientY,vx:vb.x,vy:vb.y};cv.classList.add('panning');}});
+cv.addEventListener('dblclick',e=>{if(!editBnd)return;const p=wpt(e),s=FT;let bi=-1,bd=1e9,bt=0;st.pts.forEach((a,i)=>{const c=st.pts[(i+1)%st.pts.length],ax=a[0]*s,ay=a[1]*s,cx=c[0]*s,cy=c[1]*s,dx=cx-ax,dy=cy-ay,L2=dx*dx+dy*dy;let t=clamp(((p.x-ax)*dx+(p.y-ay)*dy)/L2,0,1);const qx=ax+dx*t,qy=ay+dy*t,d=Math.hypot(p.x-qx,p.y-qy);if(d<bd){bd=d;bi=i;bt=t;}});if(bd<20){const a=st.pts[bi],c=st.pts[(bi+1)%st.pts.length];st.pts.splice(bi+1,0,[rnd(a[0]+(c[0]-a[0])*bt),rnd(a[1]+(c[1]-a[1])*bt)]);snap();render();toast('Corner added — drag it to shape the plot');}});
+window.addEventListener('pointermove',e=>{
+  if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch&&ptrs.size===2){const a=[...ptrs.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);zoomAt(wpt({clientX:(a[0].x+a[1].x)/2,clientY:(a[0].y+a[1].y)/2}),pinch.d/d);pinch.d=d;return;}
+  if(!drag)return;
+  if(drag.type==='pan'){const k=vb.w/innerWidth;vb.x=drag.vx-(e.clientX-drag.px)*k;vb.y=drag.vy-(e.clientY-drag.py)*k;applyVB();return;}
+  const p=wpt(e),s=FT;
+  if(drag.type==='vtx'){st.pts[drag.i]=[rnd(p.x/s),rnd(p.y/s)];drag.moved=true;render();return;}
+  const r=st.rooms.find(r=>r.id===drag.id);
+  if(drag.type==='move'){const nx=rnd(drag.ox+(p.x-drag.px)/s),ny=rnd(drag.oy+(p.y-drag.py)/s);if(roomInside({...r,x:nx,y:ny})){r.x=nx;r.y=ny;drag.lx=nx;drag.ly=ny;}else{r.x=drag.lx;r.y=drag.ly;}drag.moved=true;}
+  else{const nw=clamp(rnd(drag.ow+(p.x-drag.px)/s),3,999),nh=clamp(rnd(drag.oh+(p.y-drag.py)/s),3,999);if(roomInside({...r,w:nw,h:nh})){r.w=nw;r.h=nh;drag.lw=nw;drag.lh=nh;}else{r.w=drag.lw;r.h=drag.lh;}drag.moved=true;}
+  render();selPanel();
+});
+window.addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(drag&&drag.moved)snap();drag=null;cv.classList.remove('panning');});
+cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(wpt(e),e.deltaY>0?1.1:1/1.1);},{passive:false});
+function zoomAt(p,f){const b=bbox(),nw=clamp(vb.w*f,b.w*FT*.18,b.w*FT*5),k=nw/vb.w;vb.x=p.x-(p.x-vb.x)*k;vb.y=p.y-(p.y-vb.y)*k;vb.w=nw;vb.h*=k;applyVB();}
+function wpt(e){const pt=cv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;return pt.matrixTransform(cv.getScreenCTM().inverse());}
+
+/* rooms */
+function freeSpot(w,h){const b=bbox();for(let y=b.y1+1;y<=b.y2-h;y+=1)for(let x=b.x1+1;x<=b.x2-w;x+=1){if(!roomInside({x,y,w,h}))continue;if(!st.rooms.some(r=>x<r.x+r.w+1&&x+w+1>r.x&&y<r.y+r.h+1&&y+h+1>r.y))return{x,y};}return{x:b.x1+1,y:b.y1+1};}
+function addRoom(key){nextN[key]=(nextN[key]||0)+1;const n=nextN[key],k=KB[key],b=bbox(),w=Math.min(12,b.w-2),h=Math.min(10,b.h-2),sp=freeSpot(w,h),id='r'+Date.now()+Math.random().toString(36).slice(2,5);st.rooms.push({id,key,nm:k.nm+(n>1?' '+n:''),x:sp.x,y:sp.y,w,h,stairStyle:'straight',doors:[{side:'bottom',t:.5,w:3,hinge:'a',swingOut:false}],wins:[]});snap();selEnt=false;closePanels();select(id);toast(k.nm+(n>1?' '+n:'')+' added');}
+function select(id){selId=id;render();selPanel();}
+
+/* selection */
+function selPanel(){
+  const card=document.getElementById('selCard'),H=document.getElementById('selH'),B=document.getElementById('selB');
+  if(selEnt&&st.entrance){const z=entZone(),v=vOfEnt(),c=ENT.conf[z]||[65,50];
+    H.innerHTML=`<div class="pi"><svg class="ic sm" viewBox="0 0 24 24"><path d="M3 21h18M6 21V7l6-4 6 4v14"/></svg></div><b>Main entrance</b><button class="x" id="sx"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+    B.innerHTML=`<div class="field"><label>Edge</label><input class="inp num" type="number" id="eE" value="${st.entrance.edge+1}" min="1" max="${st.pts.length}"><label style="width:auto">Width</label><input class="inp num" type="number" id="eW" value="${st.entrance.w}" min="2.5" max="12" step="0.5"></div>
+      <div class="field"><label>Position</label><input type="range" id="eP" min="0.05" max="0.95" step="0.05" value="${st.entrance.t}" style="flex:1;accent-color:var(--orange)"></div>
+      <div class="actions"><button class="abtn danger" id="eD"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button></div>
+      ${verdictHTML(z,v,c,ENT.note,ENT.rem)}`;
+    card.classList.add('open');
+    document.getElementById('sx').onclick=()=>{selEnt=false;render();selPanel();card.classList.remove('open');};
+    document.getElementById('eE').onchange=e=>{st.entrance.edge=clamp(+e.target.value-1,0,st.pts.length-1);snap();render();selPanel();};
+    document.getElementById('eW').onchange=e=>{st.entrance.w=clamp(+e.target.value,2.5,12);snap();render();};
+    document.getElementById('eP').oninput=e=>{st.entrance.t=+e.target.value;render();};document.getElementById('eP').onchange=()=>snap();
+    document.getElementById('eD').onclick=()=>{st.entrance=null;selEnt=false;snap();render();card.classList.remove('open');};return;}
+  const r=st.rooms.find(r=>r.id===selId);if(!r){card.classList.remove('open');return;}
+  const k=KB[r.key],z=zoneOf(r),v=vOf(r),c=k.conf[z]||[65,50];
+  H.innerHTML=`<div class="pi" style="color:${k.tint};background:${k.fill}"><svg class="ic sm" viewBox="0 0 24 24">${ICON[r.key]}</svg></div><b>${r.nm}</b><button class="x" id="sx"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+  B.innerHTML=`<div class="field"><label>Name</label><input class="inp" type="text" id="rNm" value="${r.nm}"></div>
+    <div class="field"><label>Size ft</label><input class="inp num" type="number" id="rW" value="${r.w}" min="3" step="0.5"><span style="color:var(--ink-faint)">×</span><input class="inp num" type="number" id="rH" value="${r.h}" min="3" step="0.5"><span style="font-size:10px;color:var(--ink-faint);font-family:var(--fm)">${areaFt(r)} sqft</span></div>
+    ${r.key==='stairs'?`<div class="field"><label>Shape</label><div class="seg" id="stairSeg"><button data-v="straight" class="${r.stairStyle==='straight'?'on':''}">Straight</button><button data-v="L" class="${r.stairStyle==='L'?'on':''}">L</button><button data-v="U" class="${r.stairStyle==='U'?'on':''}">U</button></div></div>`:''}
+    <div class="actions">
+      <button class="abtn" id="rRot"><svg class="ic sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v5h-5"/></svg>Rotate</button>
+      <button class="abtn" id="rDoor"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 21V4h12v17"/><path d="M16 12h4v9"/><circle cx="13" cy="12" r=".8" fill="currentColor" stroke="none"/></svg>Door</button>
+      <button class="abtn" id="rWin"><svg class="ic sm" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 4v16M4 12h16"/></svg>Window</button>
+      <button class="abtn danger" id="rDel"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div>
+    <div id="opList"></div>${verdictHTML(z,v,c,k.note,k.rem)}`;
+  card.classList.add('open');
+  document.getElementById('sx').onclick=()=>{selId=null;render();card.classList.remove('open');};
+  document.getElementById('rNm').onchange=e=>{r.nm=e.target.value;snap();render();};
+  document.getElementById('rW').onchange=e=>{if(roomInside({...r,w:+e.target.value})){r.w=+e.target.value;snap();}render();selPanel();};
+  document.getElementById('rH').onchange=e=>{if(roomInside({...r,h:+e.target.value})){r.h=+e.target.value;snap();}render();selPanel();};
+  if(r.key==='stairs')document.querySelectorAll('#stairSeg button').forEach(b=>b.onclick=()=>{r.stairStyle=b.dataset.v;snap();render();selPanel();});
+  document.getElementById('rRot').onclick=()=>{if(roomInside({...r,w:r.h,h:r.w})){[r.w,r.h]=[r.h,r.w];snap();render();selPanel();}else toast('No room to rotate here');};
+  document.getElementById('rDel').onclick=()=>{st.rooms=st.rooms.filter(q=>q.id!==r.id);selId=null;snap();render();card.classList.remove('open');};
+  document.getElementById('rDoor').onclick=()=>{r.doors.push({side:'bottom',t:.5,w:3,hinge:'a',swingOut:false});snap();render();selPanel();};
+  document.getElementById('rWin').onclick=()=>{r.wins.push({side:'top',t:.5,w:4});snap();render();selPanel();};
+  const op=document.getElementById('opList');
+  r.doors.forEach((d,i)=>{const row=document.createElement('div');row.className='openrow';row.innerHTML=`<span class="oi"><svg class="ic sm" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M4 21V4h12v17"/><path d="M16 12h4v9"/></svg></span><b>D${i+1}</b>
+    <select data-i="${i}" class="dside"><option ${d.side==='top'?'selected':''}>top</option><option ${d.side==='bottom'?'selected':''}>bottom</option><option ${d.side==='left'?'selected':''}>left</option><option ${d.side==='right'?'selected':''}>right</option></select>
+    <input type="range" class="dpos" data-i="${i}" min="0" max="1" step="0.05" value="${d.t}">
+    <input type="number" class="dw" data-i="${i}" value="${d.w}" min="2" max="6" step="0.5">
+    <button class="minibtn dhinge ${d.hinge==='b'?'on':''}" data-i="${i}" title="Hinge side"><svg class="ic sm" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M8 4v16M8 4l8 3v10l-8 3"/></svg></button>
+    <button class="minibtn dswing ${d.swingOut?'on':''}" data-i="${i}" title="Open in/out"><svg class="ic sm" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M12 4v16M4 12h16"/></svg></button>
+    <button class="minibtn del ddel" data-i="${i}"><svg class="ic sm" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;op.appendChild(row);});
+  r.wins.forEach((wd,i)=>{const row=document.createElement('div');row.className='openrow';row.innerHTML=`<span class="oi"><svg class="ic sm" viewBox="0 0 24 24" style="width:14px;height:14px"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 4v16M4 12h16"/></svg></span><b>W${i+1}</b>
+    <select data-i="${i}" class="wside"><option ${wd.side==='top'?'selected':''}>top</option><option ${wd.side==='bottom'?'selected':''}>bottom</option><option ${wd.side==='left'?'selected':''}>left</option><option ${wd.side==='right'?'selected':''}>right</option></select>
+    <input type="range" class="wpos" data-i="${i}" min="0" max="1" step="0.05" value="${wd.t}">
+    <input type="number" class="ww" data-i="${i}" value="${wd.w}" min="1.5" max="10" step="0.5">
+    <button class="minibtn del wdel" data-i="${i}"><svg class="ic sm" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;op.appendChild(row);});
+  const re=()=>{render();selPanel();};
+  op.querySelectorAll('.dside').forEach(s=>s.onchange=e=>{r.doors[+e.target.dataset.i].side=e.target.value;snap();render();});
+  op.querySelectorAll('.dpos').forEach(s=>{s.oninput=e=>{r.doors[+e.target.dataset.i].t=+e.target.value;render();};s.onchange=()=>snap();});
+  op.querySelectorAll('.dw').forEach(s=>s.onchange=e=>{r.doors[+e.target.dataset.i].w=clamp(+e.target.value,2,6);snap();render();});
+  op.querySelectorAll('.dhinge').forEach(b=>b.onclick=e=>{const d=r.doors[+e.currentTarget.dataset.i];d.hinge=d.hinge==='a'?'b':'a';snap();re();});
+  op.querySelectorAll('.dswing').forEach(b=>b.onclick=e=>{const d=r.doors[+e.currentTarget.dataset.i];d.swingOut=!d.swingOut;snap();re();});
+  op.querySelectorAll('.ddel').forEach(b=>b.onclick=e=>{r.doors.splice(+e.currentTarget.dataset.i,1);snap();re();});
+  op.querySelectorAll('.wside').forEach(s=>s.onchange=e=>{r.wins[+e.target.dataset.i].side=e.target.value;snap();render();});
+  op.querySelectorAll('.wpos').forEach(s=>{s.oninput=e=>{r.wins[+e.target.dataset.i].t=+e.target.value;render();};s.onchange=()=>snap();});
+  op.querySelectorAll('.ww').forEach(s=>s.onchange=e=>{r.wins[+e.target.dataset.i].w=clamp(+e.target.value,1.5,10);snap();render();});
+  op.querySelectorAll('.wdel').forEach(b=>b.onclick=e=>{r.wins.splice(+e.currentTarget.dataset.i,1);snap();re();});
+}
+function verdictHTML(z,v,c,note,rem){const b=v==='good'?`<span class="vbadge good"><svg class="ic sm" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 13l4 4L19 7"/></svg>${z} · ${DEITY[z]} — ideal</span>`:v==='bad'?`<span class="vbadge bad"><svg class="ic sm" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8"/></svg>${z} · ${DEITY[z]} — avoid</span>`:`<span class="vbadge mid"><svg class="ic sm" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 3a9 9 0 000 18z"/></svg>${z} · ${DEITY[z]} — mixed</span>`;
+  return `<div class="verd">${b}<div class="confrow"><span>Source agreement on placement</span><b>${c[0]}%</b></div><div class="cbar"><i style="width:${c[0]}%"></i></div><div class="confrow"><span>Source agreement on effect</span><b>${c[1]}%</b></div><div class="cbar"><i style="width:${c[1]}%"></i></div><div class="vnote">${note}</div><div class="vrem"><b>REMEDY</b>${rem}</div></div>`;}
+
+function updateScore(){const ring=document.getElementById('ringFill'),val=document.getElementById('scoreVal'),word=document.getElementById('scoreWord');const items=[...st.rooms.map(vOf),...(st.entrance?[vOfEnt()]:[])];if(!items.length){ring.style.strokeDashoffset=84.8;val.textContent='—';word.textContent='Add rooms';return;}let s=0;items.forEach(v=>s+=v==='good'?100:v==='mid'?62:18);const sc=Math.round(s/items.length),C=84.8;ring.style.strokeDashoffset=C-C*sc/100;ring.style.stroke=sc>=75?'#3D8B5F':sc>=45?'#C08A1E':'#C24545';val.textContent=sc;word.textContent=sc>=75?'Looking great':sc>=45?'Room to improve':'Needs attention';}
+
+/* panels/rail */
+function closePanels(){document.querySelectorAll('.panel:not(#selCard)').forEach(x=>x.classList.remove('open'));document.querySelectorAll('.re button').forEach(x=>x.classList.remove('on'));}
+document.querySelectorAll('.re button').forEach(b=>b.onclick=()=>{const p=document.getElementById('pn-'+b.dataset.p),was=p.classList.contains('open');closePanels();if(!was){p.classList.add('open');b.classList.add('on');}});
+document.querySelectorAll('.panel [data-c]').forEach(b=>b.onclick=()=>closePanels());
+document.getElementById('fab').onclick=()=>{const p=document.getElementById('pn-rooms'),was=p.classList.contains('open');closePanels();if(!was){p.classList.add('open');document.querySelector('.re button[data-p=rooms]').classList.add('on');}};
+document.addEventListener('pointerdown',e=>{
+  const openPanel=document.querySelector('.panel.open:not(#selCard)');
+  if(!openPanel)return;
+  if(openPanel.contains(e.target)||e.target.closest('.re'))return;
+  closePanels();
+});
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels();});
+
+const rEl=document.getElementById('rooms');
+Object.entries(KB).forEach(([key,k])=>{const c=document.createElement('button');c.className='rc';c.innerHTML=`<span class="rci" style="background:${k.fill};color:${k.tint}"><svg class="ic" viewBox="0 0 24 24">${ICON[key]}</svg></span><span>${k.nm}</span>`;c.onclick=()=>addRoom(key);rEl.appendChild(c);});
+
+function syncSegs(){
+  document.querySelectorAll('#northSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===st.northDir));
+  document.querySelectorAll('#outerSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.v===st.outerT));
+  document.querySelectorAll('#innerSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.v===st.innerT));
+  document.querySelectorAll('#gridSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===st.showGrid));
+  document.querySelectorAll('#snapSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===st.snap));
+}
+document.querySelectorAll('#northSeg button').forEach(b=>b.onclick=()=>{st.northDir=b.dataset.v;syncSegs();snap();render();selPanel();toast('North changed — verdicts recalculated');});
+document.querySelectorAll('#outerSeg button').forEach(b=>b.onclick=()=>{st.outerT=+b.dataset.v;syncSegs();snap();render();});
+document.querySelectorAll('#innerSeg button').forEach(b=>b.onclick=()=>{st.innerT=+b.dataset.v;syncSegs();snap();render();});
+document.querySelectorAll('#gridSeg button').forEach(b=>b.onclick=()=>{st.showGrid=b.dataset.v==='1';syncSegs();snap();render();});
+document.querySelectorAll('#snapSeg button').forEach(b=>b.onclick=()=>{st.snap=b.dataset.v==='1';syncSegs();snap();});
+document.getElementById('resetBnd').onclick=()=>{const w=clamp(+document.getElementById('plotW').value,15,120),h=clamp(+document.getElementById('plotH').value,15,120);st.pts=[[0,0],[w,0],[w,h],[0,h]];st.rooms=st.rooms.filter(roomInside);if(st.entrance)st.entrance.edge=0;snap();render();fit();toast(`Boundary set to ${w}×${h} ft`);};
+document.getElementById('editBnd').onclick=e=>{editBnd=!editBnd;e.currentTarget.classList.toggle('on',editBnd);render();toast(editBnd?'Editing corners — drag them, double-tap an edge to add one':'Corner editing off');};
+document.getElementById('addEnt').onclick=()=>{if(!st.entrance)st.entrance={edge:0,t:.5,w:4};selEnt=true;selId=null;closePanels();snap();render();selPanel();toast('Entrance placed on the boundary');};
+document.getElementById('zIn').onclick=()=>zoomAt({x:vb.x+vb.w/2,y:vb.y+vb.h/2},1/1.2);
+document.getElementById('zOut').onclick=()=>zoomAt({x:vb.x+vb.w/2,y:vb.y+vb.h/2},1.2);
+document.getElementById('zFit').onclick=fit;
+document.getElementById('vm3d').onclick=()=>toast('3D view coming soon');
+document.getElementById('vmwalk').onclick=()=>toast('Walkthrough coming soon');
+window.addEventListener('resize',fit);
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* seed */
+st.pts=[[0,0],[48,0],[48,41],[45.5,50],[0,50]];
+[['store',1,1,10,20],['bedroom',12.5,1,15,10],['toilet',29,1,3,3],['bath',33.5,1,5,6],['guest',1,23,10,10],['stairs',30,12,4,10]].forEach(([k,x,y,w,h],i)=>{nextN[k]=(nextN[k]||0)+1;const n=nextN[k];st.rooms.push({id:'seed'+i,key:k,nm:KB[k].nm+(n>1?' '+n:''),x,y,w,h,stairStyle:'straight',doors:[{side:'bottom',t:.5,w:3,hinge:'a',swingOut:false}],wins:[]});});
+st.entrance={edge:3,t:.4,w:4};
+syncSegs();snap();render();fit();
+</script>
+</body>
+</html>

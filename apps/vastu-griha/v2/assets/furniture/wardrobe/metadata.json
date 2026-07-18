@@ -1,0 +1,35 @@
+{
+  "id": "furniture-wardrobe",
+  "name": "Double Door Wooden Wardrobe",
+  "category": "furniture",
+  "tags": [
+    "wardrobe",
+    "closet",
+    "cabinet",
+    "bedroom",
+    "storage"
+  ],
+  "defaultWidthFt": 4,
+  "defaultDepthFt": 2.2,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Tall wooden wardrobe cabinet with custom copper fittings. Excellent storage organizer for bedrooms, providing solid mass structure in heavier zones.",
+  "recommendedRooms": [
+    "Bedroom",
+    "Dressing Room"
+  ],
+  "recommendedDirections": [
+    "South-West",
+    "South",
+    "West"
+  ],
+  "material": "Walnut Wood & Brass details",
+  "color": "Natural Walnut Wood"
+}

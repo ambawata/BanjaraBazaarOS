@@ -1,0 +1,35 @@
+{
+  "id": "furniture-ceiling-fan",
+  "name": "Modern Wood Ceiling Fan",
+  "category": "furniture",
+  "tags": [
+    "fan",
+    "ceiling",
+    "cooling",
+    "ventilation"
+  ],
+  "defaultWidthFt": 4,
+  "defaultDepthFt": 4,
+  "rotation": 0,
+  "anchor": "center",
+  "preview": "preview.svg",
+  "thumbnail": "thumbnail.svg",
+  "plannerTop": "planner-top.svg",
+  "plannerOutline": "planner-outline.svg",
+  "license": "MIT",
+  "source": "BanjaraBazaarOS Internal",
+  "version": "1.0.0",
+  "description": "Premium wood ceiling fan with 3 blades and central casing cap. Establishes healthy air circulation in bedrooms or lounges.",
+  "recommendedRooms": [
+    "Living Room",
+    "Bedroom",
+    "Family Lounge"
+  ],
+  "recommendedDirections": [
+    "North-West",
+    "East",
+    "West"
+  ],
+  "material": "Maple Wood & Steel",
+  "color": "Maple Wood Gold"
+}

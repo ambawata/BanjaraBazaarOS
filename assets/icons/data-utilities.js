@@ -1,0 +1,40 @@
+'use strict';
+// Utility icons — sub-style 1 (48x48, monoline, single purple accent).
+const { PURPLE } = require('./generate');
+
+module.exports = {
+  size: 48,
+  folder: 'utilities',
+  items: [
+    ['Electric Meter', () => `<rect x="10" y="8" width="28" height="32" rx="3"/><circle cx="24" cy="21" r="9"/><path d="M24 21 l4-6"/><path d="M20 34 h8"/>`],
+    ['Distribution Board', () => `<rect x="8" y="6" width="32" height="36" rx="2"/><line x1="8" y1="16" x2="40" y2="16"/><rect x="13" y="21" width="8" height="4"/><rect x="27" y="21" width="8" height="4"/><rect x="13" y="29" width="8" height="4"/><rect x="27" y="29" width="8" height="4"/>`],
+    ['Solar Meter', () => `<circle cx="24" cy="12" r="5"/><path d="M24 3 v3 M24 18 v3 M15 12 h3 M30 12 h3 M17.4 5.4 l2 2 M28.6 18.6 l2 2 M30.6 5.4 l-2 2 M19.4 18.6 l-2 2"/><rect x="10" y="24" width="28" height="16" rx="3"/><circle cx="24" cy="32" r="5"/>`],
+    ['Gas Meter', () => `<rect x="11" y="14" width="26" height="20" rx="3"/><circle cx="24" cy="24" r="7"/><path d="M24 24 l3-4"/><path d="M17 8 c0 4 3 3 3 7"/>`],
+    ['Water Meter', () => `<path d="M24 6 c7 9 11 14.5 11 20 a11 11 0 0 1-22 0 c0-5.5 4-11 11-20 Z"/><circle cx="24" cy="28" r="6"/>`],
+    ['Internet Point', () => `<circle cx="24" cy="38" r="2.4" fill="${PURPLE}" stroke="none"/><path d="M15 31 a13 13 0 0 1 18 0"/><path d="M9 24 a22 22 0 0 1 30 0"/>`],
+    ['Telephone Point', () => `<path d="M12 10 h6 l3 8 l-4 3 c2 6 6 10 12 12 l3-4 l8 3 v6 a3 3 0 0 1-3 3 C21 41 7 27 9 13 a3 3 0 0 1 3-3 Z"/>`],
+    ['Water Inlet', () => `<line x1="6" y1="24" x2="26" y2="24"/><path d="M26 24 l-6-6 M26 24 l-6 6"/><path d="M30 12 c5 6 8 9.5 8 13.5 a7.5 7.5 0 0 1-15 0 c0-4 3-7.5 7-13.5 Z"/>`],
+    ['Water Outlet', () => `<path d="M18 12 c5 6 8 9.5 8 13.5 a7.5 7.5 0 0 1-15 0 c0-4 3-7.5 7-13.5 Z"/><line x1="22" y1="24" x2="42" y2="24"/><path d="M42 24 l-6-6 M42 24 l-6 6"/>`],
+    ['Sewer', () => `<circle cx="24" cy="24" r="16"/><line x1="14" y1="18" x2="34" y2="18"/><line x1="14" y1="24" x2="34" y2="24"/><line x1="14" y1="30" x2="34" y2="30"/>`],
+    ['Drainage', () => `<path d="M10 14 h28 l-4 6 H14 Z"/><line x1="24" y1="20" x2="24" y2="30"/><path d="M18 30 h12 l-3 8 h-6 Z"/>`],
+    ['Manhole', () => `<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="16" stroke-dasharray="1 4"/><line x1="24" y1="12" x2="24" y2="36"/><line x1="12" y1="24" x2="36" y2="24"/>`],
+    ['Septic', () => `<line x1="6" y1="18" x2="42" y2="18" stroke-dasharray="2 3"/><rect x="12" y="18" width="24" height="16" rx="2"/><line x1="24" y1="10" x2="24" y2="18"/>`],
+    ['Borewell', () => `<line x1="6" y1="14" x2="42" y2="14" stroke-dasharray="2 3"/><line x1="24" y1="6" x2="24" y2="14"/><line x1="21" y1="14" x2="21" y2="40"/><line x1="27" y1="14" x2="27" y2="40"/><path d="M21 40 l3 4 l3-4"/>`],
+    ['Sump', () => `<line x1="6" y1="20" x2="42" y2="20" stroke-dasharray="2 3"/><rect x="14" y="20" width="20" height="18" rx="2"/><path d="M18 27 q3-3 6 0 t6 0"/>`],
+    ['Overhead Tank', () => `<path d="M14 20 L14 8 H34 V20 Z"/><path d="M14 20 c0 6 4 8 10 8 s10-2 10-8"/><line x1="18" y1="28" x2="18" y2="40"/><line x1="30" y1="28" x2="30" y2="40"/>`],
+    ['Underground Tank', () => `<line x1="6" y1="16" x2="42" y2="16" stroke-dasharray="2 3"/><rect x="12" y="16" width="24" height="18" rx="2"/><path d="M16 23 q4-3 8 0 t8 0"/>`],
+    ['Pump', () => `<rect x="10" y="18" width="16" height="14" rx="2"/><circle cx="18" cy="25" r="3"/><line x1="26" y1="25" x2="40" y2="25"/><path d="M40 25 l-4-3 M40 25 l-4 3"/>`],
+    ['Generator', () => `<rect x="7" y="16" width="26" height="18" rx="2"/><path d="M22 20 l-5 7 h5 l-5 7"/><path d="M33 21 h8 v12 h-8"/>`],
+    ['Inverter', () => `<rect x="10" y="10" width="28" height="28" rx="3"/><path d="M15 24 h6 l3-8 l4 16 l3-8 h5"/>`],
+    ['Battery', () => `<rect x="8" y="16" width="30" height="16" rx="2"/><rect x="38" y="21" width="4" height="6"/><line x1="16" y1="20" x2="16" y2="28"/><line x1="24" y1="20" x2="24" y2="28"/>`],
+    ['Solar Panel', () => `<path d="M10 34 L14 10 H38 L36 34 Z"/><line x1="16" y1="18" x2="35.3" y2="18"/><line x1="14.7" y1="26" x2="34" y2="26"/><line x1="21.3" y1="10" x2="14" y2="34"/><line x1="28.6" y1="10" x2="25" y2="34"/>`],
+    ['EV Charger', () => `<rect x="14" y="8" width="16" height="24" rx="3"/><path d="M25 14 l-6 8 h5 l-4 6"/><path d="M30 16 h4 a3 3 0 0 1 3 3 V36 a2 2 0 0 1-4 0 V30 h-3"/>`],
+    ['Dustbin', () => `<path d="M13 14 h22 l-2 24 a2 2 0 0 1-2 2 H17 a2 2 0 0 1-2-2 Z"/><line x1="9" y1="14" x2="39" y2="14"/><path d="M18 14 v-3 a2 2 0 0 1 2-2 h8 a2 2 0 0 1 2 2 v3"/>`],
+    ['Compost Bin', () => `<path d="M13 14 h22 l-2 24 a2 2 0 0 1-2 2 H17 a2 2 0 0 1-2-2 Z"/><line x1="9" y1="14" x2="39" y2="14"/><path d="M24 19 c-4 2-4 6 0 8 c4-2 4-6 0-8 Z"/>`],
+    ['Fire Extinguisher', () => `<path d="M20 12 h8 v4 h-8 Z"/><path d="M18 16 h12 l-2 26 a2 2 0 0 1-2 2 H22 a2 2 0 0 1-2-2 Z"/><path d="M24 8 v4"/><path d="M30 18 l8-4"/>`],
+    ['Smoke Detector', () => `<circle cx="24" cy="22" r="14"/><circle cx="24" cy="22" r="5"/><line x1="24" y1="36" x2="24" y2="42"/>`],
+    ['Water Pump', () => `<circle cx="18" cy="24" r="9"/><path d="M18 18 v12 M13 24 h10"/><rect x="27" y="19" width="12" height="10" rx="2"/>`],
+    ['Security Camera', () => `<rect x="6" y="18" width="20" height="12" rx="3"/><path d="M26 21 l10-5 v18 l-10-5 Z"/><circle cx="14" cy="24" r="3"/>`],
+    ['Door Sensor', () => `<rect x="8" y="10" width="10" height="10" rx="2"/><rect x="30" y="10" width="10" height="10" rx="2"/><line x1="18" y1="15" x2="30" y2="15" stroke-dasharray="2 3"/><rect x="14" y="26" width="20" height="14" rx="1"/>`],
+  ],
+};
