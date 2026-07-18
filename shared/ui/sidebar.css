@@ -1,0 +1,25 @@
+/* shared/ui/Sidebar.jsx — component-scoped styles.
+   Imported directly by Sidebar.jsx (`import './sidebar.css'`) so this
+   component is genuinely self-contained: any future consumer app just
+   imports the JS and this CSS comes along with it via Vite's bundler —
+   no undocumented "also add this keyframe to your own index.css" step
+   required, unlike a global-stylesheet-only approach would need. */
+
+/* Label fade-in on expand. Deliberately a *mount* animation (triggered by
+   the label re-entering the DOM), not a width/opacity CSS transition on a
+   persistently-rendered element — labels are conditionally rendered in
+   JSX (removed from the DOM entirely when collapsed, not just
+   display:none), per the explicit requirement that they "genuinely
+   disappear, not just visually hidden" when collapsed. RentProOS's own
+   implementation uses opacity transitions on an always-present element;
+   this achieves the same visual fade-in while satisfying the stricter
+   DOM-absence requirement. */
+@keyframes sidebarLabelFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sidebar-label-fade {
+  animation: sidebarLabelFadeIn 0.2s linear;
+  white-space: nowrap;
+}
