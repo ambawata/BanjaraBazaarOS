@@ -1,6 +1,15 @@
-import { Building2, Calendar, LayoutGrid, Ruler, Sparkles } from "lucide-react";
+import { Building2, Calculator, Calendar, LayoutGrid, Ruler, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CONSTRUCTION_CATEGORY_LABEL, type Project } from "@/features/projects/types";
+import { useOrganization } from "@/features/organizations/use-organization";
+import { useMaterialRates, useProjectEstimate } from "@/features/estimate/hooks";
+import {
+  computeAreaBreakdown,
+  computeCostBreakdown,
+  computeStructuralBreakdown,
+  DEFAULT_MATERIAL_RATES,
+} from "@/features/estimate/engine";
+import { formatCurrency } from "@/lib/format";
 
 function StatCard({
   icon: Icon,
@@ -23,6 +32,33 @@ function StatCard({
         </div>
       </div>
     </Card>
+  );
+}
+
+function EstimateSummary({ project }: { project: Project }) {
+  const { data: organization } = useOrganization();
+  const { data: assumptions } = useProjectEstimate(project.id);
+  const { data: rates } = useMaterialRates(organization?.id);
+
+  if (!project.built_up_area_sqft || !assumptions) return null;
+
+  const area = computeAreaBreakdown(
+    {
+      builtUpAreaSqft: project.built_up_area_sqft,
+      floorsAboveGround: project.floors_above_ground,
+      hasBasement: project.has_basement,
+      basementCount: project.basement_count,
+    },
+    assumptions,
+  );
+  const structural = computeStructuralBreakdown(area);
+  const cost = computeCostBreakdown(area, structural, assumptions, rates ?? DEFAULT_MATERIAL_RATES);
+
+  return (
+    <>
+      <StatCard icon={Calculator} label="Estimated cost" value={formatCurrency(cost.grandTotal)} />
+      <StatCard icon={Calculator} label="Cost per sq ft" value={formatCurrency(cost.costPerSqft)} />
+    </>
   );
 }
 
@@ -54,6 +90,7 @@ export function ProjectOverview({ project }: { project: Project }) {
             year: "numeric",
           })}
         />
+        <EstimateSummary project={project} />
       </div>
 
       <Card>
@@ -62,10 +99,10 @@ export function ProjectOverview({ project }: { project: Project }) {
             <Sparkles className="size-6" />
           </div>
           <div>
-            <p className="font-medium">Cost estimate, BOQ and AI insights are on the way</p>
+            <p className="font-medium">BOQ export, MEP and AI insights are on the way</p>
             <p className="mt-1 max-w-md text-sm text-black/50 dark:text-white/45">
-              The area, structural, MEP and cost engines will appear here once they land — this
-              project's data is already structured to support them.
+              The area, structural and cost engines are live — see the Estimate tab for the full,
+              editable breakdown. MEP, finishing and AI-generated insights land next.
             </p>
           </div>
         </CardContent>

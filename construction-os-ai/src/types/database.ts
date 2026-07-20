@@ -1,4 +1,4 @@
-// Hand-written mirror of supabase/migrations/0001_init.sql.
+// Hand-written mirror of supabase/migrations/0001_init.sql and 0002_estimates.sql.
 // Once a live Supabase project exists, regenerate with:
 //   supabase gen types typescript --project-id <id> > src/types/database.ts
 
@@ -19,6 +19,18 @@ export type ConstructionCategory =
 export type ProjectContactRole = "owner" | "architect" | "engineer" | "contractor" | "other";
 
 export type AuditAction = "created" | "updated" | "archived" | "restored" | "deleted";
+
+export type MaterialKey =
+  | "cement"
+  | "steel"
+  | "sand"
+  | "aggregate"
+  | "bricks"
+  | "plaster"
+  | "paint"
+  | "tiles"
+  | "door"
+  | "window";
 
 // GenericRelationship[] — left empty since this schema is hand-written rather
 // than introspected. `supabase gen types` fills these in for real FK-aware
@@ -182,6 +194,58 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["audit_logs"]["Insert"]>;
+        Relationships: NoRelationships;
+      };
+      project_estimates: {
+        Row: {
+          id: string;
+          project_id: string;
+          floor_height_ft: number;
+          door_count: number;
+          window_count: number;
+          labour_cost_pct: number;
+          machine_cost_pct: number;
+          transport_cost_pct: number;
+          contingency_pct: number;
+          gst_pct: number;
+          contractor_margin_pct: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          floor_height_ft?: number;
+          door_count?: number;
+          window_count?: number;
+          labour_cost_pct?: number;
+          machine_cost_pct?: number;
+          transport_cost_pct?: number;
+          contingency_pct?: number;
+          gst_pct?: number;
+          contractor_margin_pct?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["project_estimates"]["Insert"]>;
+        Relationships: NoRelationships;
+      };
+      material_rates: {
+        Row: {
+          id: string;
+          organization_id: string;
+          material_key: MaterialKey;
+          rate: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          material_key: MaterialKey;
+          rate: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["material_rates"]["Insert"]>;
         Relationships: NoRelationships;
       };
     };
