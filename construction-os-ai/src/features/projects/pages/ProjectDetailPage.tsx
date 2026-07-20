@@ -11,6 +11,7 @@ import { ProjectActionsMenu } from "@/features/projects/components/ProjectAction
 import { ProjectOverview } from "@/features/projects/components/ProjectOverview";
 import { ProjectDetailsForm } from "@/features/projects/components/ProjectDetailsForm";
 import { EstimateTab } from "@/features/estimate/components/EstimateTab";
+import { LabourTab } from "@/features/labour/components/LabourTab";
 
 const STATUS_VARIANT: Record<Project["status"], NonNullable<VariantProps<typeof badgeVariants>["variant"]>> = {
   planning: "neutral",
@@ -60,6 +61,7 @@ export function ProjectDetailPage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="estimate">Estimate</TabsTrigger>
+          <TabsTrigger value="labour">Labour</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
           <ProjectOverview project={project} />
@@ -69,6 +71,9 @@ export function ProjectDetailPage() {
         </TabsContent>
         <TabsContent value="estimate">
           <EstimateTab project={project} />
+        </TabsContent>
+        <TabsContent value="labour">
+          <LabourTab projectId={project.id} />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,5 +1,5 @@
-// Hand-written mirror of supabase/migrations/0001_init.sql and 0002_estimates.sql.
-// Once a live Supabase project exists, regenerate with:
+// Hand-written mirror of supabase/migrations/0001_init.sql, 0002_estimates.sql
+// and 0003_labour.sql. Once a live Supabase project exists, regenerate with:
 //   supabase gen types typescript --project-id <id> > src/types/database.ts
 
 export type OrgRole = "owner" | "admin" | "member";
@@ -31,6 +31,8 @@ export type MaterialKey =
   | "tiles"
   | "door"
   | "window";
+
+export type LabourShift = "half_day" | "full_day" | "overtime";
 
 // GenericRelationship[] — left empty since this schema is hand-written rather
 // than introspected. `supabase gen types` fills these in for real FK-aware
@@ -246,6 +248,74 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["material_rates"]["Insert"]>;
+        Relationships: NoRelationships;
+      };
+      labourers: {
+        Row: {
+          id: string;
+          project_id: string;
+          name: string;
+          trade: string | null;
+          phone: string | null;
+          daily_rate: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          name: string;
+          trade?: string | null;
+          phone?: string | null;
+          daily_rate?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["labourers"]["Insert"]>;
+        Relationships: NoRelationships;
+      };
+      labour_attendance: {
+        Row: {
+          id: string;
+          labourer_id: string;
+          work_date: string;
+          shift: LabourShift;
+          overtime_hours: number;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          labourer_id: string;
+          work_date: string;
+          shift?: LabourShift;
+          overtime_hours?: number;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["labour_attendance"]["Insert"]>;
+        Relationships: NoRelationships;
+      };
+      labour_payments: {
+        Row: {
+          id: string;
+          labourer_id: string;
+          amount: number;
+          paid_on: string;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          labourer_id: string;
+          amount: number;
+          paid_on?: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["labour_payments"]["Insert"]>;
         Relationships: NoRelationships;
       };
     };

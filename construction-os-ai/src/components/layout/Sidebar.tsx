@@ -28,8 +28,8 @@ const primaryNav: NavItem[] = [
 const roadmapNav: NavItem[] = [
   { label: "AI Civil Engineer", icon: Sparkles, comingSoon: true },
   { label: "BOQ Export", icon: Calculator, comingSoon: true },
-  { label: "Material & Labour", icon: Boxes, comingSoon: true },
-  { label: "Team & Site", icon: Users2, comingSoon: true },
+  { label: "Material Management", icon: Boxes, comingSoon: true },
+  { label: "Site Diary", icon: Users2, comingSoon: true },
   { label: "Vastu Studio", icon: Compass, comingSoon: true },
   { label: "Marketplace", icon: Store, comingSoon: true },
 ];

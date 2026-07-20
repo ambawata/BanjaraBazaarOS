@@ -32,12 +32,16 @@ parties as its own product with its own clean API surface.
   branded, print-ready cost estimate (area/structural/cost tables + grand
   total). PDF generation (`jspdf`) is code-split so it's only downloaded
   when the button is actually clicked.
+- **Module 11 — Labour ledger** (`src/features/labour`): workers with a
+  daily rate, per-day attendance (half/full/overtime), and payments/
+  advances. A ledger table shows days worked, wages due, paid and balance
+  per worker, computed the same deterministic way as the cost engine.
 
 Everything else in the long-term vision (AI floor plan analysis, MEP/
-finishing engines, BOQ export, labour & material management, site diary, AI
-Civil Engineer / Interior Designer, Vastu Studio, marketplace) is
-represented in the sidebar as "on the roadmap" and will be built out in
-later modules on top of this foundation.
+finishing engines, BOQ export, material management, site diary, AI Civil
+Engineer / Interior Designer, Vastu Studio, marketplace) is represented in
+the sidebar as "on the roadmap" and will be built out in later modules on
+top of this foundation.
 
 ## Stack
 
@@ -69,6 +73,7 @@ src/
     organizations/ Current user's workspace
     projects/      Module 1 (project management) + Module 2 (project details)
     estimate/      Modules 5/6/9 — area/structural/cost engine + editable rates
+    labour/        Module 11 — workers, attendance, payments ledger
     dashboard/     Home page
   types/database.ts  Hand-written mirror of the Supabase schema
 supabase/migrations/ Postgres schema, RLS policies, triggers
