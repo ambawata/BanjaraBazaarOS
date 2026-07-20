@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import { AMBNIWAS_FIXTURE } from '../data/ambniwasFixture'
 import PlotSetupPanel from '../components/PlotSetupPanel_v1_20260717'
 import FloorPlanCanvas from '../components/FloorPlanCanvas_v1_20260717'
+import DoorViaPhotoTool from '../components/DoorViaPhotoTool'
 import CalibrationWorkflow from '../components/CalibrationWorkflow_v1_20260717'
 import GeometryResultsTable from '../components/GeometryResultsTable_v1_20260717'
 
@@ -101,6 +102,7 @@ export default function GeometryToolPage() {
           </div>
 
           <FloorPlanCanvas />
+          <DoorViaPhotoTool />
           <CalibrationWorkflow />
           <GeometryResultsTable />
         </div>
