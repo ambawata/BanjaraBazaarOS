@@ -66,7 +66,8 @@ export function useSetProjectArchived(organizationId: string | undefined) {
   return useMutation({
     mutationFn: ({ projectId, isArchived }: { projectId: string; isArchived: boolean }) =>
       setProjectArchived(projectId, isArchived),
-    onSuccess: () => {
+    onSuccess: (project: Project) => {
+      queryClient.setQueryData(projectKey(project.id), project);
       queryClient.invalidateQueries({ queryKey: projectsKey(organizationId) });
     },
   });

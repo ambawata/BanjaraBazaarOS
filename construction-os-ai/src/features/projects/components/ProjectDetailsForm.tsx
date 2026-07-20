@@ -69,6 +69,10 @@ export function ProjectDetailsForm({ project }: { project: Project }) {
     formState: { isSubmitting, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    // keepDirtyValues: when the contacts query resolves after the user has
+    // already started editing other fields, only sync the not-yet-touched
+    // fields instead of clobbering their in-progress edits.
+    resetOptions: { keepDirtyValues: true },
     values: {
       description: project.description ?? "",
       constructionCategory: project.construction_category,
@@ -102,7 +106,7 @@ export function ProjectDetailsForm({ project }: { project: Project }) {
     });
 
     await saveContacts.mutateAsync(
-      CONTACT_ROLES.filter((role) => values.contacts[role]?.name?.trim()).map((role) => ({
+      CONTACT_ROLES.map((role) => ({
         role,
         name: values.contacts[role].name.trim(),
         phone: values.contacts[role].phone?.trim() || null,

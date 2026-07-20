@@ -74,15 +74,34 @@ export async function listProjectContacts(projectId: string) {
   return data as ProjectContact[];
 }
 
+// Upserts one row per (project_id, role) — relies on the unique constraint
+// in the schema, so concurrent saves merge instead of racing a
+// delete-then-insert into duplicate rows. Roles submitted with a blank name
+// are treated as "cleared" and deleted instead of upserted.
 export async function upsertProjectContacts(
   projectId: string,
   contacts: Omit<ProjectContactInsert, "project_id">[],
 ) {
-  await supabase.from("project_contacts").delete().eq("project_id", projectId);
-  if (contacts.length === 0) return [];
+  const toUpsert = contacts.filter((c) => c.name.trim() !== "");
+  const toDelete = contacts.filter((c) => c.name.trim() === "").map((c) => c.role);
+
+  if (toDelete.length > 0) {
+    const { error: deleteError } = await supabase
+      .from("project_contacts")
+      .delete()
+      .eq("project_id", projectId)
+      .in("role", toDelete);
+    if (deleteError) throw deleteError;
+  }
+
+  if (toUpsert.length === 0) return [];
+
   const { data, error } = await supabase
     .from("project_contacts")
-    .insert(contacts.map((c) => ({ ...c, project_id: projectId })))
+    .upsert(
+      toUpsert.map((c) => ({ ...c, project_id: projectId })),
+      { onConflict: "project_id,role" },
+    )
     .select();
   if (error) throw error;
   return data as ProjectContact[];

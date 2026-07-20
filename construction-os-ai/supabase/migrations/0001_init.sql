@@ -116,7 +116,8 @@ create table public.project_contacts (
   phone text,
   email text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (project_id, role)
 );
 
 create index project_contacts_project_id_idx on public.project_contacts (project_id);
