@@ -28,6 +28,10 @@ parties as its own product with its own clean API surface.
   material rates — every line shows the formula that produced it.
 - **Module 17 — Dashboard shell**: project overview stats, including a live
   estimated cost once built-up area is set
+- **Module 18 — Reports**: "Download PDF" on the Estimate tab generates a
+  branded, print-ready cost estimate (area/structural/cost tables + grand
+  total). PDF generation (`jspdf`) is code-split so it's only downloaded
+  when the button is actually clicked.
 
 Everything else in the long-term vision (AI floor plan analysis, MEP/
 finishing engines, BOQ export, labour & material management, site diary, AI

@@ -119,7 +119,7 @@ export function computeAreaBreakdown(
       label: "Wall area",
       value: wallAreaSqft,
       unit: "sq ft",
-      formula: `Perimeter (${perimeterFt.toFixed(0)} ft) × height (${assumptions.floorHeightFt} ft) × ${floorsCount} floor(s) − openings`,
+      formula: `Perimeter (${perimeterFt.toFixed(0)} ft) × height (${assumptions.floorHeightFt} ft) × ${floorsCount} floor(s) - openings`,
     },
     { key: "paint", label: "Paint area", value: paintAreaSqft, unit: "sq ft", formula: "Wall area × 2 faces + ceiling area" },
     { key: "plaster", label: "Plaster area", value: plasterAreaSqft, unit: "sq ft", formula: "Wall area × 2 faces" },

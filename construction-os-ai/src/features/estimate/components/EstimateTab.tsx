@@ -1,4 +1,5 @@
-import { Ruler } from "lucide-react";
+import { Download, Ruler } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useOrganization } from "@/features/organizations/use-organization";
 import { useMaterialRates, useProjectEstimate } from "@/features/estimate/hooks";
@@ -55,6 +56,19 @@ export function EstimateTab({ project }: { project: Project }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={async () => {
+            const { generateEstimatePdf } = await import("@/features/estimate/pdf");
+            generateEstimatePdf(project, area, structural, cost);
+          }}
+        >
+          <Download className="size-4" />
+          Download PDF
+        </Button>
+      </div>
       <AssumptionsForm projectId={project.id} assumptions={assumptions} />
       <LineTable title="Area breakdown" description="Module 5 — derived from built-up area and openings." lines={area.lines} />
       <LineTable
