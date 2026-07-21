@@ -43,6 +43,14 @@ Engineer / Interior Designer, Vastu Studio, marketplace) is represented in
 the sidebar as "on the roadmap" and will be built out in later modules on
 top of this foundation.
 
+Ten of those roadmap items (`src/features/preview`) currently link to a
+**preview** screen — static, hardcoded sample data only, no Supabase table,
+no AI call, no real wiring. They exist so build direction can be reviewed
+before the real implementation, and are clearly marked with an in-page
+banner. AI Civil Engineer, AI Floor Plan Analysis and AI Predictions will
+need a paid LLM API when built for real (flagged in each preview); Marketplace
+will need a separate decision on payment collection.
+
 ## Stack
 
 - React 19 + TypeScript + Vite

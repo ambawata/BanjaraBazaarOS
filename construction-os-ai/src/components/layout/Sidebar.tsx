@@ -5,10 +5,15 @@ import {
   FolderKanban,
   Calculator,
   Boxes,
-  Users2,
   Compass,
   Store,
   Sparkles,
+  ScanLine,
+  Wrench,
+  ClipboardList,
+  Palette,
+  TrendingUp,
+  Settings as SettingsIcon,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +23,7 @@ interface NavItem {
   to?: string;
   icon: LucideIcon;
   comingSoon?: boolean;
+  badge?: string;
 }
 
 const primaryNav: NavItem[] = [
@@ -25,17 +31,26 @@ const primaryNav: NavItem[] = [
   { label: "Projects", to: "/projects", icon: FolderKanban },
 ];
 
+// Roadmap items with a `to` link to a /preview/* route render as a real,
+// clickable link with a "Preview" badge — a static, sample-data-only screen
+// so build direction can be reviewed before real implementation. Items
+// without `to` (like BOQ Export) stay locked with a "Soon" badge, unchanged.
 const roadmapNav: NavItem[] = [
-  { label: "AI Civil Engineer", icon: Sparkles, comingSoon: true },
+  { label: "AI Civil Engineer", icon: Sparkles, to: "/preview/ai-civil-engineer", badge: "Preview" },
+  { label: "AI Floor Plan Analysis", icon: ScanLine, to: "/preview/floor-plan-ai", badge: "Preview" },
+  { label: "MEP & Finishing", icon: Wrench, to: "/preview/mep-finishing", badge: "Preview" },
   { label: "BOQ Export", icon: Calculator, comingSoon: true },
-  { label: "Material Management", icon: Boxes, comingSoon: true },
-  { label: "Site Diary", icon: Users2, comingSoon: true },
-  { label: "Vastu Studio", icon: Compass, comingSoon: true },
-  { label: "Marketplace", icon: Store, comingSoon: true },
+  { label: "Material Management", icon: Boxes, to: "/preview/materials", badge: "Preview" },
+  { label: "Site Diary", icon: ClipboardList, to: "/preview/site-diary", badge: "Preview" },
+  { label: "Interior Designer", icon: Palette, to: "/preview/interior-designer", badge: "Preview" },
+  { label: "Vastu Studio", icon: Compass, to: "/preview/vastu-studio", badge: "Preview" },
+  { label: "AI Predictions", icon: TrendingUp, to: "/preview/ai-predictions", badge: "Preview" },
+  { label: "Marketplace", icon: Store, to: "/preview/marketplace", badge: "Preview" },
+  { label: "Settings", icon: SettingsIcon, to: "/preview/settings", badge: "Preview" },
 ];
 
 function NavRow({ item }: { item: NavItem }) {
-  if (item.comingSoon || !item.to) {
+  if (!item.to) {
     return (
       <div className="flex cursor-not-allowed items-center gap-3 rounded-control px-3 py-2.5 text-sm text-black/30 dark:text-white/25">
         <item.icon className="size-[18px]" />
@@ -44,6 +59,28 @@ function NavRow({ item }: { item: NavItem }) {
           Soon
         </span>
       </div>
+    );
+  }
+
+  if (item.badge) {
+    return (
+      <NavLink
+        to={item.to}
+        className={({ isActive }) =>
+          cn(
+            "flex items-center gap-3 rounded-control px-3 py-2.5 text-sm font-medium transition-colors",
+            isActive
+              ? "bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200"
+              : "text-black/50 hover:bg-black/[0.04] hover:text-black/80 dark:text-white/40 dark:hover:bg-white/5 dark:hover:text-white/75",
+          )
+        }
+      >
+        <item.icon className="size-[18px]" />
+        <span className="flex-1">{item.label}</span>
+        <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary-600 dark:bg-primary-500/15 dark:text-primary-300">
+          {item.badge}
+        </span>
+      </NavLink>
     );
   }
 
