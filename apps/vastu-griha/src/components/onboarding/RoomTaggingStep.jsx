@@ -78,7 +78,7 @@ export default function RoomTaggingStep({ plot, zoneGrid, onComplete, onSkip }) 
   return (
     <div className="max-w-lg mx-auto space-y-5 px-4 py-4">
       <div className="text-center space-y-1">
-        <h1 className="text-ink1 text-2xl font-bold">Apne rooms batao</h1>
+        <h1 className="text-ink1 font-display text-2xl font-semibold">Apne rooms batao</h1>
         <p className="text-ink3 text-sm">Tell us about your rooms (optional)</p>
       </div>
 

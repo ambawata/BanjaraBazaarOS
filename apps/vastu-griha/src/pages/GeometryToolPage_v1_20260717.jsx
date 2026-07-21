@@ -61,7 +61,7 @@ export default function GeometryToolPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="text-ink1 text-2xl font-semibold">Plot Geometry & True North Calibration</h1>
+        <h1 className="text-ink1 font-display text-3xl font-semibold">Plot Geometry & True North Calibration</h1>
         <p className="text-ink3 text-sm mt-1">
           Geometry layer only — plot centroid, wall/pada/room/door bearings, and
           16/32-point zone classification. No Vastu rules, verdicts, or remedies
@@ -77,7 +77,7 @@ export default function GeometryToolPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-ink1 font-semibold">{geometry.plot.name}</h2>
+              <h2 className="text-ink1 font-display font-semibold text-lg">{geometry.plot.name}</h2>
               <p className="text-ink3 text-xs font-mono">
                 centroid ({geometry.plot.centroid_x.toFixed(2)}, {geometry.plot.centroid_y.toFixed(2)}) ·
                 {' '}R = {geometry.plot.true_north_rotation_r.toFixed(2)}° ·

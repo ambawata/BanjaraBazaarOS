@@ -39,8 +39,8 @@ export default function VerdictReportPage() {
   if (!plotId) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="bg-surface border border-surface3 rounded-xl p-6 text-center">
-          <h1 className="text-ink1 text-xl font-semibold mb-2">No plot selected</h1>
+        <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6 text-center">
+          <h1 className="text-ink1 font-display text-xl font-semibold mb-2">No plot selected</h1>
           <p className="text-ink3 text-sm mb-4">
             Open a plot from the Plot Geometry &amp; Calibration tool first, then
             come back here via its "View Verdict Report" link.
@@ -66,7 +66,7 @@ export default function VerdictReportPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-ink1 text-2xl font-semibold">Vastu Verdict Report</h1>
+        <h1 className="text-ink1 font-display text-3xl font-semibold">Vastu Verdict Report</h1>
         <p className="text-ink3 text-sm mt-1">
           Every verdict below traces to a specific, verified Knowledge Base
           entry — nothing here is generated. A zone with no matching entry
@@ -90,7 +90,7 @@ export default function VerdictReportPage() {
           </div>
 
           {entityGroups.length === 0 && (
-            <div className="bg-surface border border-surface3 rounded-xl p-6 text-center text-ink3 text-sm">
+            <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6 text-center text-ink3 text-sm">
               No verdicts yet — add rooms/doors to this plot in the geometry
               tool, or none of this plot's zones have a matching KB entry.
             </div>

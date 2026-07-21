@@ -68,15 +68,15 @@ export default function PlotSetupPanel() {
   }
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-6 max-w-xl">
-      <h2 className="text-ink1 font-semibold text-lg mb-1">Plot setup</h2>
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6 max-w-xl">
+      <h2 className="text-ink1 font-display font-semibold text-xl mb-1">Plot setup</h2>
       <p className="text-ink3 text-sm mb-5">
         Enter the plot boundary once. Everything downstream (centroid, wall
         bearings, padas, rooms, doors) is computed from this and the true
         north rotation.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-ink2 text-xs font-medium mb-1">Plot name</label>
           <input

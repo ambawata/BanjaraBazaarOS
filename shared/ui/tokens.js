@@ -27,7 +27,9 @@
 // future task, not assumed here.
 
 export const colors = {
-  bg: '#FBF8F4',
+  // bg refined from #FBF8F4 to a slightly warmer cream per the approved
+  // visual design direction (2026-07) — same palette family, no new hues.
+  bg: '#FBF6EE',
   surface: '#FFFFFF',
   surface2: '#F5F1FB',
   surface3: '#E4DEF2',
@@ -43,6 +45,12 @@ export const colors = {
   amber: '#D97706',
   amberDim: '#FDF3E3',
   amberMuted: '#92400E',
+  // Distinct from `amber` (ashubh/caution, warmer orange) — used
+  // specifically for boundary_case flags per the approved severity-pill
+  // palette: green=shubh, amber-orange=ashubh, gold=boundary-case.
+  gold: '#A16207',
+  goldDim: '#FEF9E7',
+  goldMuted: '#713F12',
   red: '#DC2626',
   redDim: '#FCEAEA',
   redMuted: '#991B1B',
@@ -52,9 +60,28 @@ export const backgroundImage = {
   'brand-gradient': 'linear-gradient(135deg, #5A1FB3 0%, #5D35AE 100%)',
 }
 
+// Three-font system per the approved visual design direction (2026-07):
+// Fraunces (warm display serif, semibold headings — personality without
+// looking generic), Manrope (clean geometric sans, body/UI text), IBM
+// Plex Mono (numbers/degrees/measurements/coordinates specifically — a
+// deliberate signature tying into the app's geometry/blueprint subject,
+// not decoration). Replaces DM Sans/JetBrains Mono (`ui`/`mono`, both
+// key names kept stable so every existing font-ui/font-mono class
+// anywhere in any app re-themes automatically with zero JSX changes) and
+// adds a new `display` key for headings specifically.
 export const fontFamily = {
-  ui: ['DM Sans', 'system-ui', 'sans-serif'],
-  mono: ['JetBrains Mono', 'Fira Mono', 'monospace'],
+  display: ['Fraunces', 'Georgia', 'serif'],
+  ui: ['Manrope', 'system-ui', 'sans-serif'],
+  mono: ['IBM Plex Mono', 'Fira Mono', 'monospace'],
+}
+
+// Soft, purple-tinted card shadow — replaces flat `border` as the primary
+// depth cue on cards per the approved design direction ("soft purple-
+// tinted shadows, not harsh/flat"). Layered (a closer tight shadow + a
+// further soft one) rather than a single hard-edged box-shadow.
+export const boxShadow = {
+  card: '0 2px 8px -2px rgba(90, 31, 179, 0.06), 0 8px 24px -6px rgba(90, 31, 179, 0.14)',
+  cardHover: '0 4px 12px -2px rgba(90, 31, 179, 0.10), 0 12px 32px -6px rgba(90, 31, 179, 0.18)',
 }
 
 // Sidebar-specific layout constants — also canonical here so any future

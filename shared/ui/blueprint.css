@@ -1,0 +1,16 @@
+/* Shared "blueprint" background texture — a very faint dotted grid evoking
+   architectural drafting paper, tying into the geometry/plot-plan subject
+   matter across all 3 apps. Single source of truth: each app's own
+   index.css @imports this file rather than re-declaring the pattern,
+   same convention as tokens.js for colors/fonts. Applied via the shared
+   AppShell's root element (shared/ui/AppShell.jsx) so it's consistent
+   everywhere with zero per-screen changes.
+
+   Kept deliberately subtle (low opacity, plain radial-gradient dots, no
+   lines/hatching) so it never competes with real content — background-
+   color still comes from the `bg-bg` Tailwind utility; this only adds a
+   background-image layer on top of it. */
+.bg-blueprint {
+  background-image: radial-gradient(circle, rgba(90, 31, 179, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}

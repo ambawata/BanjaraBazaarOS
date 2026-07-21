@@ -120,7 +120,7 @@ export default function TraceBoundaryStep({ center, addressLabel, onComplete }) 
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 bg-surface border-b border-surface3">
-        <h2 className="text-ink1 font-bold text-lg">Apne plot ke corners pe tap karo</h2>
+        <h2 className="text-ink1 font-display font-semibold text-lg">Apne plot ke corners pe tap karo</h2>
         <p className="text-ink3 text-xs">Tap your plot's corners — kam se kam {MIN_CORNERS} points</p>
       </div>
 

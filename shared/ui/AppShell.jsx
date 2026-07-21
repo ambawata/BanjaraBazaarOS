@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
+import './blueprint.css'
 
 // BanjaraBazaarOS shared AppShell — composes the shared Sidebar with a
 // header (hamburger toggle + page title) and a main content slot. See
@@ -110,7 +111,7 @@ export default function AppShell({
   }, [expanded])
 
   return (
-    <div className="flex h-full bg-bg">
+    <div className="flex h-full bg-bg bg-blueprint">
       <Sidebar
         sidebarRef={sidebarRef}
         expanded={expanded}
@@ -143,7 +144,7 @@ export default function AppShell({
           >
             ☰
           </button>
-          <h1 className="text-ink1 font-semibold text-base truncate">{titles[pathname] || defaultTitle}</h1>
+          <h1 className="text-ink1 font-display font-semibold text-lg truncate">{titles[pathname] || defaultTitle}</h1>
           {headerActions && <div className="ml-auto flex items-center gap-2 shrink-0">{headerActions}</div>}
         </header>
 

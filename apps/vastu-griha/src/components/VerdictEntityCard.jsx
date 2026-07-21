@@ -25,7 +25,7 @@ function ZoneBadge({ zone }) {
 function ShubhAshubhBadge({ value }) {
   const style = SHUBH_ASHUBH_STYLES[value] || { label: value || 'Unclassified', classes: 'bg-surface2 text-ink2', icon: '' }
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium ${style.classes}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-semibold ${style.classes}`}>
       {style.icon} {style.label}
     </span>
   )
@@ -34,7 +34,7 @@ function ShubhAshubhBadge({ value }) {
 function TierBadge({ tier }) {
   const style = TIER_STYLES[tier] || { label: tier, classes: 'bg-surface2 text-ink2' }
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${style.classes}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold ${style.classes}`}>
       {style.label}
     </span>
   )
@@ -57,7 +57,7 @@ function ProductCta({ cta }) {
 // each row here traces to exactly one kb_entry_id.
 function VerdictRow({ verdict }) {
   return (
-    <div className="border border-surface3 rounded-lg p-3 space-y-2">
+    <div className="border border-surface3 rounded-xl p-4 space-y-2">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <ShubhAshubhBadge value={verdict.shubh_ashubh} />
@@ -97,14 +97,14 @@ export default function VerdictEntityCard({ group }) {
   const { entityType, entityId, zones, boundaryCase } = group
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-5">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-ink1 font-semibold">
-          <span className="uppercase text-ink3 text-xs tracking-wide mr-2">{entityType}</span>
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-5">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h3 className="text-ink1 font-display font-semibold text-lg">
+          <span className="uppercase text-ink3 text-xs font-ui tracking-wide mr-2">{entityType}</span>
           #{entityId}
         </h3>
         {boundaryCase && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amberDim text-amberMuted text-[11px] font-medium">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-goldDim text-goldMuted text-[11px] font-semibold">
             ⚠ boundary case — verdicts shown for both adjacent zones
           </span>
         )}
