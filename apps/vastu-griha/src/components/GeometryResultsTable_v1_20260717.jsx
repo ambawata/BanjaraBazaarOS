@@ -6,7 +6,7 @@ import { useStore } from '../store/useStore'
 function BoundaryBadge({ boundaryCase, adjacent }) {
   if (!boundaryCase) return <span className="text-ink3">—</span>
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amberDim text-amberMuted text-[11px] font-medium">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-goldDim text-goldMuted text-[11px] font-semibold">
       ⚠ boundary_case{adjacent ? ` (~${adjacent})` : ''}
     </span>
   )
@@ -33,8 +33,8 @@ export default function GeometryResultsTable() {
   const { walls, rooms } = geometry
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-6">
-      <h2 className="text-ink1 font-semibold text-lg mb-1">Results</h2>
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6">
+      <h2 className="text-ink1 font-display font-semibold text-xl mb-1">Results</h2>
       <p className="text-ink3 text-sm mb-4">
         Every wall, pada, room, and door — plan bearing, true bearing, and
         16/32-point zone classification. Geometry only.

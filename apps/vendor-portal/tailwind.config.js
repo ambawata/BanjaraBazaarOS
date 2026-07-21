@@ -1,4 +1,4 @@
-import { colors, backgroundImage, fontFamily } from '../../shared/ui/tokens.js'
+import { colors, backgroundImage, fontFamily, boxShadow } from '../../shared/ui/tokens.js'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -21,6 +21,7 @@ export default {
       colors,
       backgroundImage,
       fontFamily,
+      boxShadow,
     },
   },
   plugins: [],

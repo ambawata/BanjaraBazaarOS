@@ -61,8 +61,8 @@ export default function CalibrationWorkflow() {
   }
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-6">
-      <h2 className="text-ink1 font-semibold text-lg mb-1">True north calibration</h2>
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6">
+      <h2 className="text-ink1 font-display font-semibold text-xl mb-1">True north calibration</h2>
       <p className="text-ink3 text-sm mb-5">
         Tier 2.5 method — corroborate one wall's already-known true bearing
         against a fresh on-site compass reading, then apply the resulting

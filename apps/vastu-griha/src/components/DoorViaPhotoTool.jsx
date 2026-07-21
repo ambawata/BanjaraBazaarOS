@@ -50,7 +50,7 @@ function previewAssignDoorToPada(positionFt, padas) {
 function BoundaryBadge({ boundaryCase, adjacent }) {
   if (!boundaryCase) return null
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amberDim text-amberMuted text-[11px] font-medium">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-goldDim text-goldMuted text-[11px] font-semibold">
       ⚠ boundary_case{adjacent ? ` (~${adjacent})` : ''}
     </span>
   )
@@ -186,9 +186,9 @@ export default function DoorViaPhotoTool() {
   if (!geometry?.plot) return null
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-5">
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-5">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-ink1 font-semibold text-lg">Add door via floor plan photo</h2>
+        <h2 className="text-ink1 font-display font-semibold text-xl">Add door via floor plan photo</h2>
         <button
           onClick={() => setOpen(o => !o)}
           className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2"

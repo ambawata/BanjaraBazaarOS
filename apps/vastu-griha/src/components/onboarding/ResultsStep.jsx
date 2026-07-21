@@ -36,12 +36,12 @@ export default function ResultsStep({ plot, taggedRooms }) {
   return (
     <div className="max-w-lg mx-auto space-y-5 px-4 py-4">
       <div className="text-center space-y-1">
-        <h1 className="text-ink1 text-2xl font-bold">Aapka result</h1>
+        <h1 className="text-ink1 font-display text-2xl font-semibold">Aapka result</h1>
         <p className="text-ink3 text-sm">Your result</p>
       </div>
 
       {taggedRooms.length === 0 ? (
-        <div className="bg-surface border border-surface3 rounded-xl p-6 text-center">
+        <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6 text-center">
           <p className="text-ink2 text-sm">
             Aapka plot save ho gaya! Koi room tag nahi kiya — koi baat nahi,
             baad mein "Advanced view" se add kar sakte ho.
@@ -52,7 +52,7 @@ export default function ResultsStep({ plot, taggedRooms }) {
           {taggedRooms.map((room, i) => {
             const roomVerdicts = verdictsForRoom(room.roomId)
             return (
-              <div key={i} className="bg-surface border border-surface3 rounded-xl p-4">
+              <div key={i} className="bg-surface border border-surface3 shadow-card rounded-2xl p-4">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{room.emoji}</span>
                   <p className="text-ink1 text-lg font-semibold">

@@ -4,9 +4,9 @@
 // business copy on either side).
 export default function LowConfidenceBanner({ message }) {
   return (
-    <div className="px-4 py-3 rounded-lg bg-amberDim border border-amber flex items-start gap-3">
+    <div className="px-4 py-3.5 rounded-xl bg-amberDim border border-amber flex items-start gap-3">
       <span className="text-amber text-lg leading-none">⚠</span>
-      <p className="text-amberMuted text-sm">{message}</p>
+      <p className="text-amberMuted text-sm font-medium">{message}</p>
     </div>
   )
 }

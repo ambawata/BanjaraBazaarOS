@@ -101,7 +101,7 @@ export default function FloorPlanCanvas() {
 
   if (!plot) {
     return (
-      <div className="bg-surface border border-surface3 rounded-xl p-10 text-center text-ink3 text-sm">
+      <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-10 text-center text-ink3 text-sm">
         Save a plot first to unlock the floor plan canvas.
       </div>
     )
@@ -112,9 +112,9 @@ export default function FloorPlanCanvas() {
   const drawPointsScreen = drawPoints.map(p => toScreen(p.x, p.y))
 
   return (
-    <div className="bg-surface border border-surface3 rounded-xl p-5">
+    <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-5">
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <h2 className="text-ink1 font-semibold text-lg mr-auto">Floor plan canvas</h2>
+        <h2 className="text-ink1 font-display font-semibold text-xl mr-auto">Floor plan canvas</h2>
 
         <label className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2 cursor-pointer">
           Upload floor plan

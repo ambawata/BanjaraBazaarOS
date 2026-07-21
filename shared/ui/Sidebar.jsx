@@ -101,8 +101,8 @@ export default function Sidebar({
             anyway, since expanded=false means translate-x-full (invisible). */}
         {expanded && (
           <div className="sidebar-label-fade min-w-0">
-            <p className="text-ink1 text-sm font-semibold leading-none truncate">{brandName}</p>
-            {brandSubtitle && <p className="text-ink3 text-xs mt-0.5 truncate">{brandSubtitle}</p>}
+            <p className="text-ink1 font-display font-semibold text-base leading-none truncate">{brandName}</p>
+            {brandSubtitle && <p className="text-ink3 text-xs mt-1 truncate">{brandSubtitle}</p>}
           </div>
         )}
       </div>
