@@ -207,6 +207,33 @@ export default function HomeDashboard() {
 
           <VastuApp />
 
+          {/* ── MERA GHAR ENTRY POINT ─────────────────────────────────────────
+              Links out to the consumer-friendly "Mera Ghar" onboarding wizard
+              (map-traced plot boundary, Hinglish-primary, no geometry jargon)
+              built in apps/vastu-griha (a separate app/deployment from this
+              v2 design-system app — see apps/vastu-griha/src/pages/
+              MyHomeWizardPage.jsx). Real cross-app navigation, hence a plain
+              <a> to the deployed URL rather than a screenState transition. */}
+          <a
+            href="https://vastu-griha.vercel.app/vastu-griha/my-home"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ background: colors.accentDim, border: `1px solid ${colors.accent}`, borderRadius: radius['3xl'], padding: spacing[4], display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', textAlign: 'left', width: '100%', textDecoration: 'none' }}
+          >
+            <div style={{ display: 'flex', gap: spacing[3], alignItems: 'center', zIndex: 1, flex: 1.2 }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: radius.md, background: colors.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <i className="ti ti-home-2" style={{ fontSize: '20px' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', marginRight: '40px' }}>
+                <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: typography.weight.bold, color: colors.text }}>Mera Ghar</h4>
+                <span style={{ fontSize: '10.5px', color: colors.text2, marginTop: '2px' }}>Map se plot trace karo — easy mode, no coordinates</span>
+              </div>
+            </div>
+            <span style={{ padding: '8px 14px', borderRadius: radius.base, background: colors.accent, color: '#fff', zIndex: 1, fontSize: typography.size.xs, fontWeight: typography.weight.bold }}>
+              Shuru Karo
+            </span>
+          </a>
+
           {/* ── ACHARYA AI BANNER ─────────────────────────────────────────── */}
           <div
             onClick={() => { setScreenState('workspace'); setActiveTab('chat') }}
