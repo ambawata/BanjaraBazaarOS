@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { forwardAzimuth, gpsConfidenceFromAccuracy, haversineDistanceMeters } from '../lib/geoBearing'
+import { forwardAzimuth, gpsConfidencePercent, haversineDistanceMeters } from '../lib/geoBearing'
 import { DELHI_NCR_DECLINATION } from '../config/geo'
 
 // Auto True North Detect — a modal offering 3 real ways to arrive at the
@@ -15,10 +15,10 @@ import { DELHI_NCR_DECLINATION } from '../config/geo'
 // shows a real reading or an honest error state.
 
 function describeGeolocationError(e) {
-  if (e.code === 1) return 'Location permission denied. Enable location access for this site and try again.'
-  if (e.code === 2) return 'Position unavailable — GPS could not get a fix. Move to an open area (away from walls/roof) and retry.'
-  if (e.code === 3) return 'GPS request timed out. Try again, ideally outdoors with a clear sky view.'
-  return e.message || 'Could not read GPS position.'
+  if (e.code === 1) return 'Location permission nahi mili. Is site ke liye location access on karo aur phir try karo.'
+  if (e.code === 2) return 'GPS fix nahi mil paaya. Khule area mein jao (chhat/deewar se door) aur dobara try karo.'
+  if (e.code === 3) return 'GPS request timeout ho gaya. Khule aasman ke niche dobara try karo.'
+  return e.message || 'GPS position nahi mil paaya.'
 }
 
 function getCurrentPositionAsync(options) {
@@ -32,9 +32,9 @@ function getCurrentPositionAsync(options) {
 }
 
 const METHODS = [
-  { key: 'gps', label: 'GPS Corner-to-Corner', icon: '📍' },
-  { key: 'map', label: 'Map Front Wall Trace', icon: '🛰️' },
-  { key: 'compass', label: 'Live Phone Compass', icon: '🧭' },
+  { key: 'gps', label: 'GPS Se', icon: '📍' },
+  { key: 'map', label: 'Map Se', icon: '🛰️' },
+  { key: 'compass', label: 'Compass Se', icon: '🧭' },
 ]
 
 function ModalShell({ onClose, children }) {
@@ -50,6 +50,38 @@ function ModalShell({ onClose, children }) {
         {children}
       </div>
     </div>
+  )
+}
+
+// Shared compass-needle visual, reused identically across all 3 methods so
+// the "you're measuring a real angle" feeling is consistent everywhere —
+// a simple ring + N/E/S/W labels + a needle rotated to `angle` (degrees
+// clockwise from North, 0-360). `dim` renders it as an inactive/greyed
+// placeholder before a real angle exists yet (never shows a fake number —
+// callers pass `angle=0` only where 0 is itself the genuine value, e.g.
+// the Map method's inherently-north-up plots). Brand colors only (
+// shared/ui/tokens.js: brand/ink1/ink2/ink3), no new hues.
+function CompassNeedle({ angle, dim = false, size = 148 }) {
+  const cx = size / 2
+  const cy = size / 2
+  const r = size / 2 - 18
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="select-none mx-auto">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#5A1FB3" strokeWidth={2} opacity={dim ? 0.2 : 0.45} />
+      <text x={cx} y={cy - r + 15} textAnchor="middle" className="fill-brand font-display font-bold" fontSize="14" opacity={dim ? 0.4 : 1}>N</text>
+      <text x={cx + r - 11} y={cy + 5} textAnchor="middle" className="fill-ink2 font-ui" fontSize="11" opacity={dim ? 0.4 : 1}>E</text>
+      <text x={cx} y={cy + r - 3} textAnchor="middle" className="fill-ink2 font-ui" fontSize="11" opacity={dim ? 0.4 : 1}>S</text>
+      <text x={cx - r + 11} y={cy + 5} textAnchor="middle" className="fill-ink2 font-ui" fontSize="11" opacity={dim ? 0.4 : 1}>W</text>
+      <g
+        transform={`rotate(${angle ?? 0} ${cx} ${cy})`}
+        style={{ transition: 'transform 0.25s ease-out', opacity: dim ? 0.3 : 1 }}
+      >
+        <line x1={cx} y1={cy} x2={cx} y2={cy - r + 8} stroke="#5A1FB3" strokeWidth={3} strokeLinecap="round" />
+        <line x1={cx} y1={cy} x2={cx} y2={cy + (r - 8) * 0.32} stroke="#9891B3" strokeWidth={3} strokeLinecap="round" />
+      </g>
+      <circle cx={cx} cy={cy} r={4} fill="#241344" />
+    </svg>
   )
 }
 
@@ -82,7 +114,7 @@ function GpsMethod({ onApply }) {
     if (!pointA || !pointB) return null
     const distanceM = haversineDistanceMeters(pointA.lat, pointA.lon, pointB.lat, pointB.lon)
     const bearing = forwardAzimuth(pointA.lat, pointA.lon, pointB.lat, pointB.lon)
-    const confidence = gpsConfidenceFromAccuracy(pointA.accuracy, pointB.accuracy)
+    const confidence = gpsConfidencePercent(pointA.accuracy, pointB.accuracy)
     return { distanceM, bearing, confidence }
   }, [pointA, pointB])
 
@@ -95,43 +127,39 @@ function GpsMethod({ onApply }) {
   return (
     <div className="space-y-4">
       <p className="text-ink3 text-sm">
-        Stand at one corner of the front/gate wall and capture Point A, then walk to the
-        other corner of that same wall and capture Point B. The bearing between the two
-        is computed from your real GPS coordinates — no compass needed for this method.
+        Front/gate wall ke ek corner pe khade ho ke "Point A" capture karo, phir doosre
+        corner pe chal ke "Point B" capture karo. Dono ke beech ka asli direction GPS se
+        nikal lenge — compass ki zaroorat nahi.
       </p>
+
+      <CompassNeedle angle={result ? result.bearing : null} dim={!result} />
 
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3">
-          <p className="text-ink2 text-xs font-medium mb-2">Point A (first corner)</p>
+          <p className="text-ink2 text-xs font-medium mb-2">Point A (pehla corner)</p>
           {pointA ? (
-            <p className="text-ink1 text-xs font-mono">
-              {pointA.lat.toFixed(6)}, {pointA.lon.toFixed(6)}
-              <br />±{pointA.accuracy.toFixed(1)} m accuracy
-            </p>
+            <p className="text-green text-sm font-semibold">✓ Point A capture ho gaya</p>
           ) : (
             <button
               onClick={() => capture('A')}
               disabled={busy === 'A'}
               className="px-3 py-1.5 rounded-lg bg-brand-gradient text-white text-xs font-medium disabled:opacity-50"
             >
-              {busy === 'A' ? 'Getting fix…' : 'Capture Point A'}
+              {busy === 'A' ? 'Location le rahe hain…' : 'Capture Point A'}
             </button>
           )}
         </div>
         <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3">
-          <p className="text-ink2 text-xs font-medium mb-2">Point B (other corner)</p>
+          <p className="text-ink2 text-xs font-medium mb-2">Point B (doosra corner)</p>
           {pointB ? (
-            <p className="text-ink1 text-xs font-mono">
-              {pointB.lat.toFixed(6)}, {pointB.lon.toFixed(6)}
-              <br />±{pointB.accuracy.toFixed(1)} m accuracy
-            </p>
+            <p className="text-green text-sm font-semibold">✓ Point B capture ho gaya</p>
           ) : (
             <button
               onClick={() => capture('B')}
               disabled={!pointA || busy === 'B'}
               className="px-3 py-1.5 rounded-lg bg-brand-gradient text-white text-xs font-medium disabled:opacity-50"
             >
-              {busy === 'B' ? 'Getting fix…' : 'Capture Point B'}
+              {busy === 'B' ? 'Location le rahe hain…' : 'Capture Point B'}
             </button>
           )}
         </div>
@@ -140,19 +168,14 @@ function GpsMethod({ onApply }) {
       {error && <p className="text-red text-sm">{error}</p>}
 
       {result && (
-        <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3 space-y-1">
-          <p className="text-ink1 text-lg font-mono font-semibold">{result.bearing.toFixed(2)}°</p>
-          <p className="text-ink2 text-xs">
-            Distance between points: <span className="font-mono">{result.distanceM.toFixed(2)} m</span>
-            {' · '}
-            Combined GPS accuracy: <span className="font-mono">±{result.confidence.combinedAccuracyM.toFixed(1)} m</span>
-            {' → '}
-            <span className="font-semibold">{result.confidence.label} confidence</span>
+        <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3 space-y-1 text-center">
+          <p className="text-ink1 text-2xl font-mono font-semibold">{result.bearing.toFixed(1)}°</p>
+          <p className="text-ink2 text-sm">
+            GPS se <span className="font-semibold">{result.confidence.percent}% pakka</span>
           </p>
           {result.distanceM < 1 && (
             <p className="text-amberMuted text-xs">
-              ⚠ The two points are very close together (under 1 m) — GPS noise likely
-              dominates this bearing. Walk further apart and recapture for a reliable reading.
+              ⚠ Dono points bahut paas hain (1 m se kam) — thoda aur door jaake dobara try karo.
             </p>
           )}
         </div>
@@ -164,11 +187,11 @@ function GpsMethod({ onApply }) {
           disabled={!result}
           className="px-4 py-2 rounded-lg bg-brand-gradient text-white text-sm font-medium disabled:opacity-50"
         >
-          Use this bearing
+          Ye reading use karo
         </button>
         {(pointA || pointB) && (
           <button onClick={reset} className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2">
-            Reset points
+            Reset karo
           </button>
         )}
       </div>
@@ -180,14 +203,19 @@ function MapMethod() {
   return (
     <div className="space-y-4">
       <p className="text-ink3 text-sm">
-        Tracing your plot's boundary directly on a satellite map is inherently north-up
-        (you're tracing real imagery, not a hand-drawn sketch) — so this path never needs
-        manual True North calibration at all. It creates a new plot through the "Mera Ghar"
-        wizard, rather than calibrating the plot you're currently editing here.
+        Satellite map pe apne plot ki boundary trace karo — real imagery pe trace karne se
+        north apne aap sahi aa jaata hai, koi calibration ki zaroorat nahi. Ye ek naya plot
+        banata hai "Mera Ghar" wizard ke through, is abhi wale plot ko nahi badalta.
       </p>
+
+      <CompassNeedle angle={0} dim />
+      <p className="text-ink3 text-xs text-center -mt-2">
+        Map se trace kiya plot hamesha north-up hota hai (0°) — asli fact hai, andaza nahi.
+      </p>
+
       <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3">
         <p className="text-ink2 text-sm mb-3">
-          Opens in a new tab so your current plot's progress here isn't lost.
+          Naye tab mein khulega, taaki abhi wala plot progress na khoye.
         </p>
         <Link
           to="/vastu-griha/my-home"
@@ -195,7 +223,7 @@ function MapMethod() {
           rel="noopener noreferrer"
           className="inline-block px-4 py-2 rounded-lg bg-brand-gradient text-white text-sm font-medium"
         >
-          Open Map Trace →
+          Map Trace Kholo →
         </Link>
       </div>
     </div>
@@ -243,7 +271,7 @@ function CompassMethod({ onApply }) {
     setError(null)
     if (typeof DeviceOrientationEvent === 'undefined') {
       setStatus('unsupported')
-      setError('This browser does not expose device orientation/compass data.')
+      setError('Is browser mein compass data available nahi hai.')
       return
     }
     setStatus('requesting')
@@ -255,7 +283,7 @@ function CompassMethod({ onApply }) {
         const result = await DeviceOrientationEvent.requestPermission()
         if (result !== 'granted') {
           setStatus('denied')
-          setError('Compass permission denied. Enable Motion & Orientation Access for this site in Settings and retry.')
+          setError('Compass permission deny ho gayi. Settings mein Motion & Orientation Access on karke phir try karo.')
           return
         }
       }
@@ -266,7 +294,7 @@ function CompassMethod({ onApply }) {
       setStatus('listening')
     } catch (e) {
       setStatus('denied')
-      setError(e.message || 'Could not start the compass.')
+      setError(e.message || 'Compass start nahi ho paaya.')
     }
   }
 
@@ -275,28 +303,30 @@ function CompassMethod({ onApply }) {
   return (
     <div className="space-y-4">
       <p className="text-ink3 text-sm">
-        Hold your phone flat against the front/gate wall, screen facing the wall's
-        direction. The live reading below updates in real time as you rotate — tap
-        "Use this reading" once it's settled.
+        Phone ko front/gate wall se saath mein flat rakho, screen wall ki direction mein.
+        Neeche live reading ghoomti rahegi jaise-jaise tum ghumaoge — settle hone pe
+        "Ye reading use karo" dabao.
       </p>
+
+      <CompassNeedle angle={headingTrue} dim={headingTrue == null} />
 
       {status === 'idle' && (
         <button
           onClick={enableCompass}
           className="px-4 py-2 rounded-lg bg-brand-gradient text-white text-sm font-medium"
         >
-          Enable compass
+          Compass chalu karo
         </button>
       )}
 
-      {status === 'requesting' && <p className="text-ink2 text-sm">Requesting permission…</p>}
+      {status === 'requesting' && <p className="text-ink2 text-sm">Permission maang rahe hain…</p>}
 
       {(status === 'denied' || status === 'unsupported') && (
         <div className="space-y-2">
           <p className="text-red text-sm">{error}</p>
           {status === 'denied' && (
             <button onClick={enableCompass} className="px-3 py-1.5 rounded-lg border border-surface3 text-ink2 text-xs font-medium hover:bg-surface2">
-              Retry
+              Phir se try karo
             </button>
           )}
         </div>
@@ -305,20 +335,15 @@ function CompassMethod({ onApply }) {
       {status === 'listening' && (
         <div className="space-y-3">
           {headingTrue == null ? (
-            <p className="text-ink2 text-sm">Waiting for a reading… rotate your phone slightly.</p>
+            <p className="text-ink2 text-sm text-center">Reading ka wait ho raha hai… phone thoda ghumao.</p>
           ) : (
-            <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3 space-y-1">
+            <div className="px-4 py-3 rounded-lg bg-surface2 border border-surface3 space-y-1 text-center">
               <p className="text-ink1 text-2xl font-mono font-semibold tabular-nums">{headingTrue.toFixed(1)}°</p>
-              <p className="text-ink2 text-xs">
-                Magnetic heading <span className="font-mono">{headingMagnetic.toFixed(1)}°</span>
-                {' '}+ Delhi NCR declination <span className="font-mono">{DELHI_NCR_DECLINATION.toFixed(1)}°</span>
-                {' '}= true heading above (live, updating as you rotate)
-              </p>
+              <p className="text-ink2 text-sm">Compass se live pata chal raha hai — jaise ghumaoge, waise update hoga</p>
               {!isAbsolute && (
                 <p className="text-amberMuted text-xs">
-                  ⚠ This device did not report an absolute/calibrated orientation — the
-                  reading may drift. Rotate in a figure-8 to calibrate your compass, or
-                  prefer GPS/Map trace instead.
+                  ⚠ Ye reading thodi drift kar sakti hai. Phone ko figure-8 mein ghumao
+                  calibrate karne ke liye, ya GPS/Map trace try karo.
                 </p>
               )}
             </div>
@@ -328,7 +353,7 @@ function CompassMethod({ onApply }) {
             disabled={headingTrue == null}
             className="px-4 py-2 rounded-lg bg-brand-gradient text-white text-sm font-medium disabled:opacity-50"
           >
-            Use this reading
+            Ye reading use karo
           </button>
         </div>
       )}
@@ -347,12 +372,12 @@ export default function AutoTrueNorthWizard({ onClose, onApply }) {
   return (
     <ModalShell onClose={onClose}>
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-ink1 font-display font-semibold text-xl">Auto True North Detect</h2>
+        <h2 className="text-ink1 font-display font-semibold text-xl">🧭 Auto Pata Karo</h2>
         <button onClick={onClose} className="text-ink3 hover:text-ink1 text-xl leading-none" aria-label="Close">✕</button>
       </div>
       <p className="text-ink3 text-sm mb-5">
-        Pick a method to measure the raw on-site reading for Step 2 — the result drops
-        straight into the calibration form below, nothing here is applied automatically.
+        Apna asli north kaise pata karna hai, wo chuno — jo bhi reading milegi, wo neeche
+        form mein bhar jaayegi. Kuch bhi automatically apply nahi hota.
       </p>
 
       <div className="flex flex-wrap gap-2 mb-5">
@@ -374,7 +399,7 @@ export default function AutoTrueNorthWizard({ onClose, onApply }) {
       {activeMethod === 'gps' && <GpsMethod onApply={handleApply} />}
       {activeMethod === 'map' && <MapMethod />}
       {activeMethod === 'compass' && <CompassMethod onApply={handleApply} />}
-      {!activeMethod && <p className="text-ink3 text-sm">Choose a method above to get started.</p>}
+      {!activeMethod && <p className="text-ink3 text-sm">Upar se ek tareeka chuno, shuru karte hain.</p>}
     </ModalShell>
   )
 }

@@ -50,18 +50,20 @@ export function haversineDistanceMeters(lat1, lon1, lat2, lon2) {
   return EARTH_RADIUS_M * c
 }
 
-// Confidence label derived from the REAL browser-reported GPS accuracy
+// Confidence PERCENTAGE derived from the REAL browser-reported GPS accuracy
 // (meters, from position.coords.accuracy) for both captured points — never
-// a fixed/fake percentage. Combined via root-sum-square as an
+// a fixed/fake number. Combined via root-sum-square as an
 // independent-error approximation, since the bearing depends on both
-// points' error. Thresholds are a reasonable rule of thumb for consumer
-// GPS (not survey-grade): under ~6m combined is a good modern-phone fix,
-// under ~15m is typical, above that is degraded (indoors/urban canyon).
-export function gpsConfidenceFromAccuracy(accuracyA, accuracyB) {
+// points' error, then mapped onto an intuitive 0-100 scale with a smooth
+// inverse curve (a common way to turn a "lower is better" error metric
+// into a "higher is better" confidence figure): ~50% at 5m combined
+// accuracy, ~80% at 1.25m, approaching (but never reaching) 100% as
+// accuracy improves further, and correspondingly low as it degrades.
+// Clamped to [1, 99] since a real GPS fix is never perfectly certain nor
+// completely worthless.
+export function gpsConfidencePercent(accuracyA, accuracyB) {
   const combinedAccuracyM = Math.sqrt(accuracyA ** 2 + accuracyB ** 2)
-  let label
-  if (combinedAccuracyM <= 6) label = 'High'
-  else if (combinedAccuracyM <= 15) label = 'Medium'
-  else label = 'Low'
-  return { combinedAccuracyM, label }
+  const raw = 100 / (1 + combinedAccuracyM / 5)
+  const percent = Math.max(1, Math.min(99, Math.round(raw)))
+  return { combinedAccuracyM, percent }
 }
