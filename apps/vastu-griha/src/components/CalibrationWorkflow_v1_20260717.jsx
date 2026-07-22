@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store/useStore'
+import AutoTrueNorthWizard from './AutoTrueNorthWizard'
 
 // Mirrors VastuGeometryMath::calibrateOffset (backend/services/VastuGeometryMath.php)
 // exactly, for a client-side "Step 3" preview before the user commits by
@@ -31,6 +32,8 @@ export default function CalibrationWorkflow() {
   const [useCrossCheck, setUseCrossCheck] = useState(false)
   const [secondWallId, setSecondWallId] = useState('')
   const [secondRawReading, setSecondRawReading] = useState('')
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [showManual, setShowManual] = useState(false)
 
   const referenceWall = walls.find(w => String(w.id) === String(referenceWallId))
 
@@ -64,27 +67,59 @@ export default function CalibrationWorkflow() {
     <div className="bg-surface border border-surface3 shadow-card rounded-2xl p-6">
       <h2 className="text-ink1 font-display font-semibold text-xl mb-1">True north calibration</h2>
       <p className="text-ink3 text-sm mb-5">
-        Tier 2.5 method — corroborate one wall's already-known true bearing
-        against a fresh on-site compass reading, then apply the resulting
-        offset to every bearing on this plot.
+        Apna plot ka asli north pata karo — GPS, satellite map, ya phone compass se —
+        fir neeche wall chuno aur sabhi bearings mein apply ho jaayega.
       </p>
 
-      <div className="grid sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="block text-ink2 text-xs font-medium mb-1">Step 1 — Reference wall</label>
-          <select
-            value={referenceWallId}
-            onChange={e => setReferenceWallId(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-surface3 bg-bg text-ink1 text-sm"
-          >
-            <option value="">Select a wall…</option>
-            {walls.map(w => (
-              <option key={w.id} value={w.id}>Wall #{w.id} — stored true bearing {w.facing_bearing_true?.toFixed(1)}°</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-ink2 text-xs font-medium mb-1">Step 2 — Raw on-site compass reading (deg)</label>
+      <button
+        type="button"
+        onClick={() => setWizardOpen(true)}
+        className="w-full py-4 rounded-2xl bg-brand-gradient text-white text-lg font-display font-semibold shadow-card mb-5"
+      >
+        🧭 Auto Pata Karo
+      </button>
+
+      {wizardOpen && (
+        <AutoTrueNorthWizard
+          onClose={() => setWizardOpen(false)}
+          onApply={(bearing) => { setRawReading(bearing.toFixed(2)); setShowManual(true) }}
+        />
+      )}
+
+      <div className="mb-4">
+        <label className="block text-ink2 text-xs font-medium mb-1">Reference wall</label>
+        <select
+          value={referenceWallId}
+          onChange={e => setReferenceWallId(e.target.value)}
+          className="w-full px-3 py-2 rounded-lg border border-surface3 bg-bg text-ink1 text-sm"
+        >
+          <option value="">Select a wall…</option>
+          {walls.map(w => (
+            <option key={w.id} value={w.id}>Wall #{w.id} — stored true bearing {w.facing_bearing_true?.toFixed(1)}°</option>
+          ))}
+        </select>
+      </div>
+
+      {!showManual && rawReading === '' ? (
+        <button
+          type="button"
+          onClick={() => setShowManual(true)}
+          className="text-ink3 text-xs underline mb-4 block"
+        >
+          ya reading manually type karo
+        </button>
+      ) : (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-ink2 text-xs font-medium">Raw on-site compass reading (deg)</label>
+            <button
+              type="button"
+              onClick={() => { setShowManual(false); setRawReading('') }}
+              className="text-ink3 text-xs hover:underline"
+            >
+              Hide
+            </button>
+          </div>
           <input
             type="number"
             step="0.1"
@@ -94,7 +129,7 @@ export default function CalibrationWorkflow() {
             placeholder="e.g. 178.8"
           />
         </div>
-      </div>
+      )}
 
       {previewOffset !== null && (
         <div className="mb-4 px-4 py-3 rounded-lg bg-surface2 border border-surface3">
