@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store/useStore'
+import AutoTrueNorthWizard from './AutoTrueNorthWizard'
 
 // Mirrors VastuGeometryMath::calibrateOffset (backend/services/VastuGeometryMath.php)
 // exactly, for a client-side "Step 3" preview before the user commits by
@@ -31,6 +32,7 @@ export default function CalibrationWorkflow() {
   const [useCrossCheck, setUseCrossCheck] = useState(false)
   const [secondWallId, setSecondWallId] = useState('')
   const [secondRawReading, setSecondRawReading] = useState('')
+  const [wizardOpen, setWizardOpen] = useState(false)
 
   const referenceWall = walls.find(w => String(w.id) === String(referenceWallId))
 
@@ -84,7 +86,16 @@ export default function CalibrationWorkflow() {
           </select>
         </div>
         <div>
-          <label className="block text-ink2 text-xs font-medium mb-1">Step 2 — Raw on-site compass reading (deg)</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-ink2 text-xs font-medium">Step 2 — Raw on-site compass reading (deg)</label>
+            <button
+              type="button"
+              onClick={() => setWizardOpen(true)}
+              className="text-brand text-xs font-medium hover:underline"
+            >
+              🧭 Auto-detect
+            </button>
+          </div>
           <input
             type="number"
             step="0.1"
@@ -95,6 +106,13 @@ export default function CalibrationWorkflow() {
           />
         </div>
       </div>
+
+      {wizardOpen && (
+        <AutoTrueNorthWizard
+          onClose={() => setWizardOpen(false)}
+          onApply={(bearing) => setRawReading(bearing.toFixed(2))}
+        />
+      )}
 
       {previewOffset !== null && (
         <div className="mb-4 px-4 py-3 rounded-lg bg-surface2 border border-surface3">
